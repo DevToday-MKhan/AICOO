@@ -17,17 +17,22 @@ function Chat() {
       const res = await fetch("http://localhost:3000/api/gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        // FIXED: Backend expects { prompt }
+        body: JSON.stringify({ prompt: input }),
       });
 
       const data = await res.json();
 
-      const aiMessage = { role: "assistant", content: data.reply };
+      // FIXED: Backend responds with { answer }
+      const aiMessage = { role: "assistant", content: data.answer };
       setMessages((prev) => [...prev, aiMessage]);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Error: Unable to connect to AI COO." },
+        {
+          role: "assistant",
+          content: "Error: Unable to connect to AI COO.",
+        },
       ]);
     }
 
