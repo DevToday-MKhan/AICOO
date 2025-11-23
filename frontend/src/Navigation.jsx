@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const sidebarStyle = {
   display: "flex",
@@ -10,14 +11,25 @@ const sidebarStyle = {
 
 const linkStyle = {
   cursor: "pointer",
+  textDecoration: "none",
+  color: "inherit",
 };
 
-const Navigation = ({ onNavigate }) => {
+const Navigation = () => {
   return (
     <div style={sidebarStyle}>
-      <a style={linkStyle} onClick={() => onNavigate("Dashboard")}>Dashboard</a>
-      <a style={linkStyle} onClick={() => onNavigate("Settings")}>Settings</a>
-      <a style={linkStyle} onClick={() => onNavigate("Webhooks")}>Webhooks</a>
+      <li>
+        <Link to="/dashboard" style={linkStyle}>Dashboard</Link>
+      </li>
+      <li>
+        <Link to="/settings" style={linkStyle}>Settings</Link>
+      </li>
+      <li>
+        <Link to="/webhooks" style={linkStyle}>Webhooks</Link>
+      </li>
+      <li>
+        <Link to="/chat" style={linkStyle}>AI COO Chat</Link>
+      </li>
     </div>
   );
 };
