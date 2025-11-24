@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { colors, spacing, borderRadius, shadows, typography } from "../styles/theme";
+import { getColors, spacing, borderRadius, shadows, typography, animations, transitions } from "../styles/theme";
 import { LoadingDots } from "../components/LoadingSpinner";
 
 function Chat() {
@@ -21,6 +21,10 @@ I analyze operations, optimize logistics, monitor system health, and provide str
 
 **Quick Commands:**
 \`/assign 12345\` — Assign delivery for order
+\`/analytics\` — View daily analytics snapshot
+\`/summary\` — Daily performance summary
+\`/trends\` — 7-day trend analysis
+\`/predict\` — Tomorrow's predictions
 \`/memory\` — View AICOO memory & learning data
 \`health\` — Check system status
 \`analyze orders\` — Review recent order trends
@@ -46,6 +50,9 @@ How can I help optimize your operations today?`
       
       // Check for /memory command
       const memoryMatch = userInput.match(/^\/memory$/i);
+      
+      // Check for analytics commands
+      const analyticsMatch = userInput.match(/^\/(analytics|summary|trends|predict)$/i);
       
       if (assignMatch) {
         const orderId = assignMatch[1];
@@ -102,7 +109,76 @@ How can I help optimize your operations today?`
           content: `🧠 **AICOO Memory Snapshot**\n\n**Recent Observations:**\n${obsText}\n\n**Recent Deliveries:**\n${delsText}\n\n**Analytics:**\n• Total Orders: ${memory.analytics.totalOrders}\n• Total Deliveries: ${memory.analytics.totalDeliveries}\n• Avg Delivery Price: $${memory.analytics.avgDeliveryPrice}\n• Most Used Service: ${memory.analytics.commonService || "N/A"}`
         };
         setMessages((prev) => [...prev, aiMessage]);
+      } else if (analyticsMatch) {
+        const command = analyticsMatch[1].toLowerCase();
+        
+        if (command === "analytics" || command === "summary") {
+          const res = await fetch("/api/analytics/daily");
+          const data = await res.json();
+          
+          const warnings = data.warnings && data.warnings.length > 0
+            ? `\n\n⚠️ **Warnings:**\n${data.warnings.map(w => `• ${w}`).join('\n')}`
+            : '';
+          
+          const recs = data.recommendations && data.recommendations.length > 0
+            ? `\n\n💡 **Recommendations:**\n${data.recommendations.map(r => `• ${r}`).join('\n')}`
+            : '';
+          
+          const aiMessage = {
+            role: "assistant",
+            content: `📊 **Daily Analytics Snapshot**\n\n**Today's Performance:**\n• Orders: ${data.orders?.today || 0}\n• Deliveries: ${data.deliveries?.today || 0}\n• Avg Cost: $${data.deliveries?.avgCost?.toFixed(2) || '0.00'}\n• Efficiency: ${data.efficiency || 100}%${warnings}${recs}`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else if (command === "trends") {
+          const res = await fetch("/api/analytics/trends");
+          const data = await res.json();
+          
+          const trendText = data.last7Days && data.last7Days.length > 0
+            ? data.last7Days.slice(0, 3).map(d => 
+                `• ${new Date(d.date).toLocaleDateString()}: ${d.orders} orders, $${d.cost?.toFixed(2)}`
+              ).join('\n')
+            : 'No trend data available';
+          
+          const aiMessage = {
+            role: "assistant",
+            content: `📈 **7-Day Trends**\n\n**Trend Direction:** ${data.trend || 'stable'}\n\n**Recent Days:**\n${trendText}\n\nUse the Dashboard for complete visualization.`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else if (command === "predict") {
+          const res = await fetch("/api/analytics");
+          const data = await res.json();
+          const pred = data.predictions;
+          
+          const surgeTxt = pred?.surgeWarnings && pred.surgeWarnings.length > 0
+            ? `\n\n⚠️ **Surge Warnings:**\n${pred.surgeWarnings.map(s => `• ${s}`).join('\n')}`
+            : '';
+          
+          const aiMessage = {
+            role: "assistant",
+            content: `🔮 **Tomorrow's Predictions**\n\n• Predicted Cost: $${pred?.tomorrowCost?.toFixed(2) || '0.00'}\n• Predicted Orders: ${pred?.tomorrowOrders || 0}\n• Confidence: ${pred?.confidence || 'low'}\n• Trend: ${pred?.trend || 'stable'}${surgeTxt}`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        }
       } else {
+        // Fetch analytics insights for context injection
+        let analyticsContext = "";
+        try {
+          const analyticsRes = await fetch("/api/analytics/daily");
+          const analytics = await analyticsRes.json();
+          
+          if (analytics) {
+            analyticsContext = `\n\n[AICOO Intelligence Context]
+Orders Today: ${analytics.orders?.today || 0}
+Deliveries: ${analytics.deliveries?.today || 0}
+Avg Cost: $${analytics.deliveries?.avgCost?.toFixed(2) || '0.00'}
+Efficiency: ${analytics.efficiency || 100}%
+${analytics.warnings && analytics.warnings.length > 0 ? `Warnings: ${analytics.warnings.join('; ')}` : ''}
+`;
+          }
+        } catch (e) {
+          console.warn("Failed to fetch analytics context:", e);
+        }
+        
         // Fetch recent memory for context injection
         const memoryRes = await fetch("/api/memory");
         const memory = await memoryRes.json();
@@ -112,11 +188,11 @@ How can I help optimize your operations today?`
           ? `\n\nRecent System Activity:\n${recentContext.map(o => `- ${o.type} at ${new Date(o.timestamp).toLocaleTimeString()}`).join("\n")}`
           : "";
         
-        // Normal GPT chat with memory context
+        // Normal GPT chat with memory + analytics context
         const res = await fetch("/api/gpt", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: userInput }),
+          body: JSON.stringify({ prompt: userInput + analyticsContext + contextString }),
         });
 
         if (!res.ok) {
@@ -143,32 +219,90 @@ How can I help optimize your operations today?`
 
   return (
     <div style={styles.container}>
+      <style>
+        {animations.slideDown}
+        {animations.slideUp}
+        {animations.pulse}
+        {animations.fadeIn}
+        {`
+          .chat-message:hover {
+            transform: translateY(-2px);
+            box-shadow: ${shadows.lg};
+          }
+          .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: ${shadows.glow};
+          }
+          .send-button:active {
+            transform: scale(0.98);
+          }
+          .send-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+          }
+          .send-button:active::before {
+            width: 300px;
+            height: 300px;
+          }
+          .chat-input:focus {
+            border-color: ${getColors().primary};
+            box-shadow: ${shadows.glow};
+          }
+          .header-bg {
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+          }
+          @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
+
       <div style={styles.header}>
-        <div>
-          <h1 style={{margin: 0, fontSize: typography.xxxl}}>AICOO™</h1>
-          <p style={{margin: `${spacing.sm} 0 0 0`, color: colors.white, fontSize: typography.sm, opacity: 0.9}}>
+        <div className="header-bg"></div>
+        <div style={{position: "relative", zIndex: 1}}>
+          <h1 style={{margin: 0, fontSize: typography.xxxl, textShadow: "0 2px 10px rgba(0,0,0,0.2)"}}>AICOO™</h1>
+          <p style={{margin: `${spacing.sm} 0 0 0`, color: "white", fontSize: typography.sm, opacity: 0.95}}>
             AI Chief Operating Officer — Enterprise Operational Intelligence
           </p>
         </div>
         <div style={{
           padding: `${spacing.md} ${spacing.lg}`,
-          backgroundColor: "rgba(255,255,255,0.2)",
+          background: "rgba(255,255,255,0.15)",
           backdropFilter: "blur(10px)",
-          border: `1px solid rgba(255,255,255,0.3)`,
-          borderRadius: borderRadius.md,
+          border: `1px solid rgba(255,255,255,0.25)`,
+          borderRadius: "10px",
           fontSize: typography.sm,
-          color: colors.white,
+          color: "white",
           fontWeight: typography.medium,
+          boxShadow: shadows.md,
+          position: "relative",
+          zIndex: 1
         }}>
           <kbd style={{
             padding: `${spacing.xs} ${spacing.sm}`,
-            backgroundColor: "rgba(255,255,255,0.2)",
+            background: "rgba(255,255,255,0.2)",
             border: `1px solid rgba(255,255,255,0.3)`,
-            borderRadius: borderRadius.sm,
+            borderRadius: "6px",
             fontFamily: "monospace",
             fontSize: typography.xs,
             marginLeft: spacing.xs,
             marginRight: spacing.xs,
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
           }}>Ctrl+K</kbd> Command Palette ⚡
         </div>
       </div>
@@ -177,14 +311,12 @@ How can I help optimize your operations today?`
         {messages.map((msg, index) => (
           <div
             key={index}
+            className="chat-message"
             style={{
               ...styles.message,
-              alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-              background: msg.role === "user" ? colors.ctBlueLight : colors.white,
-              border: msg.role === "user" ? `1px solid ${colors.ctBlue}` : `1px solid ${colors.gray300}`,
+              ...(msg.role === "user" ? styles.userMessage : styles.assistantMessage),
+              alignSelf: msg.role === "user" ? "flex-end" : "flex-start"
             }}
-            onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-            onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
           >
             {msg.content}
           </div>
@@ -192,28 +324,27 @@ How can I help optimize your operations today?`
 
         {loading && (
           <div style={styles.typing}>
-            <LoadingDots color={colors.purple} /> AICOO is thinking...
+            <LoadingDots color={getColors().purple} /> AICOO is thinking...
           </div>
         )}
       </div>
 
       <div style={styles.inputRow}>
         <input
+          className="chat-input"
           style={styles.input}
           value={input}
-          placeholder="Ask AICOO anything about your store..."
+          placeholder="Ask AICOO anything... (e.g., /assign 123, /analytics, or any question)"
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-          onFocus={(e) => e.target.style.borderColor = colors.primary}
-          onBlur={(e) => e.target.style.borderColor = colors.gray300}
         />
         <button 
+          className="send-button"
           style={styles.button} 
           onClick={sendMessage}
-          onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
-          onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
+          disabled={loading || !input.trim()}
         >
-          Send
+          {loading ? "⏳" : "Send"} ✨
         </button>
       </div>
     </div>
@@ -224,79 +355,106 @@ const styles = {
   container: { 
     padding: spacing.xl, 
     maxWidth: "1000px", 
-    margin: "0 auto" 
+    margin: "0 auto",
+    position: "relative"
   },
   header: { 
     fontSize: typography.xxxl, 
     fontWeight: typography.bold, 
     marginBottom: spacing.xxl,
     padding: spacing.xl,
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    color: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.lg,
+    background: getColors().primaryGradient,
+    color: "white",
+    borderRadius: "16px",
+    boxShadow: shadows.xl,
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center"
+    alignItems: "center",
+    position: "relative",
+    overflow: "hidden",
+    animation: "slideDown 0.5s ease-out"
   },
   chatBox: {
-    border: `1px solid ${colors.gray300}`,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
+    border: `1px solid ${getColors().borderColor}`,
+    borderRadius: "16px",
+    padding: spacing.xl,
     height: "65vh",
     overflowY: "auto",
     display: "flex",
     flexDirection: "column",
-    gap: spacing.md,
-    background: colors.gray50,
-    boxShadow: shadows.md,
+    gap: spacing.lg,
+    background: `linear-gradient(135deg, ${getColors().background} 0%, ${getColors().gray50} 100%)`,
+    boxShadow: shadows.lg,
+    position: "relative"
   },
   message: {
     maxWidth: "70%",
     padding: spacing.lg,
-    borderRadius: borderRadius.md,
+    borderRadius: "12px",
     fontSize: typography.base,
     lineHeight: 1.7,
     whiteSpace: "pre-wrap",
-    boxShadow: shadows.sm,
-    transition: "transform 0.2s ease",
+    boxShadow: shadows.md,
+    transition: `all ${transitions.normal} ${transitions.easing}`,
+    animation: "slideUp 0.3s ease-out"
+  },
+  userMessage: {
+    background: getColors().primaryGradient,
+    color: "white",
+    borderBottomRightRadius: "4px"
+  },
+  assistantMessage: {
+    background: getColors().cardBg,
+    color: getColors().textPrimary,
+    border: `1px solid ${getColors().borderColor}`,
+    borderBottomLeftRadius: "4px"
   },
   typing: {
     fontStyle: "italic",
-    opacity: 0.7,
+    opacity: 0.9,
     fontSize: typography.base,
-    color: colors.textSecondary,
+    color: getColors().textSecondary,
     display: "flex",
     alignItems: "center",
     gap: spacing.sm,
-    padding: spacing.md,
+    padding: spacing.lg,
+    background: getColors().cardBg,
+    borderRadius: "12px",
+    border: `1px solid ${getColors().borderColor}`,
+    maxWidth: "150px",
+    animation: "pulse 1.5s ease-in-out infinite"
   },
   inputRow: {
     marginTop: spacing.lg,
     display: "flex",
     gap: spacing.md,
+    animation: "slideUp 0.6s ease-out"
   },
   input: {
     flex: 1,
     padding: spacing.lg,
-    borderRadius: borderRadius.md,
-    border: `2px solid ${colors.gray300}`,
+    borderRadius: "12px",
+    border: `2px solid ${getColors().borderColor}`,
     fontSize: typography.base,
     fontFamily: "system-ui, -apple-system, sans-serif",
     outline: "none",
-    transition: "border-color 0.2s ease",
+    transition: `all ${transitions.normal} ${transitions.easing}`,
+    background: getColors().cardBg,
+    color: getColors().textPrimary
   },
   button: {
     padding: `${spacing.lg} ${spacing.xxl}`,
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    color: colors.white,
+    background: getColors().primaryGradient,
+    color: "white",
     border: "none",
-    borderRadius: borderRadius.md,
+    borderRadius: "12px",
     cursor: "pointer",
     fontWeight: typography.semibold,
     fontSize: typography.base,
-    transition: "all 0.2s ease",
+    transition: `all ${transitions.normal} ${transitions.spring}`,
     boxShadow: shadows.md,
+    position: "relative",
+    overflow: "hidden"
   }
 };
 

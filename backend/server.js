@@ -11,6 +11,8 @@ import express from "express";
 import cors from "cors";
 import fs from "fs";
 import path from "path";
+import http from "http";
+import { Server as SocketIOServer } from "socket.io";
 import { fileURLToPath } from "url";
 import { getEvents, recordEvent, verifyShopifyWebhook, saveShopifyOrder, getLatestOrder } from "./webhooks.js";
 import { getSettings, updateSettings } from "./settings.js";
@@ -23,6 +25,8 @@ import { assignDelivery, getDeliveryHistory, getLatestDelivery } from "./deliver
 import { exportAllData, exportZipped, getStorageHealth } from "./admin/backup.js";
 import * as Memory from "./memory.js";
 import * as Simulator from "./simulator.js";
+import * as Recommendations from "./recommendations.js";
+import * as Analytics from "./analytics.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,6 +64,25 @@ const logError = (error, context = "") => {
 
 // Initialize Express
 const app = express();
+const httpServer = http.createServer(app);
+
+// Initialize Socket.IO with CORS
+export const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    methods: ["GET", "POST"]
+  }
+});
+
+// WebSocket connection handler
+io.on('connection', (socket) => {
+  console.log(`🔌 WebSocket client connected [${socket.id}]`);
+  
+  socket.on('disconnect', () => {
+    console.log(`🔌 WebSocket client disconnected [${socket.id}]`);
+  });
+});
+
 app.use(cors());
 
 // Raw body parser for webhook verification
@@ -448,6 +471,90 @@ app.get("/api/memory", (req, res) => {
   }
 });
 
+// RECOMMENDATIONS ENGINE
+// ---------------------------------------
+app.get("/api/recommendations", (req, res) => {
+  try {
+    const recommendations = Recommendations.getRecommendations();
+    res.json(recommendations);
+  } catch (err) {
+    logError(err, "RECOMMENDATIONS");
+    res.status(500).json({ error: "Failed to generate recommendations" });
+  }
+});
+
+app.get("/api/recommendations/stats", (req, res) => {
+  try {
+    const stats = Recommendations.getRecommendationStats();
+    res.json(stats);
+  } catch (err) {
+    logError(err, "RECOMMENDATION_STATS");
+    res.status(500).json({ error: "Failed to get recommendation stats" });
+  }
+});
+
+// ANALYTICS ENGINE
+// ---------------------------------------
+app.get("/api/analytics", (req, res) => {
+  try {
+    const analytics = Analytics.getAnalytics();
+    res.json(analytics);
+  } catch (err) {
+    logError(err, "ANALYTICS");
+    res.status(500).json({ error: "Failed to get analytics" });
+  }
+});
+
+app.get("/api/analytics/daily", (req, res) => {
+  try {
+    const summary = Analytics.generateSummary();
+    res.json(summary);
+  } catch (err) {
+    logError(err, "ANALYTICS_DAILY");
+    res.status(500).json({ error: "Failed to generate daily summary" });
+  }
+});
+
+app.get("/api/analytics/trends", (req, res) => {
+  try {
+    const trends = Analytics.generateTrends();
+    res.json(trends);
+  } catch (err) {
+    logError(err, "ANALYTICS_TRENDS");
+    res.status(500).json({ error: "Failed to generate trends" });
+  }
+});
+
+app.get("/api/analytics/zip", (req, res) => {
+  try {
+    const zipDistribution = Analytics.generateZIPDistribution();
+    res.json(zipDistribution);
+  } catch (err) {
+    logError(err, "ANALYTICS_ZIP");
+    res.status(500).json({ error: "Failed to generate ZIP distribution" });
+  }
+});
+
+app.post("/api/analytics/compute", (req, res) => {
+  try {
+    const analytics = Analytics.computeAnalytics();
+    res.json(analytics);
+  } catch (err) {
+    logError(err, "ANALYTICS_COMPUTE");
+    res.status(500).json({ error: "Failed to compute analytics" });
+  }
+});
+
+app.delete("/api/analytics", (req, res) => {
+  try {
+    const result = Analytics.clearAnalytics();
+    res.json(result);
+  } catch (err) {
+    logError(err, "ANALYTICS_CLEAR");
+    res.status(500).json({ error: "Failed to clear analytics" });
+  }
+});
+
 app.post("/api/memory/observe", (req, res) => {
   try {
     const { type, data } = req.body;
@@ -667,14 +774,16 @@ if (IS_DEV) {
 }
 
 // ---------------------------------------
-// START SERVER
+// START SERVER (with WebSocket support)
 // ---------------------------------------
-app.listen(3000, () => {
-  console.log("AICOO backend running on port 3000");
+httpServer.listen(3000, () => {
+  console.log("🚀 AICOO backend running on port 3000");
+  console.log("🔌 WebSocket server ready for real-time updates");
 });
 
 // ---------------------------------------
 // EXPORT — MUST BE LAST
 // ---------------------------------------
 export default app;
+
 

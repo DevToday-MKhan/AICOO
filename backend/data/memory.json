@@ -68,11 +68,195 @@
     }
   ],
   "analytics": {
-    "totalOrders": 0,
-    "totalDeliveries": 2,
-    "totalRoutes": 2,
-    "avgDeliveryPrice": "17.63",
-    "commonCarrier": null,
-    "commonService": "FedEx"
+    "timestamp": "2025-11-24T08:07:41.129Z",
+    "summary": {
+      "timestamp": "2025-11-24T08:07:41.128Z",
+      "orders": {
+        "total": 4,
+        "today": 4,
+        "avgValue": 0,
+        "totalValue": 0,
+        "topZIPs": [
+          {
+            "zip": "07102",
+            "count": 2
+          },
+          {
+            "zip": "10003",
+            "count": 1
+          },
+          {
+            "zip": "07501",
+            "count": 1
+          }
+        ]
+      },
+      "deliveries": {
+        "total": 2,
+        "today": 2,
+        "avgCost": 17.63,
+        "totalCost": 35.26,
+        "byService": {
+          "fedex": 2
+        },
+        "byType": {
+          "ride": 0,
+          "courier": 2
+        },
+        "safeModeCount": 0,
+        "safeModeRate": "0.0"
+      },
+      "routes": {
+        "total": 9,
+        "avgDistance": 5.24,
+        "courierPreferred": 3,
+        "ridePreferred": 6,
+        "slaughterhouseUsage": {
+          "Franklin Blvd Poultry": 4,
+          "Paterson Halal Live": 3,
+          "Bayonne Halal": 2
+        }
+      },
+      "warnings": [],
+      "recommendations": [
+        "Focus on 07102 (2 orders)",
+        "Avg delivery cost $17.63 - explore bulk discounts"
+      ],
+      "efficiency": 100
+    },
+    "predictions": {
+      "tomorrowCost": 0,
+      "tomorrowOrders": 0,
+      "surgeWarnings": [],
+      "confidence": "low"
+    },
+    "zipDistribution": [
+      {
+        "zip": "10001",
+        "orders": 0,
+        "deliveries": 2,
+        "totalCost": 35.26,
+        "hotness": 2,
+        "avgCost": 17.63
+      },
+      {
+        "zip": "07102",
+        "orders": 2,
+        "deliveries": 0,
+        "totalCost": 0,
+        "hotness": 2,
+        "avgCost": 0
+      },
+      {
+        "zip": "10003",
+        "orders": 1,
+        "deliveries": 0,
+        "totalCost": 0,
+        "hotness": 1,
+        "avgCost": 0
+      },
+      {
+        "zip": "07501",
+        "orders": 1,
+        "deliveries": 0,
+        "totalCost": 0,
+        "hotness": 1,
+        "avgCost": 0
+      }
+    ],
+    "courierInsights": {
+      "FedEx": {
+        "count": 0,
+        "totalCost": 0,
+        "avgCost": 0,
+        "avgDays": 0
+      },
+      "UPS": {
+        "count": 0,
+        "totalCost": 0,
+        "avgCost": 0,
+        "avgDays": 0
+      },
+      "DHL": {
+        "count": 0,
+        "totalCost": 0,
+        "avgCost": 0,
+        "avgDays": 0
+      }
+    },
+    "rideInsights": {
+      "Uber": {
+        "count": 0,
+        "totalCost": 0,
+        "avgCost": 0,
+        "avgSurge": 0
+      },
+      "Lyft": {
+        "count": 0,
+        "totalCost": 0,
+        "avgCost": 0,
+        "avgSurge": 0
+      }
+    },
+    "trends": {
+      "last7Days": [
+        {
+          "date": "2025-11-18",
+          "orders": 0,
+          "deliveries": 0,
+          "cost": 0,
+          "avgCost": 0
+        },
+        {
+          "date": "2025-11-19",
+          "orders": 0,
+          "deliveries": 0,
+          "cost": 0,
+          "avgCost": 0
+        },
+        {
+          "date": "2025-11-20",
+          "orders": 0,
+          "deliveries": 0,
+          "cost": 0,
+          "avgCost": 0
+        },
+        {
+          "date": "2025-11-21",
+          "orders": 0,
+          "deliveries": 0,
+          "cost": 0,
+          "avgCost": 0
+        },
+        {
+          "date": "2025-11-22",
+          "orders": 0,
+          "deliveries": 0,
+          "cost": 0,
+          "avgCost": 0
+        },
+        {
+          "date": "2025-11-23",
+          "orders": 0,
+          "deliveries": 0,
+          "cost": 0,
+          "avgCost": 0
+        },
+        {
+          "date": "2025-11-24",
+          "orders": 4,
+          "deliveries": 2,
+          "cost": 35.26,
+          "avgCost": 17.63
+        }
+      ],
+      "trend": "increasing"
+    },
+    "hotspots": [
+      "10001",
+      "07102",
+      "10003",
+      "07501"
+    ]
   }
 }

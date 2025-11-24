@@ -48,6 +48,13 @@ function saveDelivery(delivery) {
   
   fs.writeFileSync(DELIVERIES_PATH, JSON.stringify(trimmed, null, 2));
   
+  // Emit real-time delivery notification via WebSocket
+  import('./server.js').then(({ io }) => {
+    io.emit('delivery:assigned', deliveryRecord);
+  }).catch(() => {
+    // Socket.io not ready yet
+  });
+  
   return deliveryRecord;
 }
 

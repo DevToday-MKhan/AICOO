@@ -204,6 +204,17 @@ export function getAnalytics() {
   return memory.analytics;
 }
 
+// Update analytics (called after routing, delivery, simulation, webhook)
+export async function updateAnalytics() {
+  try {
+    const { computeAnalytics } = await import('./analytics.js');
+    return computeAnalytics();
+  } catch (err) {
+    console.error('Analytics update failed:', err.message);
+    return null;
+  }
+}
+
 // Clear all memory (admin only)
 export function clearMemory() {
   const freshMemory = {

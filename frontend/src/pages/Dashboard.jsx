@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { colors, spacing, borderRadius, shadows, typography, components } from "../styles/theme";
 import LoadingSpinner from "../components/LoadingSpinner";
+import ExportButton from "../components/ExportButton";
+import RecentActivityFeed from "../components/RecentActivityFeed";
+import AnalyticsDashboard from "../components/AnalyticsDashboard";
+import IntelligenceDashboard from "../components/IntelligenceDashboard";
+import AdvancedFilter from "../components/AdvancedFilter";
+import SmartRecommendations from "../components/SmartRecommendations";
 
 const sectionStyle = {
   ...components.card,
@@ -48,6 +54,7 @@ const getEventTag = (eventType) => {
 
 const Dashboard = () => {
   const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [settings, setSettings] = useState(null);
   const [courierHistory, setCourierHistory] = useState([]);
@@ -64,6 +71,11 @@ const Dashboard = () => {
   const [showAllOrders, setShowAllOrders] = useState(false);
   const [showAllDeliveries, setShowAllDeliveries] = useState(false);
   const [showAllRoutes, setShowAllRoutes] = useState(false);
+
+  // Initialize filtered events when events load
+  useEffect(() => {
+    setFilteredEvents(events);
+  }, [events]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -163,8 +175,6 @@ const Dashboard = () => {
     );
   }
 
-  const displayedEvents = showAllEvents ? events : events.slice(-5);
-
   return (
     <div style={{ padding: spacing.xl, maxWidth: "1400px", margin: "0 auto" }}>
       <div style={{
@@ -223,6 +233,29 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Recent Activity Feed */}
+      <div style={sectionStyle}>
+        <h3 style={headingStyle}>Recent Activity</h3>
+        <RecentActivityFeed />
+      </div>
+
+      {/* Smart Recommendations */}
+      <div style={sectionStyle}>
+        <SmartRecommendations />
+      </div>
+
+      {/* AICOO Intelligence Layer */}
+      <div style={sectionStyle}>
+        <h3 style={headingStyle}>🧠 AICOO Intelligence Layer</h3>
+        <IntelligenceDashboard />
+      </div>
+
+      {/* Analytics Dashboard */}
+      <div style={sectionStyle}>
+        <h3 style={headingStyle}>📊 Analytics & Insights</h3>
+        <AnalyticsDashboard />
+      </div>
+
       {/* Events Section */}
       <div style={sectionStyle}>
         <h3 style={headingStyle}>
@@ -235,15 +268,25 @@ const Dashboard = () => {
           >
             {showAllEvents ? "Show Less" : "Show More"}
           </button>
+          <ExportButton data={filteredEvents} filename="aicoo-events" format="json" label="JSON" />
+          <ExportButton data={filteredEvents} filename="aicoo-events" format="csv" label="CSV" />
         </h3>
+        
+        {/* Advanced Filter */}
+        <AdvancedFilter 
+          data={events} 
+          onFilterChange={setFilteredEvents}
+          dataType="events"
+        />
+        
         <p style={{ fontSize: typography.base, marginBottom: spacing.md }}>
-          <strong>Total Events:</strong> {events.length}
+          <strong>Total Events:</strong> {filteredEvents.length} {filteredEvents.length !== events.length && `(filtered from ${events.length})`}
         </p>
-        {events.length === 0 ? (
-          <p style={{color: colors.textMuted}}>No events yet.</p>
+        {filteredEvents.length === 0 ? (
+          <p style={{color: colors.textMuted}}>No events match your filters.</p>
         ) : (
           <div>
-            {displayedEvents.map((event, idx) => {
+            {(showAllEvents ? filteredEvents : filteredEvents.slice(-5)).map((event, idx) => {
               const tag = getEventTag(event.event_type);
               const preview = JSON.stringify(event).substring(0, 150);
               const isEven = idx % 2 === 0;

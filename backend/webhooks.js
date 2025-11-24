@@ -47,12 +47,20 @@ export function verifyShopifyWebhook(rawBody, hmacHeader) {
 
 export function recordEvent(event) {
   const events = loadEvents();
-  events.push({
+  const eventRecord = {
     id: Date.now(),
     timestamp: new Date().toISOString(),
     ...event,
-  });
+  };
+  events.push(eventRecord);
   saveEvents(events);
+  
+  // Emit real-time event via WebSocket (async import)
+  import('./server.js').then(({ io }) => {
+    io.emit('event:logged', eventRecord);
+  }).catch(() => {
+    // Socket.io not available yet (during initialization)
+  });
 }
 
 export function getEvents() {
@@ -87,6 +95,13 @@ function saveOrder(order) {
   // Keep only last 20 orders
   const trimmed = orders.slice(-20);
   fs.writeFileSync(ORDERS_PATH, JSON.stringify(trimmed, null, 2), "utf8");
+  
+  // Emit real-time order notification via WebSocket
+  import('./server.js').then(({ io }) => {
+    io.emit('order:created', orderRecord);
+  }).catch(() => {
+    // Socket.io not ready yet
+  });
 }
 
 export function getOrders() {

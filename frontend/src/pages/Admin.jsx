@@ -254,6 +254,70 @@ const Admin = () => {
     setTimeout(() => setMessage(""), 3000);
   };
 
+  const handleRecomputeAnalytics = async () => {
+    try {
+      setMessage("⏳ Recomputing analytics...");
+      const res = await fetch("/api/analytics/compute", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setMessage("✅ Analytics recomputed successfully");
+      } else {
+        setMessage("❌ Failed to recompute analytics");
+      }
+    } catch (err) {
+      setMessage("❌ Error recomputing analytics");
+    }
+
+    setTimeout(() => setMessage(""), 3000);
+  };
+
+  const handleClearAnalytics = async () => {
+    if (!window.confirm("Clear all analytics data? This can be recomputed from existing orders/deliveries.")) {
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/analytics", { method: "DELETE" });
+      if (res.ok) {
+        setMessage("✅ Analytics cleared");
+      } else {
+        setMessage("❌ Failed to clear analytics");
+      }
+    } catch (err) {
+      setMessage("❌ Error clearing analytics");
+    }
+
+    setTimeout(() => setMessage(""), 3000);
+  };
+
+  const handleDownloadAnalytics = async () => {
+    try {
+      const res = await fetch("/api/analytics");
+      if (!res.ok) {
+        setMessage("❌ Failed to fetch analytics");
+        setTimeout(() => setMessage(""), 3000);
+        return;
+      }
+      
+      const data = await res.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `aicoo-analytics-${new Date().toISOString()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      setMessage("✅ Analytics downloaded");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err) {
+      setMessage("❌ Error downloading analytics");
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
   const handleSimulateOrder = async () => {
     try {
       const res = await fetch("/api/simulate/fake-order?zip=10001&weight=5");
@@ -483,6 +547,32 @@ const Admin = () => {
         </button>
         <button style={{...primaryButton, backgroundColor: "#9b59b6", borderColor: "#9b59b6"}} onClick={handleClearMemory}>
           🧠 Clear AICOO Memory
+        </button>
+      </div>
+
+      {/* Analytics Controls */}
+      <div style={sectionStyle}>
+        <h3 style={{...headingStyle, borderColor: "#8b5cf6"}}>📊 AICOO Analytics Intelligence</h3>
+        <p style={{marginBottom: spacing.lg, color: colors.textSecondary}}>
+          Manage analytics computation and export intelligence data.
+        </p>
+        <button 
+          style={{...primaryButton, backgroundColor: "#8b5cf6", borderColor: "#8b5cf6"}} 
+          onClick={handleRecomputeAnalytics}
+        >
+          🔄 Recompute Analytics
+        </button>
+        <button 
+          style={{...dangerButton, backgroundColor: "#f59e0b", borderColor: "#f59e0b"}} 
+          onClick={handleClearAnalytics}
+        >
+          🗑️ Clear Analytics
+        </button>
+        <button 
+          style={successButton} 
+          onClick={handleDownloadAnalytics}
+        >
+          📥 Download Analytics JSON
         </button>
       </div>
 

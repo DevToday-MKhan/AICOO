@@ -2,6 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { colors, spacing, borderRadius, shadows, typography } from "../styles/theme";
 
 const COMMANDS = [
+  // Analytics Commands
+  { name: "analytics", description: "View full AICOO analytics", example: "analytics", category: "Analytics" },
+  { name: "summary", description: "View daily snapshot", example: "summary", category: "Analytics" },
+  { name: "trends", description: "View 7-day trends", example: "trends", category: "Analytics" },
+  { name: "predictions", description: "View tomorrow's predictions", example: "predictions", category: "Analytics" },
+  { name: "hotspots", description: "View ZIP hotspots", example: "hotspots", category: "Analytics" },
+  { name: "recompute analytics", description: "Recompute analytics data", example: "recompute analytics", category: "Analytics" },
+  
   // Simulation Commands
   { name: "simulate <zip> <weight>", description: "Simulate order with fake data", example: "simulate 10001 5", category: "Simulation" },
   { name: "replay <orderId>", description: "Replay existing order", example: "replay 12345", category: "Simulation" },
@@ -33,6 +41,7 @@ const COMMANDS = [
 ];
 
 const CATEGORY_COLORS = {
+  "Analytics": "#8b5cf6",
   "Simulation": colors.purple,
   "Delivery": colors.success,
   "Routing": colors.info,
@@ -115,8 +124,46 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
         return;
       }
 
+      // Analytics commands
+      if (command === "analytics") {
+        const res = await fetch("/api/analytics");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to fetch analytics");
+        setResult({ type: "analytics", data });
+      }
+      else if (command === "summary") {
+        const res = await fetch("/api/analytics/daily");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to fetch summary");
+        setResult({ type: "summary", data });
+      }
+      else if (command === "trends") {
+        const res = await fetch("/api/analytics/trends");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to fetch trends");
+        setResult({ type: "trends", data });
+      }
+      else if (command === "predictions") {
+        const res = await fetch("/api/analytics");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to fetch predictions");
+        setResult({ type: "predictions", data: data.predictions });
+      }
+      else if (command === "hotspots") {
+        const res = await fetch("/api/analytics/zip");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to fetch hotspots");
+        setResult({ type: "hotspots", data });
+      }
+      else if (cmd.toLowerCase().includes("recompute analytics")) {
+        const res = await fetch("/api/analytics/compute", { method: "POST" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to recompute analytics");
+        setResult({ type: "recompute", data });
+      }
+
       // Assign delivery
-      if (command === "assign") {
+      else if (command === "assign") {
         const orderId = parts[1];
         if (!orderId) throw new Error("Usage: assign <orderId>");
         
@@ -420,6 +467,102 @@ function renderResult(result) {
               <div style={{fontSize: "12px", color: "#666", marginTop: "4px"}}>Example: <code>{cmd.example}</code></div>
             </div>
           ))}
+        </div>
+      );
+
+    case "analytics":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#8b5cf6"}}>🧠 AICOO Analytics</h3>
+          <p><strong>Total Orders:</strong> {result.data.summary?.totalOrders || 0}</p>
+          <p><strong>Total Deliveries:</strong> {result.data.summary?.totalDeliveries || 0}</p>
+          <p><strong>Avg Cost:</strong> ${result.data.summary?.avgCost?.toFixed(2) || '0.00'}</p>
+          <p><strong>Predicted Tomorrow:</strong> ${result.data.predictions?.tomorrowCost?.toFixed(2) || '0.00'}</p>
+          <p><strong>Hot ZIPs:</strong> {result.data.zipDistribution?.slice(0, 3).map(z => z.zip).join(', ') || 'None'}</p>
+        </div>
+      );
+
+    case "summary":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#8b5cf6"}}>📊 Daily Snapshot</h3>
+          <p><strong>Orders Today:</strong> {result.data.orders?.today || 0}</p>
+          <p><strong>Deliveries Today:</strong> {result.data.deliveries?.today || 0}</p>
+          <p><strong>Avg Cost:</strong> ${result.data.deliveries?.avgCost?.toFixed(2) || '0.00'}</p>
+          <p><strong>Efficiency:</strong> {result.data.efficiency || 100}%</p>
+          {result.data.warnings && result.data.warnings.length > 0 && (
+            <div style={{marginTop: '12px', padding: '8px', background: '#fef3c7', borderRadius: '4px'}}>
+              <strong>⚠️ Warnings:</strong>
+              <ul style={{margin: '4px 0', paddingLeft: '20px'}}>
+                {result.data.warnings.map((w, i) => <li key={i}>{w}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
+      );
+
+    case "trends":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#8b5cf6"}}>📈 7-Day Trends</h3>
+          <p><strong>Trend Direction:</strong> {result.data.trend || 'stable'}</p>
+          {result.data.last7Days && result.data.last7Days.length > 0 && (
+            <div style={{marginTop: '12px'}}>
+              {result.data.last7Days.slice(0, 3).map((day, i) => (
+                <div key={i} style={{padding: '6px 0', borderBottom: '1px solid #eee'}}>
+                  <strong>{new Date(day.date).toLocaleDateString()}</strong>: {day.orders} orders, ${day.cost?.toFixed(2)}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+
+    case "predictions":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#8b5cf6"}}>🔮 Predictions</h3>
+          <p><strong>Tomorrow Cost:</strong> ${result.data?.tomorrowCost?.toFixed(2) || '0.00'}</p>
+          <p><strong>Tomorrow Orders:</strong> {result.data?.tomorrowOrders || 0}</p>
+          <p><strong>Confidence:</strong> {result.data?.confidence || 'low'}</p>
+          <p><strong>Trend:</strong> {result.data?.trend || 'stable'}</p>
+          {result.data?.surgeWarnings && result.data.surgeWarnings.length > 0 && (
+            <div style={{marginTop: '12px', padding: '8px', background: '#fee', borderRadius: '4px', color: '#c00'}}>
+              <strong>⚠️ Surge Warnings:</strong>
+              <ul style={{margin: '4px 0', paddingLeft: '20px'}}>
+                {result.data.surgeWarnings.map((w, i) => <li key={i}>{w}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
+      );
+
+    case "hotspots":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#8b5cf6"}}>🔥 ZIP Hotspots</h3>
+          {result.data && result.data.length > 0 ? (
+            <div style={{marginTop: '12px'}}>
+              {result.data.slice(0, 5).map((zip, i) => (
+                <div key={i} style={{padding: '8px', marginBottom: '6px', background: '#f9f9f9', borderRadius: '4px'}}>
+                  <strong>{zip.zip}</strong> - {zip.orders} orders, {zip.deliveries} deliveries
+                  <div style={{fontSize: '12px', color: '#666'}}>
+                    Avg Cost: ${zip.avgCost?.toFixed(2)} | Hotness: {zip.hotness}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No hotspots yet. Process more orders to see distribution.</p>
+          )}
+        </div>
+      );
+
+    case "recompute":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#28a745"}}>✅ Analytics Recomputed</h3>
+          <p>Analytics have been successfully recomputed from current data.</p>
         </div>
       );
 
