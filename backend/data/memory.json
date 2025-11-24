@@ -1,0 +1,22 @@
+{
+  "observations": [
+    {
+      "type": "test_observation",
+      "data": {
+        "message": "AICOO memory test"
+      },
+      "timestamp": "2025-11-24T06:45:35.074Z"
+    }
+  ],
+  "orders": [],
+  "routes": [],
+  "deliveries": [],
+  "analytics": {
+    "totalOrders": 0,
+    "totalDeliveries": 0,
+    "totalRoutes": 0,
+    "avgDeliveryPrice": 0,
+    "commonCarrier": null,
+    "commonService": null
+  }
+}

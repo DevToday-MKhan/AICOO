@@ -70,10 +70,18 @@ function loadOrders() {
 
 function saveOrder(order) {
   const orders = loadOrders();
-  orders.push({
+  const orderRecord = {
     id: Date.now(),
     timestamp: new Date().toISOString(),
     ...order,
+  };
+  orders.push(orderRecord);
+  
+  // Record in AICOO memory
+  Memory.addObservation("order_received", {
+    orderId: orderRecord.id,
+    totalPrice: order.total_price,
+    lineItems: order.line_items?.length || 0
   });
   
   // Keep only last 20 orders

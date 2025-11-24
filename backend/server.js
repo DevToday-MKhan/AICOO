@@ -21,6 +21,7 @@ import { getComparisonQuote as getRideQuote, getQuoteHistory as getRideHistory }
 import { getRouteQuote, getRouteHistory } from "./routing.js";
 import { assignDelivery, getDeliveryHistory, getLatestDelivery } from "./delivery.js";
 import { exportAllData, exportZipped, getStorageHealth } from "./admin/backup.js";
+import * as Memory from "./memory.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -430,6 +431,78 @@ app.post("/api/admin/clear-rides", (req, res) => {
     res.json({ status: "ok", message: "Ride history cleared successfully" });
   } catch (err) {
     res.status(500).json({ error: "Failed to clear ride history" });
+  }
+});
+
+// ---------------------------------------
+// MEMORY ENGINE — AICOO LEARNING LAYER
+// ---------------------------------------
+app.get("/api/memory", (req, res) => {
+  try {
+    const memory = Memory.loadMemory();
+    res.json(memory);
+  } catch (err) {
+    logError(err, "MEMORY_LOAD");
+    res.status(500).json({ error: "Failed to load memory" });
+  }
+});
+
+app.post("/api/memory/observe", (req, res) => {
+  try {
+    const { type, data } = req.body;
+    if (!type || !data) {
+      return res.status(400).json({ error: "Missing type or data" });
+    }
+    const observation = Memory.addObservation(type, data);
+    if (IS_DEV) console.log(`🧠 Observation recorded: ${type}`);
+    res.json(observation);
+  } catch (err) {
+    logError(err, "MEMORY_OBSERVE");
+    res.status(500).json({ error: "Failed to record observation" });
+  }
+});
+
+app.post("/api/memory/record-order", (req, res) => {
+  try {
+    const record = Memory.recordOrder(req.body);
+    if (IS_DEV) console.log(`🧠 Order recorded: ${record.orderId}`);
+    res.json(record);
+  } catch (err) {
+    logError(err, "MEMORY_RECORD_ORDER");
+    res.status(500).json({ error: "Failed to record order" });
+  }
+});
+
+app.post("/api/memory/record-delivery", (req, res) => {
+  try {
+    const record = Memory.recordDelivery(req.body);
+    if (IS_DEV) console.log(`🧠 Delivery recorded: ${record.orderId}`);
+    res.json(record);
+  } catch (err) {
+    logError(err, "MEMORY_RECORD_DELIVERY");
+    res.status(500).json({ error: "Failed to record delivery" });
+  }
+});
+
+app.post("/api/memory/record-route", (req, res) => {
+  try {
+    const record = Memory.recordRoute(req.body);
+    if (IS_DEV) console.log(`🧠 Route recorded: ${record.orderId}`);
+    res.json(record);
+  } catch (err) {
+    logError(err, "MEMORY_RECORD_ROUTE");
+    res.status(500).json({ error: "Failed to record route" });
+  }
+});
+
+app.post("/api/admin/clear-memory", (req, res) => {
+  try {
+    Memory.clearMemory();
+    console.log("🗑️  AICOO memory cleared");
+    res.json({ status: "ok", message: "AICOO memory cleared successfully" });
+  } catch (err) {
+    logError(err, "CLEAR_MEMORY");
+    res.status(500).json({ error: "Failed to clear memory" });
   }
 });
 

@@ -236,13 +236,33 @@ const Admin = () => {
         fetch("/api/admin/clear-deliveries", { method: "POST" }),
         fetch("/api/admin/clear-routes", { method: "POST" }),
         fetch("/api/admin/clear-couriers", { method: "POST" }),
-        fetch("/api/admin/clear-rides", { method: "POST" })
+        fetch("/api/admin/clear-rides", { method: "POST" }),
+        fetch("/api/admin/clear-memory", { method: "POST" })
       ]);
 
       setMessage("✅ System reset complete");
       fetchStats();
     } catch (err) {
       setMessage("❌ Reset failed");
+    }
+
+    setTimeout(() => setMessage(""), 3000);
+  };
+
+  const handleClearMemory = async () => {
+    if (!window.confirm("Clear AICOO memory and learning data?")) {
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/admin/clear-memory", { method: "POST" });
+      if (res.ok) {
+        setMessage("✅ AICOO memory cleared");
+      } else {
+        setMessage("❌ Failed to clear memory");
+      }
+    } catch (err) {
+      setMessage("❌ Error clearing memory");
     }
 
     setTimeout(() => setMessage(""), 3000);
@@ -390,13 +410,16 @@ const Admin = () => {
         <button style={primaryButton} onClick={handleRestartBackend}>
           🔄 Restart Backend (Simulated)
         </button>
+        <button style={{...primaryButton, backgroundColor: "#9b59b6", borderColor: "#9b59b6"}} onClick={handleClearMemory}>
+          🧠 Clear AICOO Memory
+        </button>
       </div>
 
       {/* System Reset */}
       <div style={{...sectionStyle, backgroundColor: "#fff5f5", borderColor: "#dc3545"}}>
         <h3 style={headingStyle}>⚠️ Danger Zone</h3>
         <p style={{marginBottom: "20px", color: "#721c24"}}>
-          <strong>Warning:</strong> This will clear ALL data and reset the system to initial state.
+          <strong>Warning:</strong> This will clear ALL data and reset the system to initial state (including AICOO memory).
         </p>
         <button style={dangerButton} onClick={handleReset}>
           🔥 Reset Entire System

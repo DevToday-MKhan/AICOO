@@ -7,6 +7,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import * as Memory from "./memory.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -95,6 +96,11 @@ export function assignDelivery({ orderId, customerZip, weight, routing }) {
     assignment.warning = "Safe mode fallback - routing engine unavailable";
     
     const saved = saveDelivery(assignment);
+    
+    // Record in AICOO memory
+    Memory.recordDelivery(saved);
+    Memory.addObservation("safe_mode_activated", { orderId, reason: "routing_unavailable" });
+    
     console.log(`🛡️  SAFE MODE delivery assigned: Order ${orderId} → LYFT ($7.99)`);
     return saved;
   }
@@ -148,6 +154,10 @@ export function assignDelivery({ orderId, customerZip, weight, routing }) {
 
     // Save assignment to deliveries.json
     const saved = saveDelivery(assignment);
+    
+    // Record in AICOO memory
+    Memory.recordDelivery(saved);
+    
     console.log(`📦 Delivery assigned: Order ${orderId} → ${assignment.method.toUpperCase()} ($${assignment.price})`);
     return saved;
     
@@ -167,6 +177,11 @@ export function assignDelivery({ orderId, customerZip, weight, routing }) {
     assignment.warning = `Safe mode fallback - ${err.message}`;
     
     const saved = saveDelivery(assignment);
+    
+    // Record in AICOO memory
+    Memory.recordDelivery(saved);
+    Memory.addObservation("safe_mode_activated", { orderId, reason: err.message });
+    
     console.log(`🛡️  SAFE MODE delivery assigned: Order ${orderId} → LYFT ($7.99)`);
     return saved;
   }

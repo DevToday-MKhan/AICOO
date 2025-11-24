@@ -64,6 +64,7 @@ const Dashboard = () => {
   const [routeHistory, setRouteHistory] = useState([]);
   const [latestOrder, setLatestOrder] = useState(null);
   const [latestDelivery, setLatestDelivery] = useState(null);
+  const [memory, setMemory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -123,6 +124,12 @@ const Dashboard = () => {
         if (!deliveryRes.ok) throw new Error("Failed to fetch latest delivery");
         const deliveryData = await deliveryRes.json();
         setLatestDelivery(deliveryData);
+
+        // Fetch AICOO memory
+        const memoryRes = await fetch("/api/memory");
+        if (!memoryRes.ok) throw new Error("Failed to fetch memory");
+        const memoryData = await memoryRes.json();
+        setMemory(memoryData);
 
         setLoading(false);
       } catch (error) {
@@ -240,6 +247,77 @@ const Dashboard = () => {
           </ul>
         )}
       </div>
+
+      {/* AICOO Memory Section */}
+      {memory && (
+        <div style={{...sectionStyle, backgroundColor: "#f5f0ff", borderColor: "#9b59b6"}}>
+          <h3 style={{...headingStyle, borderColor: "#9b59b6"}}>
+            🧠 AICOO Memory & Learning
+          </h3>
+          
+          <div style={{marginBottom: "20px"}}>
+            <h4 style={{fontSize: "16px", marginBottom: "12px", color: "#333"}}>Analytics Summary</h4>
+            <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px"}}>
+              <div><strong>Total Orders:</strong> {memory.analytics.totalOrders}</div>
+              <div><strong>Total Deliveries:</strong> {memory.analytics.totalDeliveries}</div>
+              <div><strong>Total Routes:</strong> {memory.analytics.totalRoutes}</div>
+              <div><strong>Avg Delivery Price:</strong> ${memory.analytics.avgDeliveryPrice}</div>
+              <div><strong>Most Used Service:</strong> {memory.analytics.commonService || "N/A"}</div>
+            </div>
+          </div>
+
+          <div style={{marginBottom: "20px"}}>
+            <h4 style={{fontSize: "16px", marginBottom: "12px", color: "#333"}}>Recent Observations</h4>
+            {memory.observations.length === 0 ? (
+              <p style={{color: "#999"}}>No observations yet.</p>
+            ) : (
+              <div>
+                {memory.observations.slice(-5).reverse().map((obs, idx) => (
+                  <div key={idx} style={{
+                    padding: "8px",
+                    marginBottom: "6px",
+                    backgroundColor: "#fff",
+                    borderLeft: "3px solid #9b59b6",
+                    borderRadius: "4px",
+                    fontSize: "13px"
+                  }}>
+                    <strong>{obs.type}</strong>
+                    <span style={{marginLeft: "10px", color: "#666", fontSize: "12px"}}>
+                      {new Date(obs.timestamp).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{marginBottom: "20px"}}>
+            <h4 style={{fontSize: "16px", marginBottom: "12px", color: "#333"}}>Recent Deliveries</h4>
+            {memory.deliveries.length === 0 ? (
+              <p style={{color: "#999"}}>No deliveries recorded yet.</p>
+            ) : (
+              <div>
+                {memory.deliveries.slice(-5).reverse().map((del, idx) => (
+                  <div key={idx} style={{
+                    padding: "8px",
+                    marginBottom: "6px",
+                    backgroundColor: "#fff",
+                    borderRadius: "4px",
+                    fontSize: "13px"
+                  }}>
+                    <strong>Order {del.orderId}:</strong> {del.service} - ${del.price}
+                    {del.safeMode && <span style={{marginLeft: "10px", color: "#dc3545", fontSize: "12px"}}>⚠️ Safe Mode</span>}
+                    <br/>
+                    <span style={{color: "#666", fontSize: "12px"}}>
+                      {new Date(del.timestamp).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Settings Section */}
       <div style={sectionStyle}>

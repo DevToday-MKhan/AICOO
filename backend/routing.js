@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getComparisonQuote as getCourierQuote } from "./courier.js";
 import { getComparisonQuote as getRideQuote } from "./ride.js";
+import * as Memory from "./memory.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -116,6 +117,15 @@ export function getRouteQuote({ customerZip, weight }) {
 
   // Save to history
   saveRoute(result);
+
+  // Record in AICOO memory
+  Memory.recordRoute({
+    orderId: result.orderId || Date.now(),
+    slaughterhouse: result.slaughterhouse,
+    distance: result.slaughterhouse?.distance,
+    duration: result.estimatedMinutes,
+    reason: `${result.bestMethod} selected`
+  });
 
   return result;
 }

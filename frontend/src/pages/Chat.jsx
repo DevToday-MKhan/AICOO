@@ -1,7 +1,31 @@
 import { useState } from "react";
 
 function Chat() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      content: `👋 **I am AICOO™** — your AI Chief Operating Officer.
+
+I analyze operations, optimize logistics, monitor system health, and provide strategic guidance for your business.
+
+**What I can do:**
+• Analyze Shopify orders and webhooks
+• Assign deliveries with /assign [orderID]
+• Compare courier & rideshare pricing
+• Monitor system health and performance
+• Learn from operations with persistent memory
+• Provide operational insights and forecasts
+• Execute admin commands
+
+**Quick Commands:**
+\`/assign 12345\` — Assign delivery for order
+\`/memory\` — View AICOO memory & learning data
+\`health\` — Check system status
+\`analyze orders\` — Review recent order trends
+
+How can I help optimize your operations today?`
+    }
+  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -17,6 +41,9 @@ function Chat() {
     try {
       // Check for /assign command
       const assignMatch = userInput.match(/^\/assign\s+(\d+)/i);
+      
+      // Check for /memory command
+      const memoryMatch = userInput.match(/^\/memory$/i);
       
       if (assignMatch) {
         const orderId = assignMatch[1];
@@ -52,8 +79,38 @@ function Chat() {
           };
           setMessages((prev) => [...prev, aiMessage]);
         }
+      } else if (memoryMatch) {
+        // Show AICOO memory
+        const res = await fetch("/api/memory");
+        const memory = await res.json();
+        
+        const recentObs = memory.observations.slice(-5).reverse();
+        const recentDels = memory.deliveries.slice(-5).reverse();
+        
+        const obsText = recentObs.length > 0
+          ? recentObs.map(o => `• ${o.type} (${new Date(o.timestamp).toLocaleString()})`).join("\n")
+          : "No recent observations";
+        
+        const delsText = recentDels.length > 0
+          ? recentDels.map(d => `• Order ${d.orderId}: ${d.service} - $${d.price}`).join("\n")
+          : "No recent deliveries";
+        
+        const aiMessage = {
+          role: "assistant",
+          content: `🧠 **AICOO Memory Snapshot**\n\n**Recent Observations:**\n${obsText}\n\n**Recent Deliveries:**\n${delsText}\n\n**Analytics:**\n• Total Orders: ${memory.analytics.totalOrders}\n• Total Deliveries: ${memory.analytics.totalDeliveries}\n• Avg Delivery Price: $${memory.analytics.avgDeliveryPrice}\n• Most Used Service: ${memory.analytics.commonService || "N/A"}`
+        };
+        setMessages((prev) => [...prev, aiMessage]);
       } else {
-        // Normal GPT chat
+        // Fetch recent memory for context injection
+        const memoryRes = await fetch("/api/memory");
+        const memory = await memoryRes.json();
+        const recentContext = memory.observations.slice(-5).reverse();
+        
+        const contextString = recentContext.length > 0
+          ? `\n\nRecent System Activity:\n${recentContext.map(o => `- ${o.type} at ${new Date(o.timestamp).toLocaleTimeString()}`).join("\n")}`
+          : "";
+        
+        // Normal GPT chat with memory context
         const res = await fetch("/api/gpt", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -84,7 +141,12 @@ function Chat() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.header}>AICOO Chat</h1>
+      <div style={styles.header}>
+        <h1 style={{margin: 0, fontSize: "28px"}}>AICOO™</h1>
+        <p style={{margin: "8px 0 0 0", color: "#666", fontSize: "14px"}}>
+          AI Chief Operating Officer — Enterprise Operational Intelligence
+        </p>
+      </div>
 
       <div style={styles.chatBox}>
         {messages.map((msg, index) => (
@@ -124,50 +186,68 @@ function Chat() {
 }
 
 const styles = {
-  container: { padding: 20, maxWidth: 800, margin: "0 auto" },
-  header: { fontSize: 28, fontWeight: "bold", marginBottom: 20 },
+  container: { padding: 20, maxWidth: 900, margin: "0 auto" },
+  header: { 
+    fontSize: 28, 
+    fontWeight: "bold", 
+    marginBottom: 24,
+    padding: "20px",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    color: "#fff",
+    borderRadius: "8px",
+    boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+  },
   chatBox: {
-    border: "1px solid #ccc",
+    border: "1px solid #ddd",
     borderRadius: 8,
-    padding: 10,
+    padding: 16,
     height: "60vh",
     overflowY: "scroll",
     display: "flex",
     flexDirection: "column",
-    gap: 10,
-    background: "#fff",
+    gap: 12,
+    background: "#f9fafb",
   },
   message: {
-    maxWidth: "70%",
-    padding: 10,
-    borderRadius: 6,
-    fontSize: 15,
+    maxWidth: "75%",
+    padding: 12,
+    borderRadius: 8,
+    fontSize: 14,
+    lineHeight: 1.6,
+    whiteSpace: "pre-wrap",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.08)"
   },
   typing: {
     fontStyle: "italic",
-    opacity: 0.7,
+    opacity: 0.6,
+    fontSize: 14,
+    color: "#666"
   },
   inputRow: {
-    marginTop: 15,
+    marginTop: 16,
     display: "flex",
     gap: 10,
   },
   input: {
     flex: 1,
-    padding: 12,
-    borderRadius: 6,
-    border: "1px solid #ccc",
+    padding: 14,
+    borderRadius: 8,
+    border: "1px solid #ddd",
     fontSize: 15,
+    fontFamily: "system-ui, -apple-system, sans-serif"
   },
   button: {
-    padding: "12px 20px",
-    background: "#4A8FE7",
+    padding: "14px 28px",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     color: "#fff",
     border: "none",
-    borderRadius: 6,
+    borderRadius: 8,
     cursor: "pointer",
-    fontWeight: "bold",
-  },
+    fontWeight: "600",
+    fontSize: "15px",
+    transition: "transform 0.2s",
+    boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+  }
 };
 
 export default Chat;
