@@ -14,7 +14,7 @@ function Chat() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/api/gpt", {
+      const res = await fetch("/api/gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // FIXED: Backend expects { prompt }

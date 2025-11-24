@@ -8,6 +8,7 @@ dotenv.config();
 
 // Core imports
 import express from "express";
+import cors from "cors";
 import Webhooks, { events } from "./webhooks.js";
 import Settings from "./settings.js";
 import Suggestions from "./suggestions.js";
@@ -15,6 +16,7 @@ import { askAICOO } from "./gpt.js";
 
 // Initialize Express
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // ---------------------------------------
