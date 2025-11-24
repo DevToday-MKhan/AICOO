@@ -1,0 +1,45 @@
+{
+  "id": 1111222233334444,
+  "order_number": 1027,
+  "email": "bulk@example.com",
+  "created_at": "2025-11-24T14:00:00-05:00",
+  "total_price": "399.99",
+  "currency": "USD",
+  "financial_status": "paid",
+  "fulfillment_status": null,
+  "shipping_address": {
+    "first_name": "Restaurant",
+    "last_name": "Buyer",
+    "address1": "789 Broadway",
+    "city": "New York",
+    "province": "New York",
+    "country": "United States",
+    "zip": "10003",
+    "phone": "555-555-5555"
+  },
+  "line_items": [
+    {
+      "id": 11112222333344445,
+      "product_id": 788032119674292903,
+      "variant_id": 39072859,
+      "title": "Bulk Chicken Order",
+      "quantity": 20,
+      "price": "19.99",
+      "grams": 4536,
+      "sku": "CHICKEN-BULK-10LB",
+      "variant_title": "10 lbs",
+      "vendor": "ChickenToday",
+      "fulfillment_service": "manual",
+      "requires_shipping": true,
+      "taxable": true,
+      "name": "Bulk Chicken Order - 10 lbs"
+    }
+  ],
+  "customer": {
+    "id": 207119553,
+    "email": "bulk@example.com",
+    "first_name": "Restaurant",
+    "last_name": "Buyer",
+    "phone": "555-555-5555"
+  }
+}

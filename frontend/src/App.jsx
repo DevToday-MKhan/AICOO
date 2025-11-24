@@ -2,10 +2,11 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Navigation from "./Navigation.jsx";
-import Dashboard from "./dashboard.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 import Settings from "./settings.jsx";
 import Webhooks from "./webhooks.jsx";
 import Chat from "./pages/Chat.jsx";
+import Admin from "./pages/Admin.jsx";
 
 const App = () => (
   <div style={{ display: "flex", height: "100vh" }}>
@@ -17,6 +18,7 @@ const App = () => (
         <Route path="/settings" element={<Settings />} />
         <Route path="/webhooks" element={<Webhooks />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </div>
   </div>

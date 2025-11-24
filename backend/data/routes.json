@@ -1,0 +1,324 @@
+[
+  {
+    "id": 1763961656081,
+    "timestamp": "2025-11-24T05:20:56.081Z",
+    "customerZip": "10001",
+    "weight": 8,
+    "slaughterhouse": {
+      "name": "Franklin Blvd Poultry",
+      "zip": "08873",
+      "distance": 11.28
+    },
+    "courier": {
+      "fedex": {
+        "carrier": "FedEx",
+        "price": 20.03,
+        "estimatedDays": 2
+      },
+      "ups": {
+        "carrier": "UPS",
+        "price": 20.35,
+        "estimatedDays": 3
+      },
+      "dhl": {
+        "carrier": "DHL",
+        "price": 22.2,
+        "estimatedDays": 4
+      },
+      "best": "FedEx"
+    },
+    "ride": {
+      "uber": {
+        "service": "Uber",
+        "price": 58.1,
+        "estimatedMinutes": 23,
+        "surgeMultiplier": 1.75
+      },
+      "lyft": {
+        "service": "Lyft",
+        "price": 47.89,
+        "estimatedMinutes": 23,
+        "surgeMultiplier": 1.37
+      },
+      "best": "Lyft"
+    },
+    "bestMethod": "courier",
+    "recommendation": "Use FedEx courier ($20.03)"
+  },
+  {
+    "id": 1763961670527,
+    "timestamp": "2025-11-24T05:21:10.527Z",
+    "customerZip": "07500",
+    "weight": 3,
+    "slaughterhouse": {
+      "name": "Paterson Halal Live",
+      "zip": "07501",
+      "distance": 0.01
+    },
+    "courier": {
+      "fedex": {
+        "carrier": "FedEx",
+        "price": 14.9,
+        "estimatedDays": 2
+      },
+      "ups": {
+        "carrier": "UPS",
+        "price": 15.25,
+        "estimatedDays": 3
+      },
+      "dhl": {
+        "carrier": "DHL",
+        "price": 17.05,
+        "estimatedDays": 4
+      },
+      "best": "FedEx"
+    },
+    "ride": {
+      "uber": {
+        "service": "Uber",
+        "price": 9.9,
+        "estimatedMinutes": 1,
+        "surgeMultiplier": 1.97
+      },
+      "lyft": {
+        "service": "Lyft",
+        "price": 8.42,
+        "estimatedMinutes": 1,
+        "surgeMultiplier": 1.86
+      },
+      "best": "Lyft"
+    },
+    "bestMethod": "ride",
+    "recommendation": "Use Lyft ride-sharing ($8.42)"
+  },
+  {
+    "id": 1763961670540,
+    "timestamp": "2025-11-24T05:21:10.540Z",
+    "customerZip": "07500",
+    "weight": 3,
+    "slaughterhouse": {
+      "name": "Paterson Halal Live",
+      "zip": "07501",
+      "distance": 0.01
+    },
+    "courier": {
+      "fedex": {
+        "carrier": "FedEx",
+        "price": 14.9,
+        "estimatedDays": 2
+      },
+      "ups": {
+        "carrier": "UPS",
+        "price": 15.25,
+        "estimatedDays": 3
+      },
+      "dhl": {
+        "carrier": "DHL",
+        "price": 17.05,
+        "estimatedDays": 4
+      },
+      "best": "FedEx"
+    },
+    "ride": {
+      "uber": {
+        "service": "Uber",
+        "price": 8.74,
+        "estimatedMinutes": 1,
+        "surgeMultiplier": 1.74
+      },
+      "lyft": {
+        "service": "Lyft",
+        "price": 4.75,
+        "estimatedMinutes": 1,
+        "surgeMultiplier": 1.05
+      },
+      "best": "Lyft"
+    },
+    "bestMethod": "ride",
+    "recommendation": "Use Lyft ride-sharing ($4.75)"
+  },
+  {
+    "id": 1763962326326,
+    "timestamp": "2025-11-24T05:32:06.326Z",
+    "customerZip": "07102",
+    "weight": 10,
+    "slaughterhouse": {
+      "name": "Bayonne Halal",
+      "zip": "07002",
+      "distance": 1
+    },
+    "courier": {
+      "fedex": {
+        "carrier": "FedEx",
+        "price": 20.6,
+        "estimatedDays": 2
+      },
+      "ups": {
+        "carrier": "UPS",
+        "price": 20.62,
+        "estimatedDays": 3
+      },
+      "dhl": {
+        "carrier": "DHL",
+        "price": 23.08,
+        "estimatedDays": 4
+      },
+      "best": "FedEx"
+    },
+    "ride": {
+      "uber": {
+        "service": "Uber",
+        "price": 9.68,
+        "estimatedMinutes": 2,
+        "surgeMultiplier": 1.29
+      },
+      "lyft": {
+        "service": "Lyft",
+        "price": 9.72,
+        "estimatedMinutes": 2,
+        "surgeMultiplier": 1.35
+      },
+      "best": "Uber"
+    },
+    "bestMethod": "ride",
+    "recommendation": "Use Uber ride-sharing ($9.68)"
+  },
+  {
+    "id": 1763962353445,
+    "timestamp": "2025-11-24T05:32:33.445Z",
+    "customerZip": "07102",
+    "weight": 10,
+    "slaughterhouse": {
+      "name": "Bayonne Halal",
+      "zip": "07002",
+      "distance": 1
+    },
+    "courier": {
+      "fedex": {
+        "carrier": "FedEx",
+        "price": 20.6,
+        "estimatedDays": 2
+      },
+      "ups": {
+        "carrier": "UPS",
+        "price": 20.62,
+        "estimatedDays": 3
+      },
+      "dhl": {
+        "carrier": "DHL",
+        "price": 23.08,
+        "estimatedDays": 4
+      },
+      "best": "FedEx"
+    },
+    "ride": {
+      "uber": {
+        "service": "Uber",
+        "price": 10.65,
+        "estimatedMinutes": 2,
+        "surgeMultiplier": 1.42
+      },
+      "lyft": {
+        "service": "Lyft",
+        "price": 10.87,
+        "estimatedMinutes": 2,
+        "surgeMultiplier": 1.51
+      },
+      "best": "Uber"
+    },
+    "bestMethod": "ride",
+    "recommendation": "Use Uber ride-sharing ($10.65)"
+  },
+  {
+    "id": 1763962423017,
+    "timestamp": "2025-11-24T05:33:43.017Z",
+    "customerZip": "07501",
+    "weight": 15,
+    "slaughterhouse": {
+      "name": "Paterson Halal Live",
+      "zip": "07501",
+      "distance": 0
+    },
+    "courier": {
+      "fedex": {
+        "carrier": "FedEx",
+        "price": 24.5,
+        "estimatedDays": 2
+      },
+      "ups": {
+        "carrier": "UPS",
+        "price": 24.25,
+        "estimatedDays": 3
+      },
+      "dhl": {
+        "carrier": "DHL",
+        "price": 27.25,
+        "estimatedDays": 4
+      },
+      "best": "UPS"
+    },
+    "ride": {
+      "uber": {
+        "service": "Uber",
+        "price": 9.85,
+        "estimatedMinutes": 0,
+        "surgeMultiplier": 1.97
+      },
+      "lyft": {
+        "service": "Lyft",
+        "price": 8.14,
+        "estimatedMinutes": 0,
+        "surgeMultiplier": 1.81
+      },
+      "best": "Lyft"
+    },
+    "bestMethod": "ride",
+    "recommendation": "Use Lyft ride-sharing ($8.14)"
+  },
+  {
+    "id": 1763963053121,
+    "timestamp": "2025-11-24T05:44:13.120Z",
+    "customerZip": "10003",
+    "weight": 200,
+    "slaughterhouse": {
+      "name": "Franklin Blvd Poultry",
+      "zip": "08873",
+      "distance": 11.3
+    },
+    "courier": {
+      "fedex": {
+        "carrier": "FedEx",
+        "price": 173.63,
+        "estimatedDays": 2
+      },
+      "ups": {
+        "carrier": "UPS",
+        "price": 164.36,
+        "estimatedDays": 3
+      },
+      "dhl": {
+        "carrier": "DHL",
+        "price": 185.4,
+        "estimatedDays": 4
+      },
+      "best": "UPS"
+    },
+    "ride": {
+      "uber": {
+        "service": "Uber",
+        "price": 51.2,
+        "estimatedMinutes": 23,
+        "surgeMultiplier": 1.54
+      },
+      "lyft": {
+        "service": "Lyft",
+        "price": 53.57,
+        "estimatedMinutes": 23,
+        "surgeMultiplier": 1.53
+      },
+      "best": "Uber"
+    },
+    "bestMethod": "ride",
+    "recommendation": "Use Uber ride-sharing ($51.2)"
+  }
+]

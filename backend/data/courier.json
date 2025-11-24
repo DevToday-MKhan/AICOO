@@ -1,0 +1,202 @@
+[
+  {
+    "id": 1763961000179,
+    "timestamp": "2025-11-24T05:10:00.179Z",
+    "request": {
+      "fromZip": "10001",
+      "toZip": "90210",
+      "weight": 5
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "price": 96.71,
+      "estimatedDays": 2
+    },
+    "ups": {
+      "carrier": "UPS",
+      "price": 113,
+      "estimatedDays": 3
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "price": 82.92,
+      "estimatedDays": 4
+    },
+    "best": "DHL"
+  },
+  {
+    "id": 1763961656080,
+    "timestamp": "2025-11-24T05:20:56.080Z",
+    "request": {
+      "fromZip": "08873",
+      "toZip": "10001",
+      "weight": 8
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "price": 20.03,
+      "estimatedDays": 2
+    },
+    "ups": {
+      "carrier": "UPS",
+      "price": 20.35,
+      "estimatedDays": 3
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "price": 22.2,
+      "estimatedDays": 4
+    },
+    "best": "FedEx"
+  },
+  {
+    "id": 1763961670526,
+    "timestamp": "2025-11-24T05:21:10.526Z",
+    "request": {
+      "fromZip": "07501",
+      "toZip": "07500",
+      "weight": 3
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "price": 14.9,
+      "estimatedDays": 2
+    },
+    "ups": {
+      "carrier": "UPS",
+      "price": 15.25,
+      "estimatedDays": 3
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "price": 17.05,
+      "estimatedDays": 4
+    },
+    "best": "FedEx"
+  },
+  {
+    "id": 1763961670539,
+    "timestamp": "2025-11-24T05:21:10.539Z",
+    "request": {
+      "fromZip": "07501",
+      "toZip": "07500",
+      "weight": 3
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "price": 14.9,
+      "estimatedDays": 2
+    },
+    "ups": {
+      "carrier": "UPS",
+      "price": 15.25,
+      "estimatedDays": 3
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "price": 17.05,
+      "estimatedDays": 4
+    },
+    "best": "FedEx"
+  },
+  {
+    "id": 1763962326324,
+    "timestamp": "2025-11-24T05:32:06.324Z",
+    "request": {
+      "fromZip": "07002",
+      "toZip": "07102",
+      "weight": 10
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "price": 20.6,
+      "estimatedDays": 2
+    },
+    "ups": {
+      "carrier": "UPS",
+      "price": 20.62,
+      "estimatedDays": 3
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "price": 23.08,
+      "estimatedDays": 4
+    },
+    "best": "FedEx"
+  },
+  {
+    "id": 1763962353440,
+    "timestamp": "2025-11-24T05:32:33.440Z",
+    "request": {
+      "fromZip": "07002",
+      "toZip": "07102",
+      "weight": 10
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "price": 20.6,
+      "estimatedDays": 2
+    },
+    "ups": {
+      "carrier": "UPS",
+      "price": 20.62,
+      "estimatedDays": 3
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "price": 23.08,
+      "estimatedDays": 4
+    },
+    "best": "FedEx"
+  },
+  {
+    "id": 1763962423013,
+    "timestamp": "2025-11-24T05:33:43.013Z",
+    "request": {
+      "fromZip": "07501",
+      "toZip": "07501",
+      "weight": 15
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "price": 24.5,
+      "estimatedDays": 2
+    },
+    "ups": {
+      "carrier": "UPS",
+      "price": 24.25,
+      "estimatedDays": 3
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "price": 27.25,
+      "estimatedDays": 4
+    },
+    "best": "UPS"
+  },
+  {
+    "id": 1763963053117,
+    "timestamp": "2025-11-24T05:44:13.117Z",
+    "request": {
+      "fromZip": "08873",
+      "toZip": "10003",
+      "weight": 200
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "price": 173.63,
+      "estimatedDays": 2
+    },
+    "ups": {
+      "carrier": "UPS",
+      "price": 164.36,
+      "estimatedDays": 3
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "price": 185.4,
+      "estimatedDays": 4
+    },
+    "best": "UPS"
+  }
+]

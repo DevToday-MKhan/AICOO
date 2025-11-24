@@ -30,6 +30,9 @@ const Navigation = () => {
       <li>
         <Link to="/chat" style={linkStyle}>AI COO Chat</Link>
       </li>
+      <li>
+        <Link to="/admin" style={linkStyle}>Admin Tools</Link>
+      </li>
     </div>
   );
 };

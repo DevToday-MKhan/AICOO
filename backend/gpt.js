@@ -10,8 +10,8 @@ dotenv.config();
 import OpenAI from "openai";
 
 // Other imports
-import { events } from "./webhooks.js";
-import Settings from "./settings.js";
+import { getEvents } from "./webhooks.js";
+import { getSettings } from "./settings.js";
 
 // Initialize OpenAI with API key from .env
 const client = new OpenAI({
@@ -31,8 +31,8 @@ export async function askAICOO(prompt) {
     `;
 
     const context = `
-      Store Settings: ${JSON.stringify(Settings.getSettings())}
-      Latest Webhook Events (up to 20): ${JSON.stringify(events.slice(-20))}
+      Store Settings: ${JSON.stringify(getSettings())}
+      Latest Webhook Events (up to 20): ${JSON.stringify(getEvents().slice(-20))}
     `;
 
     const completion = await client.chat.completions.create({

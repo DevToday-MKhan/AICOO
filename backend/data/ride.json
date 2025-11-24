@@ -1,0 +1,191 @@
+[
+  {
+    "id": 1763961274722,
+    "timestamp": "2025-11-24T05:14:34.722Z",
+    "request": {
+      "fromZip": "10001",
+      "toZip": "90210"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 205.4,
+      "estimatedMinutes": 100,
+      "surgeMultiplier": 1.58
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 177.16,
+      "estimatedMinutes": 100,
+      "surgeMultiplier": 1.27
+    },
+    "best": "Lyft"
+  },
+  {
+    "id": 1763961284926,
+    "timestamp": "2025-11-24T05:14:44.926Z",
+    "request": {
+      "fromZip": "60601",
+      "toZip": "60614"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 9.16,
+      "estimatedMinutes": 1,
+      "surgeMultiplier": 1.72
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 6.74,
+      "estimatedMinutes": 1,
+      "surgeMultiplier": 1.39
+    },
+    "best": "Lyft"
+  },
+  {
+    "id": 1763961656081,
+    "timestamp": "2025-11-24T05:20:56.081Z",
+    "request": {
+      "fromZip": "08873",
+      "toZip": "10001"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 58.1,
+      "estimatedMinutes": 23,
+      "surgeMultiplier": 1.75
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 47.89,
+      "estimatedMinutes": 23,
+      "surgeMultiplier": 1.37
+    },
+    "best": "Lyft"
+  },
+  {
+    "id": 1763961670527,
+    "timestamp": "2025-11-24T05:21:10.527Z",
+    "request": {
+      "fromZip": "07501",
+      "toZip": "07500"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 9.9,
+      "estimatedMinutes": 1,
+      "surgeMultiplier": 1.97
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 8.42,
+      "estimatedMinutes": 1,
+      "surgeMultiplier": 1.86
+    },
+    "best": "Lyft"
+  },
+  {
+    "id": 1763961670540,
+    "timestamp": "2025-11-24T05:21:10.540Z",
+    "request": {
+      "fromZip": "07501",
+      "toZip": "07500"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 8.74,
+      "estimatedMinutes": 1,
+      "surgeMultiplier": 1.74
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 4.75,
+      "estimatedMinutes": 1,
+      "surgeMultiplier": 1.05
+    },
+    "best": "Lyft"
+  },
+  {
+    "id": 1763962326325,
+    "timestamp": "2025-11-24T05:32:06.325Z",
+    "request": {
+      "fromZip": "07002",
+      "toZip": "07102"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 9.68,
+      "estimatedMinutes": 2,
+      "surgeMultiplier": 1.29
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 9.72,
+      "estimatedMinutes": 2,
+      "surgeMultiplier": 1.35
+    },
+    "best": "Uber"
+  },
+  {
+    "id": 1763962353442,
+    "timestamp": "2025-11-24T05:32:33.442Z",
+    "request": {
+      "fromZip": "07002",
+      "toZip": "07102"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 10.65,
+      "estimatedMinutes": 2,
+      "surgeMultiplier": 1.42
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 10.87,
+      "estimatedMinutes": 2,
+      "surgeMultiplier": 1.51
+    },
+    "best": "Uber"
+  },
+  {
+    "id": 1763962423016,
+    "timestamp": "2025-11-24T05:33:43.015Z",
+    "request": {
+      "fromZip": "07501",
+      "toZip": "07501"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 9.85,
+      "estimatedMinutes": 0,
+      "surgeMultiplier": 1.97
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 8.14,
+      "estimatedMinutes": 0,
+      "surgeMultiplier": 1.81
+    },
+    "best": "Lyft"
+  },
+  {
+    "id": 1763963053117,
+    "timestamp": "2025-11-24T05:44:13.117Z",
+    "request": {
+      "fromZip": "08873",
+      "toZip": "10003"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 51.2,
+      "estimatedMinutes": 23,
+      "surgeMultiplier": 1.54
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 53.57,
+      "estimatedMinutes": 23,
+      "surgeMultiplier": 1.53
+    },
+    "best": "Uber"
+  }
+]

@@ -1,20 +1,95 @@
-import shopify from "./shopify.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import crypto from "crypto";
 
-export const events = [];
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const Webhooks = {
-  async handleOrderCreated(req, res) {
-    const event_type = req.headers["x-shopify-topic"];
+const EVENTS_PATH = path.join(__dirname, "data", "events.json");
+const ORDERS_PATH = path.join(__dirname, "data", "orders.json");
 
-    const event = {
-      ...req.body,
-      event_type,
-    };
+function loadEvents() {
+  try {
+    const raw = fs.readFileSync(EVENTS_PATH, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
 
-    events.push(event);
+function saveEvents(events) {
+  fs.writeFileSync(EVENTS_PATH, JSON.stringify(events, null, 2), "utf8");
+}
 
-    res.status(200).send("Event received");
-  },
-};
+export function verifyShopifyWebhook(rawBody, hmacHeader) {
+  const secret = process.env.SHOPIFY_WEBHOOK_SECRET;
+  
+  if (!secret) {
+    console.warn("⚠️ SHOPIFY_WEBHOOK_SECRET not set - skipping HMAC verification");
+    return true; // Allow in dev if secret not configured
+  }
 
-export default Webhooks;
+  if (!hmacHeader) {
+    return false;
+  }
+
+  const hash = crypto
+    .createHmac("sha256", secret)
+    .update(rawBody, "utf8")
+    .digest("base64");
+
+  return crypto.timingSafeEqual(
+    Buffer.from(hash),
+    Buffer.from(hmacHeader)
+  );
+}
+
+export function recordEvent(event) {
+  const events = loadEvents();
+  events.push({
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    ...event,
+  });
+  saveEvents(events);
+}
+
+export function getEvents() {
+  return loadEvents();
+}
+
+function loadOrders() {
+  try {
+    const raw = fs.readFileSync(ORDERS_PATH, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function saveOrder(order) {
+  const orders = loadOrders();
+  orders.push({
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    ...order,
+  });
+  
+  // Keep only last 20 orders
+  const trimmed = orders.slice(-20);
+  fs.writeFileSync(ORDERS_PATH, JSON.stringify(trimmed, null, 2), "utf8");
+}
+
+export function getOrders() {
+  return loadOrders();
+}
+
+export function getLatestOrder() {
+  const orders = loadOrders();
+  return orders.length > 0 ? orders[orders.length - 1] : null;
+}
+
+export function saveShopifyOrder(orderData) {
+  saveOrder(orderData);
+}

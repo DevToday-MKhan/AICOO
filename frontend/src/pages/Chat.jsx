@@ -10,28 +10,71 @@ function Chat() {
 
     const newMessage = { role: "user", content: input };
     setMessages((prev) => [...prev, newMessage]);
+    const userInput = input;
     setInput("");
     setLoading(true);
 
     try {
-      const res = await fetch("/api/gpt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // FIXED: Backend expects { prompt }
-        body: JSON.stringify({ prompt: input }),
-      });
+      // Check for /assign command
+      const assignMatch = userInput.match(/^\/assign\s+(\d+)/i);
+      
+      if (assignMatch) {
+        const orderId = assignMatch[1];
+        
+        // Call delivery assignment API
+        const res = await fetch("/api/delivery/assign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId }),
+        });
 
-      const data = await res.json();
+        if (!res.ok) {
+          throw new Error(`Delivery API error: ${res.status}`);
+        }
 
-      // FIXED: Backend responds with { answer }
-      const aiMessage = { role: "assistant", content: data.answer };
-      setMessages((prev) => [...prev, aiMessage]);
+        const data = await res.json();
+
+        if (data.error) {
+          // Error response from API
+          const aiMessage = {
+            role: "assistant",
+            content: `❌ Error: ${data.error}`,
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else {
+          // Format delivery assignment response
+          const deliveryType = data.type === "ride" ? "🚗" : "📦";
+          const serviceName = data.type === "ride" ? data.service : data.carrier;
+          const safeModeWarning = data.safeMode ? "\n\n⚠️ Safe Mode: Using fallback delivery method" : "";
+          const aiMessage = {
+            role: "assistant",
+            content: `✅ Delivery assigned for Order #${data.orderId}!\n\n${deliveryType} **${serviceName}** - $${data.price}\nETA: ${data.eta}\nCustomer ZIP: ${data.customerZip}\nSlaughterhouse: ${data.slaughterhouse.name}${safeModeWarning}\n\nCheck the Dashboard for full details.`,
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        }
+      } else {
+        // Normal GPT chat
+        const res = await fetch("/api/gpt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: userInput }),
+        });
+
+        if (!res.ok) {
+          throw new Error(`GPT API error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        const aiMessage = { role: "assistant", content: data.answer };
+        setMessages((prev) => [...prev, aiMessage]);
+      }
     } catch (err) {
+      console.error("Chat error:", err);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Error: Unable to connect to AI COO.",
+          content: "❌ Service Unavailable - Unable to connect to AICOO backend. Please check that the server is running.",
         },
       ]);
     }

@@ -1,4 +1,16 @@
-[dotenv@17.2.3] injecting env (1) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+nohup: ignoring input
+
+> backend@1.0.0 dev
+> node server.js
+
+[dotenv@17.2.3] injecting env (1) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+🚀 AICOO Starting in DEV mode
+📝 Verbose logging enabled (DEV mode)
 ENV CHECK → OPENAI KEY: LOADED
 AICOO backend running on port 3000
+📦 Full backup created (0 events, 4 orders, 0 deliveries)
+📦 Full export created
+📦 Full backup created (0 events, 4 orders, 0 deliveries)
+📦 ZIP backup created (base64 encoded)
+📦 ZIP export created: aicoo-backup-2025-11-24.zip
