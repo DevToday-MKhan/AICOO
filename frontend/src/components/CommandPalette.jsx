@@ -10,6 +10,9 @@ const COMMANDS = [
   { name: "deliveries", description: "View delivery history", example: "deliveries" },
   { name: "events", description: "View system events", example: "events" },
   { name: "health", description: "Check system health", example: "health" },
+  { name: "simulate <zip> <weight>", description: "Simulate order with fake data", example: "simulate 10001 5" },
+  { name: "replay <orderId>", description: "Replay existing order", example: "replay 12345" },
+  { name: "simulations", description: "List simulation history", example: "simulations" },
   { name: "clear events", description: "Clear all events", example: "clear events" },
   { name: "clear orders", description: "Clear all orders", example: "clear orders" },
   { name: "clear deliveries", description: "Clear all deliveries", example: "clear deliveries" },
@@ -235,6 +238,47 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
         setResult({ type: "clear", target, data });
       }
       
+      // Simulate order
+      else if (command === "simulate") {
+        const zip = parts[1];
+        const weight = parseFloat(parts[2]);
+        if (!zip || !weight) throw new Error("Usage: simulate <zip> <weight>");
+        
+        const res = await fetch(`/api/simulate/fake-order?zip=${zip}&weight=${weight}`);
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || "Simulation failed");
+        
+        setResult({ type: "simulate", data });
+      }
+      
+      // Replay order
+      else if (command === "replay") {
+        const orderId = parts[1];
+        if (!orderId) throw new Error("Usage: replay <orderId>");
+        
+        const res = await fetch("/api/simulate/replay", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || "Replay failed");
+        
+        setResult({ type: "replay", data });
+      }
+      
+      // List simulations
+      else if (command === "simulations") {
+        const res = await fetch("/api/simulate/list");
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error("Failed to fetch simulations");
+        
+        setResult({ type: "simulations", data });
+      }
+      
       else {
         throw new Error(`Unknown command: ${command}. Type "help" for available commands.`);
       }
@@ -407,6 +451,69 @@ function renderResult(result) {
         <div>
           <h3 style={{marginTop: 0, color: "#28a745"}}>✅ Cleared Successfully</h3>
           <p>All {result.target} have been cleared.</p>
+        </div>
+      );
+
+    case "simulate":
+    case "replay":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#9b59b6"}}>🧪 Simulation Complete</h3>
+          <p><strong>Simulation ID:</strong> {result.data.simulationId}</p>
+          <p><strong>Status:</strong> {result.data.success ? "✅ Success" : "❌ Failed"}</p>
+          <p><strong>Order ID:</strong> {result.data.order?.id}</p>
+          {result.data.routing && (
+            <div style={{marginTop: "16px"}}>
+              <h4 style={{fontSize: "14px", marginBottom: "8px"}}>Routing</h4>
+              <p><strong>Method:</strong> {result.data.routing.bestMethod}</p>
+              <p><strong>Slaughterhouse:</strong> {result.data.routing.slaughterhouse?.name}</p>
+            </div>
+          )}
+          {result.data.delivery && (
+            <div style={{marginTop: "16px"}}>
+              <h4 style={{fontSize: "14px", marginBottom: "8px"}}>Delivery</h4>
+              <p><strong>Service:</strong> {result.data.delivery.service || result.data.delivery.carrier}</p>
+              <p><strong>Price:</strong> ${result.data.delivery.price}</p>
+              <p><strong>ETA:</strong> {result.data.delivery.eta}</p>
+            </div>
+          )}
+          {result.data.errors?.length > 0 && (
+            <div style={{marginTop: "16px", color: "#dc3545"}}>
+              <h4 style={{fontSize: "14px", marginBottom: "8px"}}>Errors</h4>
+              {result.data.errors.map((err, idx) => <p key={idx}>• {err}</p>)}
+            </div>
+          )}
+        </div>
+      );
+
+    case "simulations":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#9b59b6"}}>🧪 Simulation History</h3>
+          {result.data.length === 0 ? (
+            <p>No simulations yet.</p>
+          ) : (
+            <div>
+              {result.data.slice(0, 10).map((sim, idx) => (
+                <div key={idx} style={{
+                  padding: "10px",
+                  marginBottom: "8px",
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: "4px",
+                  borderLeft: `4px solid ${sim.success ? "#28a745" : "#dc3545"}`
+                }}>
+                  <strong>Simulation #{sim.simulationId}</strong>
+                  <span style={{marginLeft: "10px", fontSize: "12px", color: "#666"}}>
+                    {new Date(sim.timestamp).toLocaleString()}
+                  </span>
+                  <br/>
+                  <span style={{fontSize: "13px"}}>
+                    Order {sim.order?.id} → {sim.delivery?.service || "N/A"} (${sim.delivery?.price || "N/A"})
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       );
 

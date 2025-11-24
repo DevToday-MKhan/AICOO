@@ -320,5 +320,97 @@
     },
     "bestMethod": "ride",
     "recommendation": "Use Uber ride-sharing ($51.2)"
+  },
+  {
+    "id": 1763967502957,
+    "timestamp": "2025-11-24T06:58:22.957Z",
+    "customerZip": "10001",
+    "weight": 5,
+    "slaughterhouse": {
+      "name": "Franklin Blvd Poultry",
+      "zip": "08873",
+      "distance": 11.28
+    },
+    "courier": {
+      "fedex": {
+        "carrier": "FedEx",
+        "price": 17.63,
+        "estimatedDays": 2
+      },
+      "ups": {
+        "carrier": "UPS",
+        "price": 18.1,
+        "estimatedDays": 3
+      },
+      "dhl": {
+        "carrier": "DHL",
+        "price": 19.65,
+        "estimatedDays": 4
+      },
+      "best": "FedEx"
+    },
+    "ride": {
+      "uber": {
+        "service": "Uber",
+        "price": 60.09,
+        "estimatedMinutes": 23,
+        "surgeMultiplier": 1.81
+      },
+      "lyft": {
+        "service": "Lyft",
+        "price": 49.64,
+        "estimatedMinutes": 23,
+        "surgeMultiplier": 1.42
+      },
+      "best": "Lyft"
+    },
+    "bestMethod": "courier",
+    "recommendation": "Use FedEx courier ($17.63)"
+  },
+  {
+    "id": 1763967510025,
+    "timestamp": "2025-11-24T06:58:30.025Z",
+    "customerZip": "10001",
+    "weight": 5,
+    "slaughterhouse": {
+      "name": "Franklin Blvd Poultry",
+      "zip": "08873",
+      "distance": 11.28
+    },
+    "courier": {
+      "fedex": {
+        "carrier": "FedEx",
+        "price": 17.63,
+        "estimatedDays": 2
+      },
+      "ups": {
+        "carrier": "UPS",
+        "price": 18.1,
+        "estimatedDays": 3
+      },
+      "dhl": {
+        "carrier": "DHL",
+        "price": 19.65,
+        "estimatedDays": 4
+      },
+      "best": "FedEx"
+    },
+    "ride": {
+      "uber": {
+        "service": "Uber",
+        "price": 56.44,
+        "estimatedMinutes": 23,
+        "surgeMultiplier": 1.7
+      },
+      "lyft": {
+        "service": "Lyft",
+        "price": 51.73,
+        "estimatedMinutes": 23,
+        "surgeMultiplier": 1.48
+      },
+      "best": "Lyft"
+    },
+    "bestMethod": "courier",
+    "recommendation": "Use FedEx courier ($17.63)"
   }
 ]

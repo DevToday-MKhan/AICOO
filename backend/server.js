@@ -22,6 +22,7 @@ import { getRouteQuote, getRouteHistory } from "./routing.js";
 import { assignDelivery, getDeliveryHistory, getLatestDelivery } from "./delivery.js";
 import { exportAllData, exportZipped, getStorageHealth } from "./admin/backup.js";
 import * as Memory from "./memory.js";
+import * as Simulator from "./simulator.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -546,6 +547,115 @@ app.get("/api/admin/mode", (req, res) => {
     isLive: IS_LIVE,
     verboseLogging: IS_DEV
   });
+});
+
+// ---------------------------------------
+// SIMULATION ENGINE — DEV MODE ONLY
+// ---------------------------------------
+app.post("/api/simulate/order", async (req, res) => {
+  if (IS_LIVE) {
+    return res.status(403).json({ error: "Simulation disabled in LIVE mode" });
+  }
+
+  try {
+    const orderPayload = req.body;
+    if (!orderPayload) {
+      return res.status(400).json({ error: "Missing order payload" });
+    }
+
+    const result = await Simulator.simulateOrder(orderPayload);
+    if (IS_DEV) console.log("🧪 Simulation completed:", result.simulationId);
+    res.json(result);
+  } catch (err) {
+    logError(err, "SIMULATE_ORDER");
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/simulate/replay", async (req, res) => {
+  if (IS_LIVE) {
+    return res.status(403).json({ error: "Simulation disabled in LIVE mode" });
+  }
+
+  try {
+    const { orderId } = req.body;
+    if (!orderId) {
+      return res.status(400).json({ error: "Missing orderId" });
+    }
+
+    const result = await Simulator.replayOrder(orderId);
+    if (IS_DEV) console.log("🔄 Replay completed:", result.simulationId);
+    res.json(result);
+  } catch (err) {
+    logError(err, "SIMULATE_REPLAY");
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/simulate/fake-order", async (req, res) => {
+  if (IS_LIVE) {
+    return res.status(403).json({ error: "Simulation disabled in LIVE mode" });
+  }
+
+  try {
+    const { zip, weight } = req.query;
+    if (!zip || !weight) {
+      return res.status(400).json({ error: "Missing zip or weight parameters" });
+    }
+
+    const fakeOrder = Simulator.generateFakeOrder(zip, parseFloat(weight));
+    const result = await Simulator.simulateOrder(fakeOrder);
+    
+    if (IS_DEV) console.log("🧪 Fake order simulated:", result.simulationId);
+    res.json(result);
+  } catch (err) {
+    logError(err, "FAKE_ORDER");
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/simulate/list", (req, res) => {
+  if (IS_LIVE) {
+    return res.status(403).json({ error: "Simulation disabled in LIVE mode" });
+  }
+
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+    const simulations = Simulator.listSimulations(limit);
+    res.json(simulations);
+  } catch (err) {
+    logError(err, "LIST_SIMULATIONS");
+    res.status(500).json({ error: "Failed to list simulations" });
+  }
+});
+
+app.get("/api/simulate/stats", (req, res) => {
+  if (IS_LIVE) {
+    return res.status(403).json({ error: "Simulation disabled in LIVE mode" });
+  }
+
+  try {
+    const stats = Simulator.getSimulationStats();
+    res.json(stats);
+  } catch (err) {
+    logError(err, "SIMULATION_STATS");
+    res.status(500).json({ error: "Failed to get simulation stats" });
+  }
+});
+
+app.post("/api/admin/clear-simulations", (req, res) => {
+  if (IS_LIVE) {
+    return res.status(403).json({ error: "Simulation disabled in LIVE mode" });
+  }
+
+  try {
+    Simulator.clearSimulations();
+    console.log("🗑️  Simulations cleared");
+    res.json({ status: "ok", message: "Simulations cleared successfully" });
+  } catch (err) {
+    logError(err, "CLEAR_SIMULATIONS");
+    res.status(500).json({ error: "Failed to clear simulations" });
+  }
 });
 
 // TEMP – ENV CHECK

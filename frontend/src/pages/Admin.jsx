@@ -268,6 +268,72 @@ const Admin = () => {
     setTimeout(() => setMessage(""), 3000);
   };
 
+  const handleSimulateOrder = async () => {
+    try {
+      const res = await fetch("/api/simulate/fake-order?zip=10001&weight=5");
+      const data = await res.json();
+      
+      if (res.ok) {
+        setMessage(`✅ Simulated order #${data.simulationId} - ${data.delivery?.service} ($${data.delivery?.price})`);
+      } else {
+        setMessage("❌ Simulation failed");
+      }
+    } catch (err) {
+      setMessage("❌ Error simulating order");
+    }
+
+    setTimeout(() => setMessage(""), 5000);
+  };
+
+  const handleReplayLastOrder = async () => {
+    try {
+      const ordersRes = await fetch("/api/orders/latest");
+      const order = await ordersRes.json();
+      
+      if (!order || !order.id) {
+        setMessage("❌ No orders to replay");
+        setTimeout(() => setMessage(""), 3000);
+        return;
+      }
+
+      const res = await fetch("/api/simulate/replay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: order.id })
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        setMessage(`✅ Replayed order ${order.id} - Simulation #${data.simulationId}`);
+      } else {
+        setMessage("❌ Replay failed");
+      }
+    } catch (err) {
+      setMessage("❌ Error replaying order");
+    }
+
+    setTimeout(() => setMessage(""), 5000);
+  };
+
+  const handleClearSimulations = async () => {
+    if (!window.confirm("Clear all simulation logs?")) {
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/admin/clear-simulations", { method: "POST" });
+      if (res.ok) {
+        setMessage("✅ Simulations cleared");
+      } else {
+        setMessage("❌ Failed to clear simulations");
+      }
+    } catch (err) {
+      setMessage("❌ Error clearing simulations");
+    }
+
+    setTimeout(() => setMessage(""), 3000);
+  };
+
   if (loading) {
     return <div style={containerStyle}>Loading admin panel...</div>;
   }
@@ -394,6 +460,25 @@ const Admin = () => {
           </button>
         </div>
       </div>
+
+      {/* Simulation Center */}
+      {mode === "DEV" && (
+        <div style={{...sectionStyle, backgroundColor: "#f5f0ff", borderColor: "#9b59b6"}}>
+          <h3 style={{...headingStyle, borderColor: "#9b59b6"}}>🧪 Simulation Center</h3>
+          <p style={{marginBottom: "20px", color: "#666"}}>
+            Test routing, delivery, and memory systems without real Shopify webhooks.
+          </p>
+          <button style={{...primaryButton, backgroundColor: "#9b59b6", borderColor: "#9b59b6"}} onClick={handleSimulateOrder}>
+            🧪 Simulate Test Order
+          </button>
+          <button style={{...primaryButton, backgroundColor: "#9b59b6", borderColor: "#9b59b6"}} onClick={handleReplayLastOrder}>
+            🔄 Replay Last Order
+          </button>
+          <button style={{...dangerButton, backgroundColor: "#6c757d", borderColor: "#6c757d"}} onClick={handleClearSimulations}>
+            🗑️ Clear Simulation Logs
+          </button>
+        </div>
+      )}
 
       {/* Backup & Restore */}
       <div style={sectionStyle}>

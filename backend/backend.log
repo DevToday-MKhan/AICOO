@@ -3,10 +3,33 @@ nohup: ignoring input
 > backend@1.0.0 dev
 > node server.js
 
-[dotenv@17.2.3] injecting env (1) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (1) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
 🚀 AICOO Starting in DEV mode
 📝 Verbose logging enabled (DEV mode)
 ENV CHECK → OPENAI KEY: LOADED
 AICOO backend running on port 3000
-🧠 Observation recorded: test_observation
+🧪 Running order simulation...
+🧪 Starting simulation #1763967502954
+📍 Order 1763967502953 → ZIP 10001, Weight 5 lbs
+⚠️  Order save failed: Memory is not defined
+🗺️  Calculating route for ZIP 10001...
+🚚 Assigning delivery method...
+📦 Delivery assigned: Order 1763967502953 → FEDEX ($17.63)
+🧠 Recording simulation observation...
+✅ Simulation #1763967502954 completed successfully
+   → Routing: courier
+   → Delivery: FedEx ($17.63)
+🧪 Fake order simulated: 1763967502954
+🧪 Running order simulation...
+🧪 Starting simulation #1763967510022
+📍 Order 1763967510022 → ZIP 10001, Weight 5 lbs
+⚠️  Order save failed: Memory is not defined
+🗺️  Calculating route for ZIP 10001...
+🚚 Assigning delivery method...
+📦 Delivery assigned: Order 1763967510022 → FEDEX ($17.63)
+🧠 Recording simulation observation...
+✅ Simulation #1763967510022 completed successfully
+   → Routing: courier
+   → Delivery: FedEx ($17.63)
+🧪 Fake order simulated: 1763967510022

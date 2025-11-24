@@ -6,17 +6,73 @@
         "message": "AICOO memory test"
       },
       "timestamp": "2025-11-24T06:45:35.074Z"
+    },
+    {
+      "type": "simulation_completed",
+      "data": {
+        "simulationId": 1763967502954,
+        "orderId": 1763967502953,
+        "routingMethod": "courier",
+        "deliveryService": "FedEx",
+        "deliveryPrice": 17.63
+      },
+      "timestamp": "2025-11-24T06:58:22.959Z"
+    },
+    {
+      "type": "simulation_completed",
+      "data": {
+        "simulationId": 1763967510022,
+        "orderId": 1763967510022,
+        "routingMethod": "courier",
+        "deliveryService": "FedEx",
+        "deliveryPrice": 17.63
+      },
+      "timestamp": "2025-11-24T06:58:30.027Z"
     }
   ],
   "orders": [],
-  "routes": [],
-  "deliveries": [],
+  "routes": [
+    {
+      "orderId": 1763967502957,
+      "slaughterhouse": "Franklin Blvd Poultry",
+      "distance": 11.28,
+      "reason": "courier selected",
+      "timestamp": "2025-11-24T06:58:22.957Z"
+    },
+    {
+      "orderId": 1763967510025,
+      "slaughterhouse": "Franklin Blvd Poultry",
+      "distance": 11.28,
+      "reason": "courier selected",
+      "timestamp": "2025-11-24T06:58:30.025Z"
+    }
+  ],
+  "deliveries": [
+    {
+      "orderId": 1763967502953,
+      "type": "courier",
+      "service": "FedEx",
+      "price": 17.63,
+      "eta": "2 days",
+      "safeMode": false,
+      "timestamp": "2025-11-24T06:58:22.958Z"
+    },
+    {
+      "orderId": 1763967510022,
+      "type": "courier",
+      "service": "FedEx",
+      "price": 17.63,
+      "eta": "2 days",
+      "safeMode": false,
+      "timestamp": "2025-11-24T06:58:30.026Z"
+    }
+  ],
   "analytics": {
     "totalOrders": 0,
-    "totalDeliveries": 0,
-    "totalRoutes": 0,
-    "avgDeliveryPrice": 0,
+    "totalDeliveries": 2,
+    "totalRoutes": 2,
+    "avgDeliveryPrice": "17.63",
     "commonCarrier": null,
-    "commonService": null
+    "commonService": "FedEx"
   }
 }
