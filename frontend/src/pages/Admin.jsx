@@ -1,68 +1,54 @@
 import React, { useState, useEffect } from "react";
+import { colors, spacing, borderRadius, shadows, typography, components } from "../styles/theme";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const containerStyle = {
-  padding: "20px",
-  maxWidth: "1000px",
+  padding: spacing.xl,
+  maxWidth: "1200px",
   margin: "0 auto"
 };
 
 const sectionStyle = {
-  border: "1px solid #ddd",
-  padding: "20px",
-  marginBottom: "20px",
-  borderRadius: "8px",
-  backgroundColor: "#fff",
-  boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+  ...components.card,
+  marginBottom: spacing.xl,
 };
 
 const headingStyle = {
-  marginTop: 0,
-  marginBottom: "16px",
-  color: "#333",
-  fontSize: "20px",
-  fontWeight: "600",
-  borderBottom: "2px solid #dc3545",
-  paddingBottom: "8px"
+  ...components.cardHeader,
+  borderColor: colors.danger,
 };
 
 const buttonStyle = {
-  padding: "10px 20px",
-  margin: "8px",
-  fontSize: "14px",
-  cursor: "pointer",
-  border: "none",
-  borderRadius: "4px",
-  fontWeight: "500",
-  transition: "all 0.2s"
+  ...components.button,
+  margin: spacing.sm,
+  transition: "all 0.2s ease",
 };
 
 const dangerButton = {
   ...buttonStyle,
-  backgroundColor: "#dc3545",
-  color: "#fff"
+  ...components.buttonDanger,
 };
 
 const primaryButton = {
   ...buttonStyle,
-  backgroundColor: "#007bff",
-  color: "#fff"
+  ...components.buttonPrimary,
 };
 
 const successButton = {
   ...buttonStyle,
-  backgroundColor: "#28a745",
-  color: "#fff"
+  ...components.buttonSuccess,
 };
 
 const statStyle = {
   display: "inline-block",
-  padding: "12px 24px",
-  margin: "8px",
-  backgroundColor: "#f0f8ff",
-  border: "2px solid #007bff",
-  borderRadius: "6px",
-  fontSize: "16px",
-  fontWeight: "600"
+  padding: `${spacing.lg} ${spacing.xxl}`,
+  margin: spacing.sm,
+  backgroundColor: colors.ctBlueLight,
+  border: `2px solid ${colors.ctBlue}`,
+  borderRadius: borderRadius.md,
+  fontSize: typography.md,
+  fontWeight: typography.semibold,
+  boxShadow: shadows.sm,
 };
 
 const Admin = () => {

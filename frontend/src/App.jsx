@@ -8,9 +8,12 @@ import Webhooks from "./webhooks.jsx";
 import Chat from "./pages/Chat.jsx";
 import Admin from "./pages/Admin.jsx";
 import CommandPalette from "./components/CommandPalette.jsx";
+import ModeIndicator from "./components/ModeIndicator.jsx";
+import Toast from "./components/Toast.jsx";
 
 const App = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [toast, setToast] = useState(null);
 
   // Global Ctrl+K / Cmd+K listener
   useEffect(() => {
@@ -39,14 +42,27 @@ const App = () => {
         </Routes>
       </div>
 
+      {/* Global Mode Indicator */}
+      <ModeIndicator />
+
       {/* Global Command Palette */}
       <CommandPalette
         isOpen={commandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
         onExecute={(cmd) => {
           console.log("Command executed:", cmd);
+          setToast({ message: "Command executed successfully", type: "success" });
         }}
       />
+
+      {/* Global Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

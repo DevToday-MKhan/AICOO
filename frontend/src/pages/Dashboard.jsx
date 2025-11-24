@@ -1,58 +1,49 @@
 import React, { useState, useEffect } from "react";
+import { colors, spacing, borderRadius, shadows, typography, components } from "../styles/theme";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const sectionStyle = {
-  border: "1px solid #ddd",
-  padding: "20px",
-  marginBottom: "20px",
-  borderRadius: "8px",
-  backgroundColor: "#fff",
-  boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+  ...components.card,
+  marginBottom: spacing.xl,
 };
 
 const headingStyle = {
-  marginTop: 0,
-  marginBottom: "16px",
-  color: "#333",
-  fontSize: "20px",
-  fontWeight: "600",
-  borderBottom: "2px solid #007bff",
-  paddingBottom: "8px"
+  ...components.cardHeader,
+  fontSize: typography.xl,
+  fontWeight: typography.bold,
 };
 
 const loadingStyle = {
-  color: "#666",
+  color: colors.textSecondary,
   fontStyle: "italic",
-  padding: "40px",
+  padding: "60px 40px",
   textAlign: "center"
 };
 
 const buttonStyle = {
-  padding: "6px 12px",
-  marginLeft: "12px",
-  fontSize: "13px",
+  padding: `${spacing.sm} ${spacing.lg}`,
+  marginLeft: spacing.md,
+  fontSize: typography.sm,
   cursor: "pointer",
-  border: "1px solid #007bff",
-  backgroundColor: "#fff",
-  color: "#007bff",
-  borderRadius: "4px",
-  fontWeight: "500"
+  border: `1px solid ${colors.primary}`,
+  backgroundColor: colors.white,
+  color: colors.primary,
+  borderRadius: borderRadius.md,
+  fontWeight: typography.medium,
+  transition: "all 0.2s ease",
 };
 
 const tagStyle = {
-  padding: "2px 8px",
-  borderRadius: "3px",
-  fontSize: "11px",
-  fontWeight: "bold",
-  marginRight: "8px",
-  display: "inline-block"
+  ...components.badge,
+  marginRight: spacing.sm,
 };
 
 const getEventTag = (eventType) => {
-  if (!eventType) return { text: "INFO", color: "#6c757d" };
-  if (eventType.includes("order")) return { text: "ORDER", color: "#28a745" };
-  if (eventType.includes("delivery")) return { text: "DELIVERY", color: "#17a2b8" };
-  if (eventType.includes("error")) return { text: "ERROR", color: "#dc3545" };
-  return { text: "INFO", color: "#6c757d" };
+  if (!eventType) return { text: "INFO", color: colors.gray600 };
+  if (eventType.includes("order")) return { text: "ORDER", color: colors.success };
+  if (eventType.includes("delivery")) return { text: "DELIVERY", color: colors.info };
+  if (eventType.includes("error")) return { text: "ERROR", color: colors.danger };
+  return { text: "INFO", color: colors.gray600 };
 };
 
 const Dashboard = () => {
@@ -143,27 +134,27 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return <div style={loadingStyle}>Loading dashboard...</div>;
+    return (
+      <div style={loadingStyle}>
+        <LoadingSpinner size={50} color={colors.primary} />
+        <div style={{ marginTop: spacing.lg, fontSize: typography.md }}>Loading dashboard...</div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div style={{...loadingStyle, color: "#dc3545", padding: "60px"}}>
-        <h2>⚠️ {error}</h2>
-        <p style={{marginTop: "20px", fontSize: "14px", color: "#666"}}>
+      <div style={{...loadingStyle, color: colors.danger, padding: "80px 40px"}}>
+        <h2 style={{ marginTop: 0 }}>⚠️ {error}</h2>
+        <p style={{marginTop: spacing.xl, fontSize: typography.base, color: colors.textSecondary}}>
           Please check that the backend server is running on port 3000.
         </p>
         <button 
           onClick={() => window.location.reload()} 
           style={{
-            marginTop: "20px",
-            padding: "10px 20px",
-            fontSize: "14px",
-            cursor: "pointer",
-            border: "1px solid #007bff",
-            backgroundColor: "#007bff",
-            color: "#fff",
-            borderRadius: "4px"
+            ...components.buttonPrimary,
+            ...components.button,
+            marginTop: spacing.xl,
           }}
         >
           Retry Connection
@@ -172,46 +163,62 @@ const Dashboard = () => {
     );
   }
 
-
   const displayedEvents = showAllEvents ? events : events.slice(-5);
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
-      <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px"}}>
-        <h1 style={{ margin: 0, color: "#333" }}>AICOO Dashboard</h1>
+    <div style={{ padding: spacing.xl, maxWidth: "1400px", margin: "0 auto" }}>
+      <div style={{
+        display: "flex", 
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        marginBottom: spacing.xxl,
+        paddingBottom: spacing.lg,
+        borderBottom: `2px solid ${colors.gray200}`
+      }}>
+        <h1 style={{ margin: 0, color: colors.textPrimary, fontSize: typography.xxxl, fontWeight: typography.bold }}>
+          AICOO Dashboard
+        </h1>
         <div style={{
-          padding: "8px 16px",
-          backgroundColor: "#f0f8ff",
-          border: "1px solid #007bff",
-          borderRadius: "6px",
-          fontSize: "13px",
-          color: "#007bff",
-          fontWeight: "500"
+          padding: `${spacing.md} ${spacing.lg}`,
+          backgroundColor: colors.ctBlueLight,
+          border: `1px solid ${colors.ctBlue}`,
+          borderRadius: borderRadius.md,
+          fontSize: typography.sm,
+          color: colors.ctBlue,
+          fontWeight: typography.medium,
+          boxShadow: shadows.sm,
         }}>
           Press <kbd style={{
-            padding: "2px 6px",
-            backgroundColor: "#fff",
-            border: "1px solid #ccc",
-            borderRadius: "3px",
+            padding: `${spacing.xs} ${spacing.sm}`,
+            backgroundColor: colors.white,
+            border: `1px solid ${colors.gray300}`,
+            borderRadius: borderRadius.sm,
             fontFamily: "monospace",
-            fontSize: "12px"
+            fontSize: typography.xs,
+            marginLeft: spacing.xs,
+            marginRight: spacing.xs,
           }}>Ctrl+K</kbd> for Command Palette ⚡
         </div>
       </div>
 
       {/* System Health Card */}
-      <div style={{...sectionStyle, backgroundColor: "#f0f8ff", borderColor: "#007bff"}}>
-        <h3 style={{...headingStyle, borderColor: "#007bff"}}>
+      <div style={{...sectionStyle, backgroundColor: colors.ctBlueLight, borderColor: colors.ctBlue}}>
+        <h3 style={{...headingStyle, borderColor: colors.ctBlue}}>
           System Health
         </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
-          <div><strong>Backend:</strong> <span style={{color: "#28a745"}}>● Online</span></div>
-          <div><strong>Webhook HMAC:</strong> <span style={{color: "#28a745"}}>✓ Enabled</span></div>
-          <div><strong>Delivery Engine:</strong> <span style={{color: "#28a745"}}>✓ Enabled</span></div>
-          <div><strong>Routing Engine:</strong> <span style={{color: "#28a745"}}>✓ Enabled</span></div>
-          <div><strong>CourierCompare:</strong> <span style={{color: "#28a745"}}>✓ Enabled</span></div>
-          <div><strong>RideCompare:</strong> <span style={{color: "#28a745"}}>✓ Enabled</span></div>
-          <div><strong>Data Storage:</strong> <span style={{color: "#28a745"}}>✓ Enabled</span></div>
+        <div style={{ 
+          display: "grid", 
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", 
+          gap: spacing.lg,
+          fontSize: typography.base,
+        }}>
+          <div><strong>Backend:</strong> <span style={{color: colors.success}}>● Online</span></div>
+          <div><strong>Webhook HMAC:</strong> <span style={{color: colors.success}}>✓ Enabled</span></div>
+          <div><strong>Delivery Engine:</strong> <span style={{color: colors.success}}>✓ Enabled</span></div>
+          <div><strong>Routing Engine:</strong> <span style={{color: colors.success}}>✓ Enabled</span></div>
+          <div><strong>CourierCompare:</strong> <span style={{color: colors.success}}>✓ Enabled</span></div>
+          <div><strong>RideCompare:</strong> <span style={{color: colors.success}}>✓ Enabled</span></div>
+          <div><strong>Data Storage:</strong> <span style={{color: colors.success}}>✓ Enabled</span></div>
           <div><strong>App Version:</strong> 1.0.0</div>
         </div>
       </div>
@@ -220,33 +227,42 @@ const Dashboard = () => {
       <div style={sectionStyle}>
         <h3 style={headingStyle}>
           Events
-          <button style={buttonStyle} onClick={() => setShowAllEvents(!showAllEvents)}>
+          <button 
+            style={buttonStyle} 
+            onClick={() => setShowAllEvents(!showAllEvents)}
+            onMouseEnter={(e) => e.target.style.backgroundColor = colors.primary}
+            onMouseLeave={(e) => e.target.style.backgroundColor = colors.white}
+          >
             {showAllEvents ? "Show Less" : "Show More"}
           </button>
         </h3>
-        <p><strong>Total Events:</strong> {events.length}</p>
+        <p style={{ fontSize: typography.base, marginBottom: spacing.md }}>
+          <strong>Total Events:</strong> {events.length}
+        </p>
         {events.length === 0 ? (
-          <p style={{color: "#999"}}>No events yet.</p>
+          <p style={{color: colors.textMuted}}>No events yet.</p>
         ) : (
           <div>
             {displayedEvents.map((event, idx) => {
               const tag = getEventTag(event.event_type);
-              const preview = JSON.stringify(event).substring(0, 120);
+              const preview = JSON.stringify(event).substring(0, 150);
+              const isEven = idx % 2 === 0;
               return (
                 <div key={idx} style={{ 
-                  padding: "10px", 
-                  marginBottom: "8px", 
-                  backgroundColor: "#f9f9f9",
+                  padding: spacing.md, 
+                  marginBottom: spacing.sm, 
+                  backgroundColor: isEven ? colors.gray50 : colors.white,
                   borderLeft: `4px solid ${tag.color}`,
-                  borderRadius: "4px",
+                  borderRadius: borderRadius.md,
                   fontFamily: "monospace",
-                  fontSize: "13px"
+                  fontSize: typography.sm,
+                  transition: "background-color 0.2s ease",
                 }}>
-                  <span style={{...tagStyle, backgroundColor: tag.color, color: "#fff"}}>
+                  <span style={{...tagStyle, backgroundColor: tag.color, color: colors.white}}>
                     {tag.text}
                   </span>
                   <strong>{event.event_type || "Event"}:</strong>{" "}
-                  <span style={{color: "#666"}}>{preview}...</span>
+                  <span style={{color: colors.textSecondary}}>{preview}...</span>
                 </div>
               );
             })}
@@ -258,11 +274,11 @@ const Dashboard = () => {
       <div style={sectionStyle}>
         <h3 style={headingStyle}>Suggestions</h3>
         {suggestions.length === 0 ? (
-          <p style={{color: "#999"}}>No suggestions available.</p>
+          <p style={{color: colors.textMuted}}>No suggestions available.</p>
         ) : (
-          <ul style={{lineHeight: "1.8"}}>
+          <ul style={{lineHeight: "2", paddingLeft: spacing.xl, fontSize: typography.base}}>
             {suggestions.map((suggestion, idx) => (
-              <li key={idx} style={{marginBottom: "8px"}}>{suggestion}</li>
+              <li key={idx} style={{marginBottom: spacing.sm, color: colors.textPrimary}}>{suggestion}</li>
             ))}
           </ul>
         )}
@@ -270,14 +286,14 @@ const Dashboard = () => {
 
       {/* AICOO Memory Section */}
       {memory && (
-        <div style={{...sectionStyle, backgroundColor: "#f5f0ff", borderColor: "#9b59b6"}}>
-          <h3 style={{...headingStyle, borderColor: "#9b59b6"}}>
+        <div style={{...sectionStyle, backgroundColor: colors.purpleLight, borderColor: colors.purple}}>
+          <h3 style={{...headingStyle, borderColor: colors.purple}}>
             🧠 AICOO Memory & Learning
           </h3>
           
-          <div style={{marginBottom: "20px"}}>
-            <h4 style={{fontSize: "16px", marginBottom: "12px", color: "#333"}}>Analytics Summary</h4>
-            <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px"}}>
+          <div style={{marginBottom: spacing.xl}}>
+            <h4 style={{fontSize: typography.lg, marginBottom: spacing.md, color: colors.textPrimary, fontWeight: typography.semibold}}>Analytics Summary</h4>
+            <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: spacing.lg, fontSize: typography.base}}>
               <div><strong>Total Orders:</strong> {memory.analytics.totalOrders}</div>
               <div><strong>Total Deliveries:</strong> {memory.analytics.totalDeliveries}</div>
               <div><strong>Total Routes:</strong> {memory.analytics.totalRoutes}</div>
@@ -286,23 +302,23 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div style={{marginBottom: "20px"}}>
-            <h4 style={{fontSize: "16px", marginBottom: "12px", color: "#333"}}>Recent Observations</h4>
+          <div style={{marginBottom: spacing.xl}}>
+            <h4 style={{fontSize: typography.lg, marginBottom: spacing.md, color: colors.textPrimary, fontWeight: typography.semibold}}>Recent Observations</h4>
             {memory.observations.length === 0 ? (
-              <p style={{color: "#999"}}>No observations yet.</p>
+              <p style={{color: colors.textMuted}}>No observations yet.</p>
             ) : (
               <div>
                 {memory.observations.slice(-5).reverse().map((obs, idx) => (
                   <div key={idx} style={{
-                    padding: "8px",
-                    marginBottom: "6px",
-                    backgroundColor: "#fff",
-                    borderLeft: "3px solid #9b59b6",
-                    borderRadius: "4px",
-                    fontSize: "13px"
+                    padding: spacing.md,
+                    marginBottom: spacing.sm,
+                    backgroundColor: colors.white,
+                    borderLeft: `3px solid ${colors.purple}`,
+                    borderRadius: borderRadius.md,
+                    fontSize: typography.sm
                   }}>
                     <strong>{obs.type}</strong>
-                    <span style={{marginLeft: "10px", color: "#666", fontSize: "12px"}}>
+                    <span style={{marginLeft: spacing.md, color: colors.textSecondary, fontSize: typography.xs}}>
                       {new Date(obs.timestamp).toLocaleString()}
                     </span>
                   </div>
@@ -311,24 +327,24 @@ const Dashboard = () => {
             )}
           </div>
 
-          <div style={{marginBottom: "20px"}}>
-            <h4 style={{fontSize: "16px", marginBottom: "12px", color: "#333"}}>Recent Deliveries</h4>
+          <div style={{marginBottom: spacing.xl}}>
+            <h4 style={{fontSize: typography.lg, marginBottom: spacing.md, color: colors.textPrimary, fontWeight: typography.semibold}}>Recent Deliveries</h4>
             {memory.deliveries.length === 0 ? (
-              <p style={{color: "#999"}}>No deliveries recorded yet.</p>
+              <p style={{color: colors.textMuted}}>No deliveries recorded yet.</p>
             ) : (
               <div>
                 {memory.deliveries.slice(-5).reverse().map((del, idx) => (
                   <div key={idx} style={{
-                    padding: "8px",
-                    marginBottom: "6px",
-                    backgroundColor: "#fff",
-                    borderRadius: "4px",
-                    fontSize: "13px"
+                    padding: spacing.md,
+                    marginBottom: spacing.sm,
+                    backgroundColor: colors.white,
+                    borderRadius: borderRadius.md,
+                    fontSize: typography.sm
                   }}>
                     <strong>Order {del.orderId}:</strong> {del.service} - ${del.price}
-                    {del.safeMode && <span style={{marginLeft: "10px", color: "#dc3545", fontSize: "12px"}}>⚠️ Safe Mode</span>}
+                    {del.safeMode && <span style={{marginLeft: spacing.md, color: colors.danger, fontSize: typography.xs}}>⚠️ Safe Mode</span>}
                     <br/>
-                    <span style={{color: "#666", fontSize: "12px"}}>
+                    <span style={{color: colors.textSecondary, fontSize: typography.xs}}>
                       {new Date(del.timestamp).toLocaleString()}
                     </span>
                   </div>
@@ -343,17 +359,17 @@ const Dashboard = () => {
       <div style={sectionStyle}>
         <h3 style={headingStyle}>Settings</h3>
         {settings ? (
-          <div>
-            <p>
+          <div style={{fontSize: typography.base, lineHeight: "1.8"}}>
+            <p style={{marginBottom: spacing.md}}>
               <strong>Store Name:</strong> {settings.storeName || "Not set"}
             </p>
-            <p>
+            <p style={{marginBottom: spacing.md}}>
               <strong>Notification Email:</strong>{" "}
               {settings.notificationEmail || "Not set"}
             </p>
           </div>
         ) : (
-          <p>Settings not available.</p>
+          <p style={{color: colors.textMuted}}>Settings not available.</p>
         )}
       </div>
 
@@ -361,48 +377,51 @@ const Dashboard = () => {
       <div style={sectionStyle}>
         <h3 style={headingStyle}>CourierCompare - Latest Quote</h3>
         {courierHistory.length === 0 ? (
-          <p>No courier quotes yet. Use the API to get shipping quotes.</p>
+          <p style={{color: colors.textMuted}}>No courier quotes yet. Use the API to get shipping quotes.</p>
         ) : (
           (() => {
             const latest = courierHistory[courierHistory.length - 1];
             const bestCarrier = latest.best;
             return (
               <div>
-                <p>
+                <p style={{fontSize: typography.base, marginBottom: spacing.md}}>
                   <strong>Request:</strong> {latest.request.fromZip} → {latest.request.toZip} ({latest.request.weight} lbs)
                 </p>
-                <p>
+                <p style={{fontSize: typography.base, marginBottom: spacing.md, color: colors.textSecondary}}>
                   <strong>Timestamp:</strong> {new Date(latest.timestamp).toLocaleString()}
                 </p>
-                <div style={{ marginTop: "12px" }}>
+                <div style={{ marginTop: spacing.lg }}>
                   <div style={{ 
-                    padding: "8px", 
-                    marginBottom: "6px",
-                    backgroundColor: bestCarrier === "FedEx" ? "#d4edda" : "#fff",
-                    border: bestCarrier === "FedEx" ? "2px solid #28a745" : "1px solid #ddd",
-                    borderRadius: "4px"
+                    padding: spacing.md, 
+                    marginBottom: spacing.sm,
+                    backgroundColor: bestCarrier === "FedEx" ? colors.successLight : colors.white,
+                    border: bestCarrier === "FedEx" ? `2px solid ${colors.success}` : `1px solid ${colors.gray300}`,
+                    borderRadius: borderRadius.md,
+                    fontSize: typography.base,
                   }}>
                     <strong>FedEx:</strong> ${latest.fedex.price} ({latest.fedex.estimatedDays} days)
-                    {bestCarrier === "FedEx" && <span style={{ color: "#28a745", marginLeft: "8px" }}>✓ BEST</span>}
+                    {bestCarrier === "FedEx" && <span style={{ color: colors.success, marginLeft: spacing.sm, fontWeight: typography.bold }}>✓ BEST</span>}
                   </div>
                   <div style={{ 
-                    padding: "8px", 
-                    marginBottom: "6px",
-                    backgroundColor: bestCarrier === "UPS" ? "#d4edda" : "#fff",
-                    border: bestCarrier === "UPS" ? "2px solid #28a745" : "1px solid #ddd",
-                    borderRadius: "4px"
+                    padding: spacing.md, 
+                    marginBottom: spacing.sm,
+                    backgroundColor: bestCarrier === "UPS" ? colors.successLight : colors.white,
+                    border: bestCarrier === "UPS" ? `2px solid ${colors.success}` : `1px solid ${colors.gray300}`,
+                    borderRadius: borderRadius.md,
+                    fontSize: typography.base,
                   }}>
                     <strong>UPS:</strong> ${latest.ups.price} ({latest.ups.estimatedDays} days)
-                    {bestCarrier === "UPS" && <span style={{ color: "#28a745", marginLeft: "8px" }}>✓ BEST</span>}
+                    {bestCarrier === "UPS" && <span style={{ color: colors.success, marginLeft: spacing.sm, fontWeight: typography.bold }}>✓ BEST</span>}
                   </div>
                   <div style={{ 
-                    padding: "8px",
-                    backgroundColor: bestCarrier === "DHL" ? "#d4edda" : "#fff",
-                    border: bestCarrier === "DHL" ? "2px solid #28a745" : "1px solid #ddd",
-                    borderRadius: "4px"
+                    padding: spacing.md,
+                    backgroundColor: bestCarrier === "DHL" ? colors.successLight : colors.white,
+                    border: bestCarrier === "DHL" ? `2px solid ${colors.success}` : `1px solid ${colors.gray300}`,
+                    borderRadius: borderRadius.md,
+                    fontSize: typography.base,
                   }}>
                     <strong>DHL:</strong> ${latest.dhl.price} ({latest.dhl.estimatedDays} days)
-                    {bestCarrier === "DHL" && <span style={{ color: "#28a745", marginLeft: "8px" }}>✓ BEST</span>}
+                    {bestCarrier === "DHL" && <span style={{ color: colors.success, marginLeft: spacing.sm, fontWeight: typography.bold }}>✓ BEST</span>}
                   </div>
                 </div>
               </div>

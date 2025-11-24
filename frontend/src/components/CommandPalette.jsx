@@ -1,24 +1,45 @@
 import { useState, useEffect, useRef } from "react";
+import { colors, spacing, borderRadius, shadows, typography } from "../styles/theme";
 
 const COMMANDS = [
-  { name: "assign <orderId>", description: "Assign delivery for order", example: "assign 12345" },
-  { name: "route <zip> <weight>", description: "Get routing quote", example: "route 10001 5" },
-  { name: "courier <fromZip> <toZip> <weight>", description: "Compare courier services", example: "courier 10001 90210 10" },
-  { name: "ride <fromZip> <toZip>", description: "Compare rideshare services", example: "ride 10001 90210" },
-  { name: "memory", description: "View AICOO memory & learning", example: "memory" },
-  { name: "orders", description: "View recent orders", example: "orders" },
-  { name: "deliveries", description: "View delivery history", example: "deliveries" },
-  { name: "events", description: "View system events", example: "events" },
-  { name: "health", description: "Check system health", example: "health" },
-  { name: "simulate <zip> <weight>", description: "Simulate order with fake data", example: "simulate 10001 5" },
-  { name: "replay <orderId>", description: "Replay existing order", example: "replay 12345" },
-  { name: "simulations", description: "List simulation history", example: "simulations" },
-  { name: "clear events", description: "Clear all events", example: "clear events" },
-  { name: "clear orders", description: "Clear all orders", example: "clear orders" },
-  { name: "clear deliveries", description: "Clear all deliveries", example: "clear deliveries" },
-  { name: "clear routes", description: "Clear route history", example: "clear routes" },
-  { name: "help", description: "Show all commands", example: "help" },
+  // Simulation Commands
+  { name: "simulate <zip> <weight>", description: "Simulate order with fake data", example: "simulate 10001 5", category: "Simulation" },
+  { name: "replay <orderId>", description: "Replay existing order", example: "replay 12345", category: "Simulation" },
+  { name: "simulations", description: "List simulation history", example: "simulations", category: "Simulation" },
+  
+  // Delivery Commands
+  { name: "assign <orderId>", description: "Assign delivery for order", example: "assign 12345", category: "Delivery" },
+  { name: "deliveries", description: "View delivery history", example: "deliveries", category: "Delivery" },
+  
+  // Routing Commands
+  { name: "route <zip> <weight>", description: "Get routing quote", example: "route 10001 5", category: "Routing" },
+  { name: "courier <fromZip> <toZip> <weight>", description: "Compare courier services", example: "courier 10001 90210 10", category: "Routing" },
+  { name: "ride <fromZip> <toZip>", description: "Compare rideshare services", example: "ride 10001 90210", category: "Routing" },
+  
+  // Memory Commands
+  { name: "memory", description: "View AICOO memory & learning", example: "memory", category: "Memory" },
+  
+  // Admin Commands
+  { name: "orders", description: "View recent orders", example: "orders", category: "Admin" },
+  { name: "events", description: "View system events", example: "events", category: "Admin" },
+  { name: "health", description: "Check system health", example: "health", category: "Admin" },
+  { name: "clear events", description: "Clear all events", example: "clear events", category: "Admin" },
+  { name: "clear orders", description: "Clear all orders", example: "clear orders", category: "Admin" },
+  { name: "clear deliveries", description: "Clear all deliveries", example: "clear deliveries", category: "Admin" },
+  { name: "clear routes", description: "Clear route history", example: "clear routes", category: "Admin" },
+  
+  // Help
+  { name: "help", description: "Show all commands", example: "help", category: "Help" },
 ];
+
+const CATEGORY_COLORS = {
+  "Simulation": colors.purple,
+  "Delivery": colors.success,
+  "Routing": colors.info,
+  "Memory": colors.warning,
+  "Admin": colors.danger,
+  "Help": colors.gray600,
+};
 
 const CommandPalette = ({ isOpen, onClose, onExecute }) => {
   const [input, setInput] = useState("");
@@ -298,12 +319,25 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
   if (!isOpen) return null;
 
   return (
-    <div style={styles.overlay} onClick={onClose}>
+    <>
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideDown {
+          from { transform: translateY(-20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+      `}</style>
+      <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div style={styles.header}>
           <span style={styles.title}>⚡ AICOO Command Palette</span>
-          <span style={styles.hint}>Press Esc to close</span>
+          <span style={styles.hint}>
+            <kbd style={styles.kbd}>Esc</kbd> to close • <kbd style={styles.kbd}>↑↓</kbd> to navigate • <kbd style={styles.kbd}>Enter</kbd> to execute
+          </span>
         </div>
 
         {/* Input */}
@@ -352,7 +386,15 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
                 >
-                  <div style={styles.commandName}>{cmd.name}</div>
+                  <div style={{display: "flex", alignItems: "center", gap: spacing.sm, marginBottom: spacing.xs}}>
+                    <span style={{
+                      ...styles.categoryBadge,
+                      backgroundColor: CATEGORY_COLORS[cmd.category],
+                    }}>
+                      {cmd.category}
+                    </span>
+                    <div style={styles.commandName}>{cmd.name}</div>
+                  </div>
                   <div style={styles.commandDesc}>{cmd.description}</div>
                 </div>
               ))
@@ -361,6 +403,7 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
         )}
       </div>
     </div>
+    </>
   );
 };
 
@@ -530,97 +573,125 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    backdropFilter: "blur(4px)",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backdropFilter: "blur(8px)",
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "center",
-    paddingTop: "15vh",
+    paddingTop: "12vh",
     zIndex: 9999,
+    animation: "fadeIn 0.2s ease-out",
   },
   modal: {
-    backgroundColor: "#fff",
-    borderRadius: "12px",
-    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.xl,
+    boxShadow: shadows.xxl,
     width: "90%",
-    maxWidth: "700px",
-    maxHeight: "70vh",
+    maxWidth: "750px",
+    maxHeight: "75vh",
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
+    animation: "slideDown 0.3s ease-out",
   },
   header: {
-    padding: "16px 20px",
-    borderBottom: "1px solid #e0e0e0",
+    padding: spacing.lg,
+    borderBottom: `1px solid ${colors.gray200}`,
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: colors.gray50,
   },
   title: {
-    fontSize: "18px",
-    fontWeight: "600",
-    color: "#333",
+    fontSize: typography.lg,
+    fontWeight: typography.semibold,
+    color: colors.textPrimary,
   },
   hint: {
-    fontSize: "12px",
-    color: "#999",
+    fontSize: typography.xs,
+    color: colors.textMuted,
+    display: "flex",
+    gap: spacing.xs,
+    alignItems: "center",
+  },
+  kbd: {
+    padding: `${spacing.xs} ${spacing.sm}`,
+    backgroundColor: colors.white,
+    border: `1px solid ${colors.gray300}`,
+    borderRadius: borderRadius.sm,
+    fontFamily: "monospace",
+    fontSize: typography.xs,
+    boxShadow: shadows.sm,
   },
   input: {
-    padding: "16px 20px",
-    fontSize: "16px",
+    padding: spacing.lg,
+    fontSize: typography.md,
     border: "none",
-    borderBottom: "1px solid #e0e0e0",
+    borderBottom: `2px solid ${colors.gray200}`,
     outline: "none",
     width: "100%",
     boxSizing: "border-box",
+    transition: "border-color 0.2s ease",
   },
   suggestions: {
     overflowY: "auto",
-    maxHeight: "400px",
-    padding: "8px 0",
+    maxHeight: "450px",
+    padding: `${spacing.sm} 0`,
   },
   suggestion: {
-    padding: "12px 20px",
+    padding: spacing.lg,
     cursor: "pointer",
-    transition: "background-color 0.1s",
+    transition: "all 0.15s ease",
+    borderLeft: `3px solid transparent`,
   },
   suggestionSelected: {
-    backgroundColor: "#e3f2fd",
-    borderLeft: "3px solid #007bff",
+    backgroundColor: colors.ctBlueLight,
+    borderLeft: `3px solid ${colors.ctBlue}`,
+  },
+  categoryBadge: {
+    padding: `${spacing.xs} ${spacing.sm}`,
+    borderRadius: borderRadius.sm,
+    fontSize: typography.xs,
+    fontWeight: typography.semibold,
+    color: colors.white,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
   },
   commandName: {
-    fontSize: "14px",
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: "4px",
+    fontSize: typography.base,
+    fontWeight: typography.semibold,
+    color: colors.textPrimary,
     fontFamily: "monospace",
   },
   commandDesc: {
-    fontSize: "12px",
-    color: "#666",
+    fontSize: typography.sm,
+    color: colors.textSecondary,
+    marginLeft: "62px",
   },
   noResults: {
-    padding: "40px 20px",
+    padding: "60px 20px",
     textAlign: "center",
-    color: "#999",
+    color: colors.textMuted,
+    fontSize: typography.base,
   },
   resultContainer: {
-    padding: "20px",
+    padding: spacing.xl,
     overflowY: "auto",
-    maxHeight: "400px",
+    maxHeight: "450px",
   },
   error: {
-    padding: "20px",
-    color: "#dc3545",
-    backgroundColor: "#ffe6e6",
-    margin: "10px",
-    borderRadius: "6px",
+    padding: spacing.lg,
+    color: colors.danger,
+    backgroundColor: colors.dangerLight,
+    margin: spacing.md,
+    borderRadius: borderRadius.md,
+    fontSize: typography.base,
   },
   loading: {
-    padding: "40px 20px",
+    padding: "60px 20px",
     textAlign: "center",
-    color: "#666",
+    color: colors.textSecondary,
+    fontSize: typography.base,
   },
 };
 

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { colors, spacing, borderRadius, shadows, typography } from "../styles/theme";
+import { LoadingDots } from "../components/LoadingSpinner";
 
 function Chat() {
   const [messages, setMessages] = useState([
@@ -143,27 +145,30 @@ How can I help optimize your operations today?`
     <div style={styles.container}>
       <div style={styles.header}>
         <div>
-          <h1 style={{margin: 0, fontSize: "28px"}}>AICOO™</h1>
-          <p style={{margin: "8px 0 0 0", color: "#666", fontSize: "14px"}}>
+          <h1 style={{margin: 0, fontSize: typography.xxxl}}>AICOO™</h1>
+          <p style={{margin: `${spacing.sm} 0 0 0`, color: colors.white, fontSize: typography.sm, opacity: 0.9}}>
             AI Chief Operating Officer — Enterprise Operational Intelligence
           </p>
         </div>
         <div style={{
-          padding: "8px 16px",
-          backgroundColor: "#f0f8ff",
-          border: "1px solid #007bff",
-          borderRadius: "6px",
-          fontSize: "13px",
-          color: "#007bff",
-          fontWeight: "500"
+          padding: `${spacing.md} ${spacing.lg}`,
+          backgroundColor: "rgba(255,255,255,0.2)",
+          backdropFilter: "blur(10px)",
+          border: `1px solid rgba(255,255,255,0.3)`,
+          borderRadius: borderRadius.md,
+          fontSize: typography.sm,
+          color: colors.white,
+          fontWeight: typography.medium,
         }}>
           <kbd style={{
-            padding: "2px 6px",
-            backgroundColor: "#fff",
-            border: "1px solid #ccc",
-            borderRadius: "3px",
+            padding: `${spacing.xs} ${spacing.sm}`,
+            backgroundColor: "rgba(255,255,255,0.2)",
+            border: `1px solid rgba(255,255,255,0.3)`,
+            borderRadius: borderRadius.sm,
             fontFamily: "monospace",
-            fontSize: "12px"
+            fontSize: typography.xs,
+            marginLeft: spacing.xs,
+            marginRight: spacing.xs,
           }}>Ctrl+K</kbd> Command Palette ⚡
         </div>
       </div>
@@ -175,9 +180,11 @@ How can I help optimize your operations today?`
             style={{
               ...styles.message,
               alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-              background:
-                msg.role === "user" ? "#DCF8C6" : "rgba(0,0,0,0.05)",
+              background: msg.role === "user" ? colors.ctBlueLight : colors.white,
+              border: msg.role === "user" ? `1px solid ${colors.ctBlue}` : `1px solid ${colors.gray300}`,
             }}
+            onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
+            onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
           >
             {msg.content}
           </div>
@@ -185,7 +192,7 @@ How can I help optimize your operations today?`
 
         {loading && (
           <div style={styles.typing}>
-            AICOO is typing<span className="dots">...</span>
+            <LoadingDots color={colors.purple} /> AICOO is thinking...
           </div>
         )}
       </div>
@@ -196,8 +203,16 @@ How can I help optimize your operations today?`
           value={input}
           placeholder="Ask AICOO anything about your store..."
           onChange={(e) => setInput(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+          onFocus={(e) => e.target.style.borderColor = colors.primary}
+          onBlur={(e) => e.target.style.borderColor = colors.gray300}
         />
-        <button style={styles.button} onClick={sendMessage}>
+        <button 
+          style={styles.button} 
+          onClick={sendMessage}
+          onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
+          onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
+        >
           Send
         </button>
       </div>
@@ -206,70 +221,82 @@ How can I help optimize your operations today?`
 }
 
 const styles = {
-  container: { padding: 20, maxWidth: 900, margin: "0 auto" },
+  container: { 
+    padding: spacing.xl, 
+    maxWidth: "1000px", 
+    margin: "0 auto" 
+  },
   header: { 
-    fontSize: 28, 
-    fontWeight: "bold", 
-    marginBottom: 24,
-    padding: "20px",
+    fontSize: typography.xxxl, 
+    fontWeight: typography.bold, 
+    marginBottom: spacing.xxl,
+    padding: spacing.xl,
     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    color: "#fff",
-    borderRadius: "8px",
-    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+    color: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.lg,
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center"
   },
   chatBox: {
-    border: "1px solid #ddd",
-    borderRadius: 8,
-    padding: 16,
-    height: "60vh",
-    overflowY: "scroll",
+    border: `1px solid ${colors.gray300}`,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    height: "65vh",
+    overflowY: "auto",
     display: "flex",
     flexDirection: "column",
-    gap: 12,
-    background: "#f9fafb",
+    gap: spacing.md,
+    background: colors.gray50,
+    boxShadow: shadows.md,
   },
   message: {
-    maxWidth: "75%",
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 14,
-    lineHeight: 1.6,
+    maxWidth: "70%",
+    padding: spacing.lg,
+    borderRadius: borderRadius.md,
+    fontSize: typography.base,
+    lineHeight: 1.7,
     whiteSpace: "pre-wrap",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.08)"
+    boxShadow: shadows.sm,
+    transition: "transform 0.2s ease",
   },
   typing: {
     fontStyle: "italic",
-    opacity: 0.6,
-    fontSize: 14,
-    color: "#666"
+    opacity: 0.7,
+    fontSize: typography.base,
+    color: colors.textSecondary,
+    display: "flex",
+    alignItems: "center",
+    gap: spacing.sm,
+    padding: spacing.md,
   },
   inputRow: {
-    marginTop: 16,
+    marginTop: spacing.lg,
     display: "flex",
-    gap: 10,
+    gap: spacing.md,
   },
   input: {
     flex: 1,
-    padding: 14,
-    borderRadius: 8,
-    border: "1px solid #ddd",
-    fontSize: 15,
-    fontFamily: "system-ui, -apple-system, sans-serif"
+    padding: spacing.lg,
+    borderRadius: borderRadius.md,
+    border: `2px solid ${colors.gray300}`,
+    fontSize: typography.base,
+    fontFamily: "system-ui, -apple-system, sans-serif",
+    outline: "none",
+    transition: "border-color 0.2s ease",
   },
   button: {
-    padding: "14px 28px",
+    padding: `${spacing.lg} ${spacing.xxl}`,
     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    color: "#fff",
+    color: colors.white,
     border: "none",
-    borderRadius: 8,
+    borderRadius: borderRadius.md,
     cursor: "pointer",
-    fontWeight: "600",
-    fontSize: "15px",
-    transition: "transform 0.2s",
-    boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+    fontWeight: typography.semibold,
+    fontSize: typography.base,
+    transition: "all 0.2s ease",
+    boxShadow: shadows.md,
   }
 };
 
