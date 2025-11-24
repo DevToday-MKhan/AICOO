@@ -142,10 +142,30 @@ How can I help optimize your operations today?`
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={{margin: 0, fontSize: "28px"}}>AICOO™</h1>
-        <p style={{margin: "8px 0 0 0", color: "#666", fontSize: "14px"}}>
-          AI Chief Operating Officer — Enterprise Operational Intelligence
-        </p>
+        <div>
+          <h1 style={{margin: 0, fontSize: "28px"}}>AICOO™</h1>
+          <p style={{margin: "8px 0 0 0", color: "#666", fontSize: "14px"}}>
+            AI Chief Operating Officer — Enterprise Operational Intelligence
+          </p>
+        </div>
+        <div style={{
+          padding: "8px 16px",
+          backgroundColor: "#f0f8ff",
+          border: "1px solid #007bff",
+          borderRadius: "6px",
+          fontSize: "13px",
+          color: "#007bff",
+          fontWeight: "500"
+        }}>
+          <kbd style={{
+            padding: "2px 6px",
+            backgroundColor: "#fff",
+            border: "1px solid #ccc",
+            borderRadius: "3px",
+            fontFamily: "monospace",
+            fontSize: "12px"
+          }}>Ctrl+K</kbd> Command Palette ⚡
+        </div>
       </div>
 
       <div style={styles.chatBox}>
@@ -195,7 +215,10 @@ const styles = {
     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     color: "#fff",
     borderRadius: "8px",
-    boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   chatBox: {
     border: "1px solid #ddd",

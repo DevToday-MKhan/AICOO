@@ -177,7 +177,27 @@ const Dashboard = () => {
 
   return (
     <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
-      <h1 style={{ marginBottom: "24px", color: "#333" }}>AICOO Dashboard</h1>
+      <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px"}}>
+        <h1 style={{ margin: 0, color: "#333" }}>AICOO Dashboard</h1>
+        <div style={{
+          padding: "8px 16px",
+          backgroundColor: "#f0f8ff",
+          border: "1px solid #007bff",
+          borderRadius: "6px",
+          fontSize: "13px",
+          color: "#007bff",
+          fontWeight: "500"
+        }}>
+          Press <kbd style={{
+            padding: "2px 6px",
+            backgroundColor: "#fff",
+            border: "1px solid #ccc",
+            borderRadius: "3px",
+            fontFamily: "monospace",
+            fontSize: "12px"
+          }}>Ctrl+K</kbd> for Command Palette ⚡
+        </div>
+      </div>
 
       {/* System Health Card */}
       <div style={{...sectionStyle, backgroundColor: "#f0f8ff", borderColor: "#007bff"}}>

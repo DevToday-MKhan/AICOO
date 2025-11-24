@@ -89,9 +89,31 @@ npm run dev
 
 ### Chat Commands
 - `/assign [orderID]` — Assign delivery for specific order
+- `/memory` — View AICOO memory & learning data
 - `health` — Check system status
 - `analyze orders` — Review recent order trends
 - Natural language queries for operational insights
+
+### Command Palette (Ctrl+K / Cmd+K)
+Global command launcher available throughout the app:
+- `assign <orderId>` — Assign delivery
+- `route <zip> <weight>` — Get routing quote
+- `courier <fromZip> <toZip> <weight>` — Compare couriers
+- `ride <fromZip> <toZip>` — Compare rideshares
+- `memory` — View AICOO memory
+- `orders` — View recent orders
+- `deliveries` — View delivery history
+- `events` — View system events
+- `health` — Check system health
+- `clear events|orders|deliveries|routes` — Clear data
+- `help` — Show all commands
+
+**Features:**
+- Keyboard navigation (↑ ↓ Enter)
+- Fuzzy search
+- Instant execution
+- Real-time results
+- Error handling with fallbacks
 
 ## 📊 API Endpoints
 
@@ -172,8 +194,10 @@ AICOO/
 │       └── slaughterhouses.json
 ├── frontend/
 │   └── src/
-│       ├── App.jsx            # Main app shell
+│       ├── App.jsx            # Main app shell with Command Palette
 │       ├── Navigation.jsx     # Page routing
+│       ├── components/
+│       │   └── CommandPalette.jsx  # Global Ctrl+K command launcher
 │       └── pages/
 │           ├── Chat.jsx       # AICOO conversation UI
 │           ├── Dashboard.jsx  # Analytics & monitoring

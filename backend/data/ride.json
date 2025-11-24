@@ -187,5 +187,26 @@
       "surgeMultiplier": 1.53
     },
     "best": "Uber"
+  },
+  {
+    "id": 1763966988558,
+    "timestamp": "2025-11-24T06:49:48.558Z",
+    "request": {
+      "fromZip": "10001",
+      "toZip": "90210"
+    },
+    "uber": {
+      "service": "Uber",
+      "price": 215.8,
+      "estimatedMinutes": 100,
+      "surgeMultiplier": 1.66
+    },
+    "lyft": {
+      "service": "Lyft",
+      "price": 203.67,
+      "estimatedMinutes": 100,
+      "surgeMultiplier": 1.46
+    },
+    "best": "Lyft"
   }
 ]

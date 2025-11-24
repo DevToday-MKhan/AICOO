@@ -1,0 +1,520 @@
+import { useState, useEffect, useRef } from "react";
+
+const COMMANDS = [
+  { name: "assign <orderId>", description: "Assign delivery for order", example: "assign 12345" },
+  { name: "route <zip> <weight>", description: "Get routing quote", example: "route 10001 5" },
+  { name: "courier <fromZip> <toZip> <weight>", description: "Compare courier services", example: "courier 10001 90210 10" },
+  { name: "ride <fromZip> <toZip>", description: "Compare rideshare services", example: "ride 10001 90210" },
+  { name: "memory", description: "View AICOO memory & learning", example: "memory" },
+  { name: "orders", description: "View recent orders", example: "orders" },
+  { name: "deliveries", description: "View delivery history", example: "deliveries" },
+  { name: "events", description: "View system events", example: "events" },
+  { name: "health", description: "Check system health", example: "health" },
+  { name: "clear events", description: "Clear all events", example: "clear events" },
+  { name: "clear orders", description: "Clear all orders", example: "clear orders" },
+  { name: "clear deliveries", description: "Clear all deliveries", example: "clear deliveries" },
+  { name: "clear routes", description: "Clear route history", example: "clear routes" },
+  { name: "help", description: "Show all commands", example: "help" },
+];
+
+const CommandPalette = ({ isOpen, onClose, onExecute }) => {
+  const [input, setInput] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null);
+
+  // Filter commands based on input
+  const filteredCommands = input.trim()
+    ? COMMANDS.filter(cmd => 
+        cmd.name.toLowerCase().includes(input.toLowerCase()) ||
+        cmd.description.toLowerCase().includes(input.toLowerCase())
+      )
+    : COMMANDS;
+
+  // Focus input when opened
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+      setInput("");
+      setResult(null);
+      setError(null);
+      setSelectedIndex(0);
+    }
+  }, [isOpen]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isOpen) return;
+
+      if (e.key === "Escape") {
+        onClose();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex(prev => Math.min(prev + 1, filteredCommands.length - 1));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex(prev => Math.max(prev - 1, 0));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (filteredCommands[selectedIndex]) {
+          executeCommand(filteredCommands[selectedIndex].example);
+        } else if (input.trim()) {
+          executeCommand(input.trim());
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, selectedIndex, filteredCommands, input]);
+
+  // Execute command
+  const executeCommand = async (cmd) => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const parts = cmd.trim().split(/\s+/);
+      const command = parts[0].toLowerCase();
+
+      // Help command
+      if (command === "help") {
+        setResult({
+          type: "help",
+          data: COMMANDS
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Assign delivery
+      if (command === "assign") {
+        const orderId = parts[1];
+        if (!orderId) throw new Error("Usage: assign <orderId>");
+        
+        const res = await fetch("/api/delivery/assign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || "Delivery assignment failed");
+        
+        setResult({ type: "assign", data });
+      }
+      
+      // Route quote
+      else if (command === "route") {
+        const customerZip = parts[1];
+        const weight = parseFloat(parts[2]);
+        if (!customerZip || !weight) throw new Error("Usage: route <zip> <weight>");
+        
+        const res = await fetch("/api/route/quote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customerZip, weight })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || "Route quote failed");
+        
+        setResult({ type: "route", data });
+      }
+      
+      // Courier comparison
+      else if (command === "courier") {
+        const fromZip = parts[1];
+        const toZip = parts[2];
+        const weight = parseFloat(parts[3]);
+        if (!fromZip || !toZip || !weight) throw new Error("Usage: courier <fromZip> <toZip> <weight>");
+        
+        const res = await fetch("/api/courier/quote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fromZip, toZip, weight })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || "Courier comparison failed");
+        
+        setResult({ type: "courier", data });
+      }
+      
+      // Ride comparison
+      else if (command === "ride") {
+        const fromZip = parts[1];
+        const toZip = parts[2];
+        if (!fromZip || !toZip) throw new Error("Usage: ride <fromZip> <toZip>");
+        
+        const res = await fetch("/api/ride/quote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fromZip, toZip })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || "Ride comparison failed");
+        
+        setResult({ type: "ride", data });
+      }
+      
+      // Memory
+      else if (command === "memory") {
+        const res = await fetch("/api/memory");
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error("Failed to fetch memory");
+        
+        setResult({ type: "memory", data });
+      }
+      
+      // Health
+      else if (command === "health") {
+        const res = await fetch("/api/health");
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error("Failed to fetch health");
+        
+        setResult({ type: "health", data });
+      }
+      
+      // Orders
+      else if (command === "orders") {
+        const res = await fetch("/api/orders/latest");
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error("Failed to fetch orders");
+        
+        setResult({ type: "orders", data });
+      }
+      
+      // Deliveries
+      else if (command === "deliveries") {
+        const res = await fetch("/api/delivery/history");
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error("Failed to fetch deliveries");
+        
+        setResult({ type: "deliveries", data });
+      }
+      
+      // Events
+      else if (command === "events") {
+        const res = await fetch("/api/events");
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error("Failed to fetch events");
+        
+        setResult({ type: "events", data });
+      }
+      
+      // Clear commands
+      else if (command === "clear") {
+        const target = parts[1];
+        if (!target) throw new Error("Usage: clear <events|orders|deliveries|routes>");
+        
+        if (!["events", "orders", "deliveries", "routes"].includes(target)) {
+          throw new Error("Invalid target. Use: events, orders, deliveries, or routes");
+        }
+        
+        if (!window.confirm(`Clear all ${target}? This cannot be undone.`)) {
+          setLoading(false);
+          return;
+        }
+        
+        const res = await fetch(`/api/admin/clear-${target}`, { method: "POST" });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || `Failed to clear ${target}`);
+        
+        setResult({ type: "clear", target, data });
+      }
+      
+      else {
+        throw new Error(`Unknown command: ${command}. Type "help" for available commands.`);
+      }
+
+      // Notify parent if needed
+      if (onExecute) {
+        onExecute(cmd);
+      }
+
+    } catch (err) {
+      setError(err.message);
+    }
+
+    setLoading(false);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div style={styles.overlay} onClick={onClose}>
+      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div style={styles.header}>
+          <span style={styles.title}>⚡ AICOO Command Palette</span>
+          <span style={styles.hint}>Press Esc to close</span>
+        </div>
+
+        {/* Input */}
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            setSelectedIndex(0);
+            setResult(null);
+            setError(null);
+          }}
+          placeholder="Type a command... (e.g., 'assign 12345' or 'help')"
+          style={styles.input}
+        />
+
+        {/* Results or Suggestions */}
+        {result ? (
+          <div style={styles.resultContainer}>
+            {renderResult(result)}
+          </div>
+        ) : error ? (
+          <div style={styles.error}>
+            ❌ {error}
+          </div>
+        ) : loading ? (
+          <div style={styles.loading}>
+            ⏳ Executing command...
+          </div>
+        ) : (
+          <div style={styles.suggestions}>
+            {filteredCommands.length === 0 ? (
+              <div style={styles.noResults}>No commands found. Type "help" to see all commands.</div>
+            ) : (
+              filteredCommands.map((cmd, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    ...styles.suggestion,
+                    ...(idx === selectedIndex ? styles.suggestionSelected : {})
+                  }}
+                  onClick={() => {
+                    setInput(cmd.example);
+                    executeCommand(cmd.example);
+                  }}
+                  onMouseEnter={() => setSelectedIndex(idx)}
+                >
+                  <div style={styles.commandName}>{cmd.name}</div>
+                  <div style={styles.commandDesc}>{cmd.description}</div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Render command results
+function renderResult(result) {
+  switch (result.type) {
+    case "help":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, marginBottom: "16px", color: "#333"}}>Available Commands</h3>
+          {result.data.map((cmd, idx) => (
+            <div key={idx} style={{marginBottom: "12px", padding: "8px", backgroundColor: "#f9f9f9", borderRadius: "4px"}}>
+              <strong>{cmd.name}</strong> — {cmd.description}
+              <div style={{fontSize: "12px", color: "#666", marginTop: "4px"}}>Example: <code>{cmd.example}</code></div>
+            </div>
+          ))}
+        </div>
+      );
+
+    case "assign":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#28a745"}}>✅ Delivery Assigned</h3>
+          <p><strong>Order ID:</strong> {result.data.orderId}</p>
+          <p><strong>Service:</strong> {result.data.service || result.data.carrier}</p>
+          <p><strong>Price:</strong> ${result.data.price}</p>
+          <p><strong>ETA:</strong> {result.data.eta}</p>
+          {result.data.safeMode && <p style={{color: "#dc3545"}}>⚠️ Safe Mode Activated</p>}
+        </div>
+      );
+
+    case "route":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#007bff"}}>📍 Route Quote</h3>
+          <p><strong>Best Method:</strong> {result.data.bestMethod}</p>
+          <p><strong>Slaughterhouse:</strong> {result.data.slaughterhouse?.name}</p>
+          <p><strong>Distance:</strong> {result.data.slaughterhouse?.distance} miles</p>
+          <p><strong>Estimated Time:</strong> {result.data.estimatedMinutes} min</p>
+        </div>
+      );
+
+    case "courier":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#007bff"}}>📦 Courier Comparison</h3>
+          <p><strong>Best:</strong> {result.data.best} - ${result.data[result.data.best.toLowerCase()]?.price}</p>
+          <p><strong>FedEx:</strong> ${result.data.fedex?.price} ({result.data.fedex?.eta})</p>
+          <p><strong>UPS:</strong> ${result.data.ups?.price} ({result.data.ups?.eta})</p>
+          <p><strong>DHL:</strong> ${result.data.dhl?.price} ({result.data.dhl?.eta})</p>
+        </div>
+      );
+
+    case "ride":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#007bff"}}>🚗 Ride Comparison</h3>
+          <p><strong>Best:</strong> {result.data.best} - ${result.data[result.data.best.toLowerCase()]?.price}</p>
+          <p><strong>Uber:</strong> ${result.data.uber?.price} ({result.data.uber?.estimatedMinutes} min)</p>
+          <p><strong>Lyft:</strong> ${result.data.lyft?.price} ({result.data.lyft?.estimatedMinutes} min)</p>
+        </div>
+      );
+
+    case "memory":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#9b59b6"}}>🧠 AICOO Memory</h3>
+          <p><strong>Total Orders:</strong> {result.data.analytics.totalOrders}</p>
+          <p><strong>Total Deliveries:</strong> {result.data.analytics.totalDeliveries}</p>
+          <p><strong>Avg Delivery Price:</strong> ${result.data.analytics.avgDeliveryPrice}</p>
+          <p><strong>Observations:</strong> {result.data.observations.length}</p>
+        </div>
+      );
+
+    case "health":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#28a745"}}>💚 System Health</h3>
+          <p><strong>Backend:</strong> {result.data.backend}</p>
+          <p><strong>Mode:</strong> {result.data.mode}</p>
+          <p><strong>Storage:</strong> {result.data.storage}</p>
+          <p><strong>Uptime:</strong> {result.data.uptime?.toFixed(2)}s</p>
+        </div>
+      );
+
+    case "clear":
+      return (
+        <div>
+          <h3 style={{marginTop: 0, color: "#28a745"}}>✅ Cleared Successfully</h3>
+          <p>All {result.target} have been cleared.</p>
+        </div>
+      );
+
+    default:
+      return <pre style={{fontSize: "12px", overflow: "auto"}}>{JSON.stringify(result.data, null, 2)}</pre>;
+  }
+}
+
+// Styles
+const styles = {
+  overlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backdropFilter: "blur(4px)",
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    paddingTop: "15vh",
+    zIndex: 9999,
+  },
+  modal: {
+    backgroundColor: "#fff",
+    borderRadius: "12px",
+    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+    width: "90%",
+    maxWidth: "700px",
+    maxHeight: "70vh",
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+  },
+  header: {
+    padding: "16px 20px",
+    borderBottom: "1px solid #e0e0e0",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+  },
+  title: {
+    fontSize: "18px",
+    fontWeight: "600",
+    color: "#333",
+  },
+  hint: {
+    fontSize: "12px",
+    color: "#999",
+  },
+  input: {
+    padding: "16px 20px",
+    fontSize: "16px",
+    border: "none",
+    borderBottom: "1px solid #e0e0e0",
+    outline: "none",
+    width: "100%",
+    boxSizing: "border-box",
+  },
+  suggestions: {
+    overflowY: "auto",
+    maxHeight: "400px",
+    padding: "8px 0",
+  },
+  suggestion: {
+    padding: "12px 20px",
+    cursor: "pointer",
+    transition: "background-color 0.1s",
+  },
+  suggestionSelected: {
+    backgroundColor: "#e3f2fd",
+    borderLeft: "3px solid #007bff",
+  },
+  commandName: {
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: "4px",
+    fontFamily: "monospace",
+  },
+  commandDesc: {
+    fontSize: "12px",
+    color: "#666",
+  },
+  noResults: {
+    padding: "40px 20px",
+    textAlign: "center",
+    color: "#999",
+  },
+  resultContainer: {
+    padding: "20px",
+    overflowY: "auto",
+    maxHeight: "400px",
+  },
+  error: {
+    padding: "20px",
+    color: "#dc3545",
+    backgroundColor: "#ffe6e6",
+    margin: "10px",
+    borderRadius: "6px",
+  },
+  loading: {
+    padding: "40px 20px",
+    textAlign: "center",
+    color: "#666",
+  },
+};
+
+export default CommandPalette;
