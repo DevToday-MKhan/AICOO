@@ -1,0 +1,1 @@
+NIXPACKS_START_CMD=cd backend && npm start

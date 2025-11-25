@@ -1,10 +1,17 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
+  "name": "aicoo-backend",
+  "version": "1.1.0",
+  "description": "AICOO AI Chicken Logistics Backend",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "dev": "node server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "echo 'No build step required'"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -12,5 +19,8 @@
     "express": "^5.1.0",
     "openai": "^6.9.1",
     "socket.io": "^4.8.1"
-  }
+  },
+  "keywords": ["shopify", "logistics", "ai", "carrier", "shipping"],
+  "author": "DevToday-MKhan",
+  "license": "MIT"
 }
