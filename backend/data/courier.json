@@ -1,180 +1,5 @@
 [
   {
-    "id": 1763961000179,
-    "timestamp": "2025-11-24T05:10:00.179Z",
-    "request": {
-      "fromZip": "10001",
-      "toZip": "90210",
-      "weight": 5
-    },
-    "fedex": {
-      "carrier": "FedEx",
-      "price": 96.71,
-      "estimatedDays": 2
-    },
-    "ups": {
-      "carrier": "UPS",
-      "price": 113,
-      "estimatedDays": 3
-    },
-    "dhl": {
-      "carrier": "DHL",
-      "price": 82.92,
-      "estimatedDays": 4
-    },
-    "best": "DHL"
-  },
-  {
-    "id": 1763961656080,
-    "timestamp": "2025-11-24T05:20:56.080Z",
-    "request": {
-      "fromZip": "08873",
-      "toZip": "10001",
-      "weight": 8
-    },
-    "fedex": {
-      "carrier": "FedEx",
-      "price": 20.03,
-      "estimatedDays": 2
-    },
-    "ups": {
-      "carrier": "UPS",
-      "price": 20.35,
-      "estimatedDays": 3
-    },
-    "dhl": {
-      "carrier": "DHL",
-      "price": 22.2,
-      "estimatedDays": 4
-    },
-    "best": "FedEx"
-  },
-  {
-    "id": 1763961670526,
-    "timestamp": "2025-11-24T05:21:10.526Z",
-    "request": {
-      "fromZip": "07501",
-      "toZip": "07500",
-      "weight": 3
-    },
-    "fedex": {
-      "carrier": "FedEx",
-      "price": 14.9,
-      "estimatedDays": 2
-    },
-    "ups": {
-      "carrier": "UPS",
-      "price": 15.25,
-      "estimatedDays": 3
-    },
-    "dhl": {
-      "carrier": "DHL",
-      "price": 17.05,
-      "estimatedDays": 4
-    },
-    "best": "FedEx"
-  },
-  {
-    "id": 1763961670539,
-    "timestamp": "2025-11-24T05:21:10.539Z",
-    "request": {
-      "fromZip": "07501",
-      "toZip": "07500",
-      "weight": 3
-    },
-    "fedex": {
-      "carrier": "FedEx",
-      "price": 14.9,
-      "estimatedDays": 2
-    },
-    "ups": {
-      "carrier": "UPS",
-      "price": 15.25,
-      "estimatedDays": 3
-    },
-    "dhl": {
-      "carrier": "DHL",
-      "price": 17.05,
-      "estimatedDays": 4
-    },
-    "best": "FedEx"
-  },
-  {
-    "id": 1763962326324,
-    "timestamp": "2025-11-24T05:32:06.324Z",
-    "request": {
-      "fromZip": "07002",
-      "toZip": "07102",
-      "weight": 10
-    },
-    "fedex": {
-      "carrier": "FedEx",
-      "price": 20.6,
-      "estimatedDays": 2
-    },
-    "ups": {
-      "carrier": "UPS",
-      "price": 20.62,
-      "estimatedDays": 3
-    },
-    "dhl": {
-      "carrier": "DHL",
-      "price": 23.08,
-      "estimatedDays": 4
-    },
-    "best": "FedEx"
-  },
-  {
-    "id": 1763962353440,
-    "timestamp": "2025-11-24T05:32:33.440Z",
-    "request": {
-      "fromZip": "07002",
-      "toZip": "07102",
-      "weight": 10
-    },
-    "fedex": {
-      "carrier": "FedEx",
-      "price": 20.6,
-      "estimatedDays": 2
-    },
-    "ups": {
-      "carrier": "UPS",
-      "price": 20.62,
-      "estimatedDays": 3
-    },
-    "dhl": {
-      "carrier": "DHL",
-      "price": 23.08,
-      "estimatedDays": 4
-    },
-    "best": "FedEx"
-  },
-  {
-    "id": 1763962423013,
-    "timestamp": "2025-11-24T05:33:43.013Z",
-    "request": {
-      "fromZip": "07501",
-      "toZip": "07501",
-      "weight": 15
-    },
-    "fedex": {
-      "carrier": "FedEx",
-      "price": 24.5,
-      "estimatedDays": 2
-    },
-    "ups": {
-      "carrier": "UPS",
-      "price": 24.25,
-      "estimatedDays": 3
-    },
-    "dhl": {
-      "carrier": "DHL",
-      "price": 27.25,
-      "estimatedDays": 4
-    },
-    "best": "UPS"
-  },
-  {
     "id": 1763963053117,
     "timestamp": "2025-11-24T05:44:13.117Z",
     "request": {
@@ -245,6 +70,949 @@
     "dhl": {
       "carrier": "DHL",
       "price": 19.65,
+      "estimatedDays": 4
+    },
+    "best": "FedEx"
+  },
+  {
+    "id": 1764008583241,
+    "timestamp": "2025-11-24T18:23:03.240Z",
+    "request": {
+      "fromZip": "07102",
+      "toZip": "10001",
+      "weight": 5
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "services": [
+        {
+          "service": "FEDEX_GROUND",
+          "price": "20.30",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_2_DAY",
+          "price": "34.80",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_OVERNIGHT",
+          "price": "65.25",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "ups": {
+      "carrier": "UPS",
+      "services": [
+        {
+          "service": "UPS_GROUND",
+          "price": "18.47",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_2ND_DAY_AIR",
+          "price": "33.29",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_NEXT_DAY_AIR",
+          "price": "55.45",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "services": [
+        {
+          "service": "DHL_DOMESTIC",
+          "price": "22.13",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS",
+          "price": "41.65",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS_OVERNIGHT",
+          "price": "75.79",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "allOptions": [
+      {
+        "carrier": "UPS",
+        "service": "UPS_GROUND",
+        "price": 18.47,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_GROUND",
+        "price": 20.3,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_DOMESTIC",
+        "price": 22.13,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_2ND_DAY_AIR",
+        "price": 33.29,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_2_DAY",
+        "price": 34.8,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS",
+        "price": 41.65,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_NEXT_DAY_AIR",
+        "price": 55.45,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_OVERNIGHT",
+        "price": 65.25,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS_OVERNIGHT",
+        "price": 75.79,
+        "deliveryDays": 1,
+        "currency": "USD"
+      }
+    ],
+    "best": {
+      "carrier": "UPS",
+      "service": "UPS_GROUND",
+      "price": 18.47,
+      "deliveryDays": 3,
+      "savings": 1.83
+    }
+  },
+  {
+    "id": 1764010147489,
+    "timestamp": "2025-11-24T18:49:07.489Z",
+    "request": {
+      "fromZip": "07102",
+      "toZip": "10001",
+      "weight": 5
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "services": [
+        {
+          "service": "FEDEX_GROUND",
+          "price": "20.30",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_2_DAY",
+          "price": "34.80",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_OVERNIGHT",
+          "price": "65.25",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "ups": {
+      "carrier": "UPS",
+      "services": [
+        {
+          "service": "UPS_GROUND",
+          "price": "18.47",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_2ND_DAY_AIR",
+          "price": "33.29",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_NEXT_DAY_AIR",
+          "price": "55.45",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "services": [
+        {
+          "service": "DHL_DOMESTIC",
+          "price": "22.13",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS",
+          "price": "41.65",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS_OVERNIGHT",
+          "price": "75.79",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "allOptions": [
+      {
+        "carrier": "UPS",
+        "service": "UPS_GROUND",
+        "price": 18.47,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_GROUND",
+        "price": 20.3,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_DOMESTIC",
+        "price": 22.13,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_2ND_DAY_AIR",
+        "price": 33.29,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_2_DAY",
+        "price": 34.8,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS",
+        "price": 41.65,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_NEXT_DAY_AIR",
+        "price": 55.45,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_OVERNIGHT",
+        "price": 65.25,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS_OVERNIGHT",
+        "price": 75.79,
+        "deliveryDays": 1,
+        "currency": "USD"
+      }
+    ],
+    "best": {
+      "carrier": "UPS",
+      "service": "UPS_GROUND",
+      "price": 18.47,
+      "deliveryDays": 3,
+      "savings": 1.83
+    }
+  },
+  {
+    "id": 1764011028528,
+    "timestamp": "2025-11-24T19:03:48.528Z",
+    "request": {
+      "fromZip": "07102",
+      "toZip": "10001",
+      "weight": 5
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "services": [
+        {
+          "service": "FEDEX_GROUND",
+          "price": "20.30",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_2_DAY",
+          "price": "34.80",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_OVERNIGHT",
+          "price": "65.25",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "ups": {
+      "carrier": "UPS",
+      "services": [
+        {
+          "service": "UPS_GROUND",
+          "price": "18.47",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_2ND_DAY_AIR",
+          "price": "33.29",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_NEXT_DAY_AIR",
+          "price": "55.45",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "services": [
+        {
+          "service": "DHL_DOMESTIC",
+          "price": "22.13",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS",
+          "price": "41.65",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS_OVERNIGHT",
+          "price": "75.79",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "allOptions": [
+      {
+        "carrier": "UPS",
+        "service": "UPS_GROUND",
+        "price": 18.47,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_GROUND",
+        "price": 20.3,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_DOMESTIC",
+        "price": 22.13,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_2ND_DAY_AIR",
+        "price": 33.29,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_2_DAY",
+        "price": 34.8,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS",
+        "price": 41.65,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_NEXT_DAY_AIR",
+        "price": 55.45,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_OVERNIGHT",
+        "price": 65.25,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS_OVERNIGHT",
+        "price": 75.79,
+        "deliveryDays": 1,
+        "currency": "USD"
+      }
+    ],
+    "best": {
+      "carrier": "UPS",
+      "service": "UPS_GROUND",
+      "price": 18.47,
+      "deliveryDays": 3,
+      "savings": 1.83
+    }
+  },
+  {
+    "id": 1764016128211,
+    "timestamp": "2025-11-24T20:28:48.210Z",
+    "request": {
+      "fromZip": "07102",
+      "toZip": "10001",
+      "weight": 5
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "services": [
+        {
+          "service": "FEDEX_GROUND",
+          "price": "20.30",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_2_DAY",
+          "price": "34.80",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_OVERNIGHT",
+          "price": "65.25",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "ups": {
+      "carrier": "UPS",
+      "services": [
+        {
+          "service": "UPS_GROUND",
+          "price": "18.47",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_2ND_DAY_AIR",
+          "price": "33.29",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_NEXT_DAY_AIR",
+          "price": "55.45",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "services": [
+        {
+          "service": "DHL_DOMESTIC",
+          "price": "22.13",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS",
+          "price": "41.65",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS_OVERNIGHT",
+          "price": "75.79",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "allOptions": [
+      {
+        "carrier": "UPS",
+        "service": "UPS_GROUND",
+        "price": 18.47,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_GROUND",
+        "price": 20.3,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_DOMESTIC",
+        "price": 22.13,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_2ND_DAY_AIR",
+        "price": 33.29,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_2_DAY",
+        "price": 34.8,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS",
+        "price": 41.65,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_NEXT_DAY_AIR",
+        "price": 55.45,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_OVERNIGHT",
+        "price": 65.25,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS_OVERNIGHT",
+        "price": 75.79,
+        "deliveryDays": 1,
+        "currency": "USD"
+      }
+    ],
+    "best": {
+      "carrier": "UPS",
+      "service": "UPS_GROUND",
+      "price": 18.47,
+      "deliveryDays": 3,
+      "savings": 1.83
+    }
+  },
+  {
+    "id": 1764020096600,
+    "timestamp": "2025-11-24T21:34:56.600Z",
+    "request": {
+      "fromZip": "07102",
+      "toZip": "10001",
+      "weight": 5
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "services": [
+        {
+          "service": "FEDEX_GROUND",
+          "price": "20.30",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_2_DAY",
+          "price": "34.80",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_OVERNIGHT",
+          "price": "65.25",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "ups": {
+      "carrier": "UPS",
+      "services": [
+        {
+          "service": "UPS_GROUND",
+          "price": "18.47",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_2ND_DAY_AIR",
+          "price": "33.29",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_NEXT_DAY_AIR",
+          "price": "55.45",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "services": [
+        {
+          "service": "DHL_DOMESTIC",
+          "price": "22.13",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS",
+          "price": "41.65",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS_OVERNIGHT",
+          "price": "75.79",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "allOptions": [
+      {
+        "carrier": "UPS",
+        "service": "UPS_GROUND",
+        "price": 18.47,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_GROUND",
+        "price": 20.3,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_DOMESTIC",
+        "price": 22.13,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_2ND_DAY_AIR",
+        "price": 33.29,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_2_DAY",
+        "price": 34.8,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS",
+        "price": 41.65,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_NEXT_DAY_AIR",
+        "price": 55.45,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_OVERNIGHT",
+        "price": 65.25,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS_OVERNIGHT",
+        "price": 75.79,
+        "deliveryDays": 1,
+        "currency": "USD"
+      }
+    ],
+    "best": {
+      "carrier": "UPS",
+      "service": "UPS_GROUND",
+      "price": 18.47,
+      "deliveryDays": 3,
+      "savings": 1.83
+    }
+  },
+  {
+    "id": 1764037822669,
+    "timestamp": "2025-11-25T02:30:22.668Z",
+    "request": {
+      "fromZip": "07102",
+      "toZip": "10001",
+      "weight": 5
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "services": [
+        {
+          "service": "FEDEX_GROUND",
+          "price": "20.30",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_2_DAY",
+          "price": "34.80",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "FEDEX_OVERNIGHT",
+          "price": "65.25",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "ups": {
+      "carrier": "UPS",
+      "services": [
+        {
+          "service": "UPS_GROUND",
+          "price": "18.47",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_2ND_DAY_AIR",
+          "price": "33.29",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "UPS_NEXT_DAY_AIR",
+          "price": "55.45",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "services": [
+        {
+          "service": "DHL_DOMESTIC",
+          "price": "22.13",
+          "deliveryDays": 3,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS",
+          "price": "41.65",
+          "deliveryDays": 2,
+          "currency": "USD"
+        },
+        {
+          "service": "DHL_EXPRESS_OVERNIGHT",
+          "price": "75.79",
+          "deliveryDays": 1,
+          "currency": "USD"
+        }
+      ],
+      "mock": true
+    },
+    "allOptions": [
+      {
+        "carrier": "UPS",
+        "service": "UPS_GROUND",
+        "price": 18.47,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_GROUND",
+        "price": 20.3,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_DOMESTIC",
+        "price": 22.13,
+        "deliveryDays": 3,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_2ND_DAY_AIR",
+        "price": 33.29,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_2_DAY",
+        "price": 34.8,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS",
+        "price": 41.65,
+        "deliveryDays": 2,
+        "currency": "USD"
+      },
+      {
+        "carrier": "UPS",
+        "service": "UPS_NEXT_DAY_AIR",
+        "price": 55.45,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "FedEx",
+        "service": "FEDEX_OVERNIGHT",
+        "price": 65.25,
+        "deliveryDays": 1,
+        "currency": "USD"
+      },
+      {
+        "carrier": "DHL",
+        "service": "DHL_EXPRESS_OVERNIGHT",
+        "price": 75.79,
+        "deliveryDays": 1,
+        "currency": "USD"
+      }
+    ],
+    "best": {
+      "carrier": "UPS",
+      "service": "UPS_GROUND",
+      "price": 18.47,
+      "deliveryDays": 3,
+      "savings": 1.83
+    }
+  },
+  {
+    "id": 1764037822710,
+    "timestamp": "2025-11-25T02:30:22.710Z",
+    "request": {
+      "fromZip": "07102",
+      "toZip": "10001",
+      "weight": 5
+    },
+    "fedex": {
+      "carrier": "FedEx",
+      "price": 19.4,
+      "estimatedDays": 2
+    },
+    "ups": {
+      "carrier": "UPS",
+      "price": 20.23,
+      "estimatedDays": 3
+    },
+    "dhl": {
+      "carrier": "DHL",
+      "price": 21.07,
       "estimatedDays": 4
     },
     "best": "FedEx"

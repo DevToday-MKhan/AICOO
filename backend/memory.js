@@ -204,6 +204,78 @@ export function getAnalytics() {
   return memory.analytics;
 }
 
+/**
+ * Record carrier performance metrics (NEW - Mission 11)
+ * @param {object} carrierData - Carrier performance data from shipping
+ */
+export function recordCarrierPerformance(carrierData) {
+  const memory = loadMemory();
+  
+  // Initialize carrier performance if not exists
+  if (!memory.carrierPerformance) {
+    memory.carrierPerformance = {
+      fedex: { totalShipments: 0, totalCost: 0, onTimeDeliveries: 0, avgDays: 0 },
+      ups: { totalShipments: 0, totalCost: 0, onTimeDeliveries: 0, avgDays: 0 },
+      dhl: { totalShipments: 0, totalCost: 0, onTimeDeliveries: 0, avgDays: 0 }
+    };
+  }
+  
+  const carrier = carrierData.carrier.toLowerCase();
+  
+  if (memory.carrierPerformance[carrier]) {
+    memory.carrierPerformance[carrier].totalShipments++;
+    memory.carrierPerformance[carrier].totalCost += parseFloat(carrierData.cost || 0);
+    
+    if (carrierData.onTime) {
+      memory.carrierPerformance[carrier].onTimeDeliveries++;
+    }
+    
+    if (carrierData.deliveryDays) {
+      const currentAvg = memory.carrierPerformance[carrier].avgDays;
+      const count = memory.carrierPerformance[carrier].totalShipments;
+      memory.carrierPerformance[carrier].avgDays = 
+        ((currentAvg * (count - 1)) + carrierData.deliveryDays) / count;
+    }
+  }
+  
+  saveMemory(memory);
+  addObservation("carrier_performance_updated", { carrier, ...carrierData });
+  
+  return memory.carrierPerformance;
+}
+
+/**
+ * Get carrier performance statistics (NEW - Mission 11)
+ */
+export function getCarrierPerformance() {
+  const memory = loadMemory();
+  
+  const defaultData = {
+    fedex: { totalShipments: 0, totalCost: 0, onTimeDeliveries: 0, avgDays: 0 },
+    ups: { totalShipments: 0, totalCost: 0, onTimeDeliveries: 0, avgDays: 0 },
+    dhl: { totalShipments: 0, totalCost: 0, onTimeDeliveries: 0, avgDays: 0 }
+  };
+  
+  const sourceData = memory.carrierPerformance || defaultData;
+  
+  // Calculate on-time percentages and average costs
+  const stats = {};
+  
+  for (const [carrier, data] of Object.entries(sourceData)) {
+    stats[carrier] = {
+      ...data,
+      onTimePercentage: data.totalShipments > 0 
+        ? parseFloat(((data.onTimeDeliveries / data.totalShipments) * 100).toFixed(1))
+        : 0,
+      avgCost: data.totalShipments > 0
+        ? parseFloat((data.totalCost / data.totalShipments).toFixed(2))
+        : 0
+    };
+  }
+  
+  return stats;
+}
+
 // Update analytics (called after routing, delivery, simulation, webhook)
 export async function updateAnalytics() {
   try {
@@ -230,6 +302,11 @@ export function clearMemory() {
       commonCarrier: null,
       commonService: null,
     },
+    carrierPerformance: {
+      fedex: { totalShipments: 0, totalCost: 0, onTimeDeliveries: 0, avgDays: 0 },
+      ups: { totalShipments: 0, totalCost: 0, onTimeDeliveries: 0, avgDays: 0 },
+      dhl: { totalShipments: 0, totalCost: 0, onTimeDeliveries: 0, avgDays: 0 }
+    }
   };
   saveMemory(freshMemory);
   return freshMemory;

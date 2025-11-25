@@ -7,6 +7,8 @@ import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import IntelligenceDashboard from "../components/IntelligenceDashboard";
 import AdvancedFilter from "../components/AdvancedFilter";
 import SmartRecommendations from "../components/SmartRecommendations";
+import CarrierPerformanceCard from "../components/CarrierPerformanceCard";
+import RateShopping from "../components/RateShopping";
 
 const sectionStyle = {
   ...components.card,
@@ -248,6 +250,13 @@ const Dashboard = () => {
       <div style={sectionStyle}>
         <h3 style={headingStyle}>🧠 AICOO Intelligence Layer</h3>
         <IntelligenceDashboard />
+      </div>
+
+      {/* Carrier Performance & Rate Shopping - NEW Mission 11 */}
+      <div style={sectionStyle}>
+        <h3 style={headingStyle}>🚚 Carrier Management</h3>
+        <CarrierPerformanceCard isDarkMode={false} />
+        <RateShopping isDarkMode={false} />
       </div>
 
       {/* Analytics Dashboard */}

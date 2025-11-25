@@ -26,6 +26,10 @@ I analyze operations, optimize logistics, monitor system health, and provide str
 \`/trends\` — 7-day trend analysis
 \`/predict\` — Tomorrow's predictions
 \`/memory\` — View AICOO memory & learning data
+\`/rates 07102 10001 5\` — Compare carrier rates
+\`/label 12345\` — Create shipping label
+\`/track FX1234567890\` — Track shipment
+\`/validate-address <address>\` — Validate address
 \`health\` — Check system status
 \`analyze orders\` — Review recent order trends
 
@@ -53,6 +57,12 @@ How can I help optimize your operations today?`
       
       // Check for analytics commands
       const analyticsMatch = userInput.match(/^\/(analytics|summary|trends|predict)$/i);
+      
+      // Check for carrier commands (NEW - Mission 11)
+      const ratesMatch = userInput.match(/^\/rates\s+(\d{5})\s+(\d{5})\s+(\d+(?:\.\d+)?)/i);
+      const labelMatch = userInput.match(/^\/label\s+(.+)/i);
+      const trackMatch = userInput.match(/^\/track\s+(.+)/i);
+      const validateMatch = userInput.match(/^\/validate-address\s+(.+)/i);
       
       if (assignMatch) {
         const orderId = assignMatch[1];
@@ -156,6 +166,192 @@ How can I help optimize your operations today?`
           const aiMessage = {
             role: "assistant",
             content: `🔮 **Tomorrow's Predictions**\n\n• Predicted Cost: $${pred?.tomorrowCost?.toFixed(2) || '0.00'}\n• Predicted Orders: ${pred?.tomorrowOrders || 0}\n• Confidence: ${pred?.confidence || 'low'}\n• Trend: ${pred?.trend || 'stable'}${surgeTxt}`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        }
+      } else if (ratesMatch) {
+        // /rates command - Rate shopping
+        const fromZip = ratesMatch[1];
+        const toZip = ratesMatch[2];
+        const weight = parseFloat(ratesMatch[3]);
+        
+        const res = await fetch("/api/courier/rates", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fromZip, toZip, weight })
+        });
+        
+        if (!res.ok) {
+          throw new Error(`Rates API error: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          const aiMessage = {
+            role: "assistant",
+            content: `❌ Error: ${data.error}`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else {
+          // Format rate comparison response
+          const fedexServices = data.fedex?.services || [];
+          const upsServices = data.ups?.services || [];
+          const dhlServices = data.dhl?.services || [];
+          
+          const fedexText = fedexServices.length > 0
+            ? fedexServices.map(s => `  • ${s.service}: $${s.price} (${s.deliveryDays}d)`).join('\n')
+            : '  • No rates available';
+          
+          const upsText = upsServices.length > 0
+            ? upsServices.map(s => `  • ${s.service}: $${s.price} (${s.deliveryDays}d)`).join('\n')
+            : '  • No rates available';
+          
+          const dhlText = dhlServices.length > 0
+            ? dhlServices.map(s => `  • ${s.service}: $${s.price} (${s.deliveryDays}d)`).join('\n')
+            : '  • No rates available';
+          
+          const bestOption = data.best
+            ? `\n\n⭐ **BEST OPTION**\n${data.best.carrier} ${data.best.service}\n💰 $${data.best.price} (${data.best.deliveryDays} days)\n💵 Save $${data.best.savings} vs next best`
+            : '';
+          
+          const mockWarning = (data.fedex?.mock || data.ups?.mock || data.dhl?.mock)
+            ? '\n\n⚠️ *Using mock data - configure carrier API credentials in Admin for live rates*'
+            : '';
+          
+          const aiMessage = {
+            role: "assistant",
+            content: `🔍 **Rate Shopping Results**\n\nRoute: ${fromZip} → ${toZip} (${weight} lbs)\n\n📮 **FedEx:**\n${fedexText}\n\n📦 **UPS:**\n${upsText}\n\n🚚 **DHL:**\n${dhlText}${bestOption}${mockWarning}`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        }
+      } else if (labelMatch) {
+        // /label command - Create shipping label
+        const orderId = labelMatch[1].trim();
+        
+        // For demo, we'll use default shipment data
+        // In production, this would fetch order details first
+        const res = await fetch("/api/courier/label", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: orderId,
+            carrier: "fedex",
+            fromZip: "07102",
+            toZip: "10001",
+            weight: 5,
+            customerName: "Customer",
+            customerAddress: "123 Main St",
+            customerCity: "New York",
+            customerState: "NY"
+          })
+        });
+        
+        if (!res.ok) {
+          throw new Error(`Label API error: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          const aiMessage = {
+            role: "assistant",
+            content: `❌ Error: ${data.error}`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else {
+          const mockWarning = data.mock
+            ? '\n\n⚠️ *Mock label generated - configure carrier API credentials in Admin for real labels*'
+            : '';
+          
+          const aiMessage = {
+            role: "assistant",
+            content: `✅ **Shipping Label Created!**\n\nOrder: #${orderId}\nCarrier: ${data.carrier}\nTracking: \`${data.trackingNumber}\`\nCost: $${data.cost}\nService: ${data.service}\nEstimated Delivery: ${new Date(data.estimatedDelivery).toLocaleDateString()}\n\n📄 [Download Label](${data.labelUrl})${mockWarning}\n\nUse \`/track ${data.trackingNumber}\` to monitor shipment.`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        }
+      } else if (trackMatch) {
+        // /track command - Track shipment
+        const trackingNumber = trackMatch[1].trim();
+        
+        const res = await fetch("/api/courier/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ trackingNumber })
+        });
+        
+        if (!res.ok) {
+          throw new Error(`Track API error: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          const aiMessage = {
+            role: "assistant",
+            content: `❌ Error: ${data.error}`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else {
+          const statusEmoji = data.status === 'DELIVERED' ? '✅'
+            : data.status === 'IN_TRANSIT' ? '🚚'
+            : data.status === 'PICKED_UP' ? '📦'
+            : '📍';
+          
+          const eventsText = data.events && data.events.length > 0
+            ? data.events.slice(0, 5).map(e => 
+                `• ${new Date(e.timestamp).toLocaleString()}\n  ${e.status} - ${e.location || 'N/A'}`
+              ).join('\n')
+            : 'No tracking events available';
+          
+          const mockWarning = data.mock
+            ? '\n\n⚠️ *Mock tracking data - configure carrier API credentials in Admin for live tracking*'
+            : '';
+          
+          const aiMessage = {
+            role: "assistant",
+            content: `📦 **Shipment Tracking**\n\nTracking #: \`${trackingNumber}\`\nCarrier: ${data.carrier}\nStatus: ${statusEmoji} ${data.status}\nEst. Delivery: ${new Date(data.estimatedDelivery).toLocaleDateString()}\n\n**History:**\n${eventsText}${mockWarning}`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        }
+      } else if (validateMatch) {
+        // /validate-address command
+        const addressString = validateMatch[1].trim();
+        
+        // Parse address (simple format: street, city, state zip)
+        const parts = addressString.split(',').map(p => p.trim());
+        const address = {
+          street: parts[0] || addressString,
+          city: parts[1] || "New York",
+          state: parts[2]?.split(' ')[0] || "NY",
+          zip: parts[2]?.split(' ')[1] || "10001"
+        };
+        
+        const res = await fetch("/api/courier/validate-address", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address, carrier: "fedex" })
+        });
+        
+        if (!res.ok) {
+          throw new Error(`Address validation error: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          const aiMessage = {
+            role: "assistant",
+            content: `❌ Error: ${data.error}`
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else {
+          const validEmoji = data.valid ? '✅' : '⚠️';
+          const validText = data.valid ? 'Valid' : 'Invalid or Unverified';
+          
+          const aiMessage = {
+            role: "assistant",
+            content: `📍 **Address Validation**\n\nStatus: ${validEmoji} ${validText}\nConfidence: ${data.confidence || 'medium'}\n\n**Submitted:**\n${address.street}\n${address.city}, ${address.state} ${address.zip}\n\n${data.valid ? '✓ Address can be used for shipping' : '⚠️ Address may need correction'}`
           };
           setMessages((prev) => [...prev, aiMessage]);
         }

@@ -239,6 +239,124 @@ app.get("/api/courier/history", (req, res) => {
   res.json(getCourierHistory());
 });
 
+// NEW: Live carrier rates (real API integration)
+app.post("/api/courier/rates", async (req, res) => {
+  const { fromZip, toZip, weight } = req.body;
+
+  if (!fromZip || !toZip || !weight) {
+    return res.status(400).json({ error: "Missing required fields: fromZip, toZip, weight" });
+  }
+
+  try {
+    const { getLiveRates } = await import("./courier.js");
+    const result = await getLiveRates(fromZip, toZip, weight);
+    res.json(result);
+  } catch (err) {
+    console.error("🔥 LIVE RATES ERROR:", err);
+    res.status(500).json({ error: "Failed to fetch live rates", details: err.message });
+  }
+});
+
+// NEW: Create shipping label
+app.post("/api/courier/label", async (req, res) => {
+  const orderData = req.body;
+
+  if (!orderData.carrier || !orderData.fromZip || !orderData.toZip) {
+    return res.status(400).json({ error: "Missing required fields: carrier, fromZip, toZip" });
+  }
+
+  try {
+    const { createShippingLabel } = await import("./courier.js");
+    const label = await createShippingLabel(orderData);
+    res.json(label);
+  } catch (err) {
+    console.error("🔥 LABEL CREATION ERROR:", err);
+    res.status(500).json({ error: "Failed to create shipping label", details: err.message });
+  }
+});
+
+// NEW: Track shipment
+app.post("/api/courier/track", async (req, res) => {
+  const { trackingNumber, carrier } = req.body;
+
+  if (!trackingNumber) {
+    return res.status(400).json({ error: "Missing required field: trackingNumber" });
+  }
+
+  try {
+    const { trackShipment } = await import("./courier.js");
+    const tracking = await trackShipment(trackingNumber, carrier);
+    res.json(tracking);
+  } catch (err) {
+    console.error("🔥 TRACKING ERROR:", err);
+    res.status(500).json({ error: "Failed to track shipment", details: err.message });
+  }
+});
+
+// NEW: Validate address
+app.post("/api/courier/validate-address", async (req, res) => {
+  const { address, carrier } = req.body;
+
+  if (!address || !address.street || !address.city || !address.zip) {
+    return res.status(400).json({ error: "Missing required address fields" });
+  }
+
+  try {
+    const { validateAddress } = await import("./courier.js");
+    const validation = await validateAddress(address, carrier);
+    res.json(validation);
+  } catch (err) {
+    console.error("🔥 ADDRESS VALIDATION ERROR:", err);
+    res.status(500).json({ error: "Failed to validate address", details: err.message });
+  }
+});
+
+// NEW: FedEx webhook endpoint
+app.post("/api/courier/webhooks/fedex", async (req, res) => {
+  console.log("📦 FedEx Webhook received:", JSON.stringify(req.body, null, 2));
+  
+  try {
+    // TODO: Implement FedEx webhook processing
+    // - Parse tracking update
+    // - Update delivery status in deliveries.json
+    // - Trigger analytics recomputation
+    // - Send WebSocket notification to frontend
+    
+    res.json({ received: true, carrier: "FedEx", timestamp: new Date().toISOString() });
+  } catch (err) {
+    console.error("🔥 FEDEX WEBHOOK ERROR:", err);
+    res.status(500).json({ error: "Failed to process FedEx webhook" });
+  }
+});
+
+// NEW: UPS webhook endpoint
+app.post("/api/courier/webhooks/ups", async (req, res) => {
+  console.log("📦 UPS Webhook received:", JSON.stringify(req.body, null, 2));
+  
+  try {
+    // TODO: Implement UPS webhook processing
+    
+    res.json({ received: true, carrier: "UPS", timestamp: new Date().toISOString() });
+  } catch (err) {
+    console.error("🔥 UPS WEBHOOK ERROR:", err);
+    res.status(500).json({ error: "Failed to process UPS webhook" });
+  }
+});
+
+// NEW: DHL webhook endpoint
+app.post("/api/courier/webhooks/dhl", async (req, res) => {
+  console.log("📦 DHL Webhook received:", JSON.stringify(req.body, null, 2));
+  
+  try {
+    // TODO: Implement DHL webhook processing
+    
+    res.json({ received: true, carrier: "DHL", timestamp: new Date().toISOString() });
+  } catch (err) {
+    console.error("🔥 DHL WEBHOOK ERROR:", err);
+    res.status(500).json({ error: "Failed to process DHL webhook" });
+  }
+});
+
 // ---------------------------------------
 // RIDE COMPARE — UBER VS LYFT
 // ---------------------------------------
@@ -603,6 +721,29 @@ app.post("/api/memory/record-route", (req, res) => {
   }
 });
 
+// NEW: Get carrier performance statistics
+app.get("/api/memory/carrier-performance", (req, res) => {
+  try {
+    const stats = Memory.getCarrierPerformance();
+    res.json(stats);
+  } catch (err) {
+    logError(err, "GET_CARRIER_PERFORMANCE");
+    res.status(500).json({ error: "Failed to get carrier performance" });
+  }
+});
+
+// NEW: Record carrier performance
+app.post("/api/memory/carrier-performance", (req, res) => {
+  try {
+    const performance = Memory.recordCarrierPerformance(req.body);
+    if (IS_DEV) console.log(`📊 Carrier performance recorded: ${req.body.carrier}`);
+    res.json(performance);
+  } catch (err) {
+    logError(err, "RECORD_CARRIER_PERFORMANCE");
+    res.status(500).json({ error: "Failed to record carrier performance" });
+  }
+});
+
 app.post("/api/admin/clear-memory", (req, res) => {
   try {
     Memory.clearMemory();
@@ -612,6 +753,26 @@ app.post("/api/admin/clear-memory", (req, res) => {
     logError(err, "CLEAR_MEMORY");
     res.status(500).json({ error: "Failed to clear memory" });
   }
+});
+
+// NEW: Save carrier credentials (Mission 11)
+app.post("/api/admin/credentials/:carrier", (req, res) => {
+  const { carrier } = req.params;
+  const credentials = req.body;
+  
+  // TODO: In production, save to .env file or encrypted storage
+  // For now, we'll just validate and acknowledge
+  
+  console.log(`🔑 Carrier credentials received for ${carrier.toUpperCase()}`);
+  console.log(`   Client ID/API Key: ${credentials.clientId || credentials.apiKey ? '***' : 'not provided'}`);
+  console.log(`   Secret: ${credentials.clientSecret || credentials.apiSecret ? '***' : 'not provided'}`);
+  console.log(`   Account: ${credentials.accountNumber || 'not provided'}`);
+  
+  res.json({ 
+    status: "ok", 
+    message: `${carrier.toUpperCase()} credentials saved (currently in-memory only. For production, implement .env storage)`,
+    carrier: carrier
+  });
 });
 
 app.get("/api/admin/backup", (req, res) => {

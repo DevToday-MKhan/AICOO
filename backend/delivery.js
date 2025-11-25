@@ -67,6 +67,106 @@ export function getLatestDelivery() {
   return deliveries.length > 0 ? deliveries[deliveries.length - 1] : null;
 }
 
+/**
+ * Update delivery with shipping label data (NEW - Mission 11)
+ * @param {string} deliveryId - Delivery ID to update
+ * @param {object} labelData - Shipping label information
+ */
+export function updateDeliveryWithLabel(deliveryId, labelData) {
+  const deliveries = loadDeliveries();
+  const index = deliveries.findIndex(d => d.id === parseInt(deliveryId));
+  
+  if (index === -1) {
+    throw new Error(`Delivery ${deliveryId} not found`);
+  }
+  
+  // Add shipping label information
+  deliveries[index].shippingLabel = {
+    trackingNumber: labelData.trackingNumber,
+    labelUrl: labelData.labelUrl,
+    carrierType: labelData.carrier,
+    service: labelData.service,
+    cost: labelData.cost,
+    estimatedDelivery: labelData.estimatedDelivery,
+    createdAt: new Date().toISOString()
+  };
+  
+  // Initialize status updates array if not exists
+  if (!deliveries[index].statusUpdates) {
+    deliveries[index].statusUpdates = [];
+  }
+  
+  // Add initial status
+  deliveries[index].statusUpdates.push({
+    timestamp: new Date().toISOString(),
+    status: "LABEL_CREATED",
+    description: "Shipping label created",
+    location: null
+  });
+  
+  fs.writeFileSync(DELIVERIES_PATH, JSON.stringify(deliveries, null, 2));
+  
+  // Emit WebSocket update
+  import('./server.js').then(({ io }) => {
+    io.emit('delivery:label-created', deliveries[index]);
+  }).catch(() => {});
+  
+  return deliveries[index];
+}
+
+/**
+ * Add tracking status update to delivery (NEW - Mission 11)
+ * @param {string} trackingNumber - Tracking number
+ * @param {object} statusUpdate - Status update from carrier webhook
+ */
+export function addTrackingUpdate(trackingNumber, statusUpdate) {
+  const deliveries = loadDeliveries();
+  const index = deliveries.findIndex(d => 
+    d.shippingLabel && d.shippingLabel.trackingNumber === trackingNumber
+  );
+  
+  if (index === -1) {
+    console.warn(`⚠️ No delivery found for tracking number: ${trackingNumber}`);
+    return null;
+  }
+  
+  // Initialize status updates if not exists
+  if (!deliveries[index].statusUpdates) {
+    deliveries[index].statusUpdates = [];
+  }
+  
+  // Add new status update
+  deliveries[index].statusUpdates.push({
+    timestamp: statusUpdate.timestamp || new Date().toISOString(),
+    status: statusUpdate.status,
+    description: statusUpdate.description || statusUpdate.status,
+    location: statusUpdate.location || null
+  });
+  
+  // Update current status
+  deliveries[index].currentStatus = statusUpdate.status;
+  
+  fs.writeFileSync(DELIVERIES_PATH, JSON.stringify(deliveries, null, 2));
+  
+  // Emit WebSocket update
+  import('./server.js').then(({ io }) => {
+    io.emit('delivery:tracking-update', deliveries[index]);
+  }).catch(() => {});
+  
+  return deliveries[index];
+}
+
+/**
+ * Get delivery by tracking number (NEW - Mission 11)
+ * @param {string} trackingNumber - Tracking number
+ */
+export function getDeliveryByTracking(trackingNumber) {
+  const deliveries = loadDeliveries();
+  return deliveries.find(d => 
+    d.shippingLabel && d.shippingLabel.trackingNumber === trackingNumber
+  ) || null;
+}
+
 // ---------------------------------------
 // DELIVERY ASSIGNMENT LOGIC
 // ---------------------------------------

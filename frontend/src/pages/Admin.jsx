@@ -65,6 +65,30 @@ const Admin = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // Carrier credentials state
+  const [carrierCredentials, setCarrierCredentials] = useState({
+    fedex: {
+      clientId: '',
+      clientSecret: '',
+      accountNumber: ''
+    },
+    ups: {
+      clientId: '',
+      clientSecret: '',
+      accountNumber: ''
+    },
+    dhl: {
+      apiKey: '',
+      apiSecret: '',
+      accountNumber: ''
+    }
+  });
+  const [carrierTestResults, setCarrierTestResults] = useState({
+    fedex: null,
+    ups: null,
+    dhl: null
+  });
+
   useEffect(() => {
     fetchStats();
     fetchHealth();
@@ -365,6 +389,64 @@ const Admin = () => {
     setTimeout(() => setMessage(""), 5000);
   };
 
+  // Carrier Credentials Handlers
+  const handleCarrierCredentialChange = (carrier, field, value) => {
+    setCarrierCredentials(prev => ({
+      ...prev,
+      [carrier]: {
+        ...prev[carrier],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleSaveCarrierCredentials = async (carrier) => {
+    try {
+      const res = await fetch(`/api/admin/credentials/${carrier}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(carrierCredentials[carrier])
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        setMessage(`✅ ${carrier.toUpperCase()} credentials saved successfully`);
+      } else {
+        setMessage(`❌ Failed to save ${carrier.toUpperCase()} credentials: ${data.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      setMessage(`❌ Error saving ${carrier.toUpperCase()} credentials: ${err.message}`);
+    }
+
+    setTimeout(() => setMessage(""), 3000);
+  };
+
+  const handleTestCarrierConnection = async (carrier) => {
+    setCarrierTestResults(prev => ({ ...prev, [carrier]: 'testing' }));
+    
+    try {
+      const res = await fetch(`/api/courier/rates`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fromZip: "07102", toZip: "10001", weight: 5 })
+      });
+      const data = await res.json();
+      
+      if (res.ok && data[carrier] && !data[carrier].error) {
+        setCarrierTestResults(prev => ({ ...prev, [carrier]: 'success' }));
+        setMessage(`✅ ${carrier.toUpperCase()} connection test successful!`);
+      } else {
+        setCarrierTestResults(prev => ({ ...prev, [carrier]: 'error' }));
+        setMessage(`❌ ${carrier.toUpperCase()} connection test failed: ${data[carrier]?.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      setCarrierTestResults(prev => ({ ...prev, [carrier]: 'error' }));
+      setMessage(`❌ ${carrier.toUpperCase()} connection test failed: ${err.message}`);
+    }
+
+    setTimeout(() => setMessage(""), 5000);
+  };
+
   const handleClearSimulations = async () => {
     if (!window.confirm("Clear all simulation logs?")) {
       return;
@@ -462,6 +544,169 @@ const Admin = () => {
             <div style={{fontSize: "12px", color: "#666"}}>Ride Quotes</div>
             <div style={{fontSize: "24px", color: "#007bff"}}>{stats.rides}</div>
           </div>
+        </div>
+      </div>
+
+      {/* Carrier API Credentials - NEW Mission 11 */}
+      <div style={{...sectionStyle, backgroundColor: "#f0f9ff", borderColor: "#0ea5e9"}}>
+        <h3 style={{...headingStyle, borderColor: "#0ea5e9"}}>🚚 Carrier API Credentials</h3>
+        <p style={{marginBottom: "20px", color: "#666"}}>
+          Configure API credentials for FedEx, UPS, and DHL to enable live rate shopping and label creation.
+        </p>
+
+        {/* FedEx */}
+        <div style={{marginBottom: "24px", padding: "16px", backgroundColor: "white", borderRadius: "8px", border: "1px solid #e5e7eb"}}>
+          <div style={{display: "flex", alignItems: "center", marginBottom: "12px"}}>
+            <h4 style={{margin: 0, color: "#4f46e5"}}>📮 FedEx</h4>
+            {carrierTestResults.fedex === 'success' && <span style={{marginLeft: "12px", color: "#10b981"}}>✓ Connected</span>}
+            {carrierTestResults.fedex === 'error' && <span style={{marginLeft: "12px", color: "#ef4444"}}>✗ Failed</span>}
+            {carrierTestResults.fedex === 'testing' && <span style={{marginLeft: "12px", color: "#f59e0b"}}>⏳ Testing...</span>}
+          </div>
+          <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "12px", marginBottom: "12px"}}>
+            <div>
+              <label style={{display: "block", fontSize: "12px", color: "#666", marginBottom: "4px"}}>Client ID</label>
+              <input
+                type="text"
+                placeholder="YOUR_FEDEX_CLIENT_ID"
+                value={carrierCredentials.fedex.clientId}
+                onChange={(e) => handleCarrierCredentialChange('fedex', 'clientId', e.target.value)}
+                style={{width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db"}}
+              />
+            </div>
+            <div>
+              <label style={{display: "block", fontSize: "12px", color: "#666", marginBottom: "4px"}}>Client Secret</label>
+              <input
+                type="password"
+                placeholder="YOUR_FEDEX_CLIENT_SECRET"
+                value={carrierCredentials.fedex.clientSecret}
+                onChange={(e) => handleCarrierCredentialChange('fedex', 'clientSecret', e.target.value)}
+                style={{width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db"}}
+              />
+            </div>
+            <div>
+              <label style={{display: "block", fontSize: "12px", color: "#666", marginBottom: "4px"}}>Account Number</label>
+              <input
+                type="text"
+                placeholder="YOUR_FEDEX_ACCOUNT"
+                value={carrierCredentials.fedex.accountNumber}
+                onChange={(e) => handleCarrierCredentialChange('fedex', 'accountNumber', e.target.value)}
+                style={{width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db"}}
+              />
+            </div>
+          </div>
+          <div>
+            <button style={{...primaryButton, backgroundColor: "#4f46e5", borderColor: "#4f46e5"}} onClick={() => handleSaveCarrierCredentials('fedex')}>
+              💾 Save FedEx
+            </button>
+            <button style={{...successButton, marginLeft: "8px"}} onClick={() => handleTestCarrierConnection('fedex')}>
+              🧪 Test Connection
+            </button>
+          </div>
+        </div>
+
+        {/* UPS */}
+        <div style={{marginBottom: "24px", padding: "16px", backgroundColor: "white", borderRadius: "8px", border: "1px solid #e5e7eb"}}>
+          <div style={{display: "flex", alignItems: "center", marginBottom: "12px"}}>
+            <h4 style={{margin: 0, color: "#eab308"}}>📦 UPS</h4>
+            {carrierTestResults.ups === 'success' && <span style={{marginLeft: "12px", color: "#10b981"}}>✓ Connected</span>}
+            {carrierTestResults.ups === 'error' && <span style={{marginLeft: "12px", color: "#ef4444"}}>✗ Failed</span>}
+            {carrierTestResults.ups === 'testing' && <span style={{marginLeft: "12px", color: "#f59e0b"}}>⏳ Testing...</span>}
+          </div>
+          <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "12px", marginBottom: "12px"}}>
+            <div>
+              <label style={{display: "block", fontSize: "12px", color: "#666", marginBottom: "4px"}}>Client ID</label>
+              <input
+                type="text"
+                placeholder="YOUR_UPS_CLIENT_ID"
+                value={carrierCredentials.ups.clientId}
+                onChange={(e) => handleCarrierCredentialChange('ups', 'clientId', e.target.value)}
+                style={{width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db"}}
+              />
+            </div>
+            <div>
+              <label style={{display: "block", fontSize: "12px", color: "#666", marginBottom: "4px"}}>Client Secret</label>
+              <input
+                type="password"
+                placeholder="YOUR_UPS_CLIENT_SECRET"
+                value={carrierCredentials.ups.clientSecret}
+                onChange={(e) => handleCarrierCredentialChange('ups', 'clientSecret', e.target.value)}
+                style={{width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db"}}
+              />
+            </div>
+            <div>
+              <label style={{display: "block", fontSize: "12px", color: "#666", marginBottom: "4px"}}>Account Number</label>
+              <input
+                type="text"
+                placeholder="YOUR_UPS_ACCOUNT"
+                value={carrierCredentials.ups.accountNumber}
+                onChange={(e) => handleCarrierCredentialChange('ups', 'accountNumber', e.target.value)}
+                style={{width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db"}}
+              />
+            </div>
+          </div>
+          <div>
+            <button style={{...primaryButton, backgroundColor: "#eab308", borderColor: "#eab308"}} onClick={() => handleSaveCarrierCredentials('ups')}>
+              💾 Save UPS
+            </button>
+            <button style={{...successButton, marginLeft: "8px"}} onClick={() => handleTestCarrierConnection('ups')}>
+              🧪 Test Connection
+            </button>
+          </div>
+        </div>
+
+        {/* DHL */}
+        <div style={{marginBottom: "24px", padding: "16px", backgroundColor: "white", borderRadius: "8px", border: "1px solid #e5e7eb"}}>
+          <div style={{display: "flex", alignItems: "center", marginBottom: "12px"}}>
+            <h4 style={{margin: 0, color: "#ef4444"}}>🚚 DHL</h4>
+            {carrierTestResults.dhl === 'success' && <span style={{marginLeft: "12px", color: "#10b981"}}>✓ Connected</span>}
+            {carrierTestResults.dhl === 'error' && <span style={{marginLeft: "12px", color: "#ef4444"}}>✗ Failed</span>}
+            {carrierTestResults.dhl === 'testing' && <span style={{marginLeft: "12px", color: "#f59e0b"}}>⏳ Testing...</span>}
+          </div>
+          <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "12px", marginBottom: "12px"}}>
+            <div>
+              <label style={{display: "block", fontSize: "12px", color: "#666", marginBottom: "4px"}}>API Key</label>
+              <input
+                type="text"
+                placeholder="YOUR_DHL_API_KEY"
+                value={carrierCredentials.dhl.apiKey}
+                onChange={(e) => handleCarrierCredentialChange('dhl', 'apiKey', e.target.value)}
+                style={{width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db"}}
+              />
+            </div>
+            <div>
+              <label style={{display: "block", fontSize: "12px", color: "#666", marginBottom: "4px"}}>API Secret</label>
+              <input
+                type="password"
+                placeholder="YOUR_DHL_API_SECRET"
+                value={carrierCredentials.dhl.apiSecret}
+                onChange={(e) => handleCarrierCredentialChange('dhl', 'apiSecret', e.target.value)}
+                style={{width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db"}}
+              />
+            </div>
+            <div>
+              <label style={{display: "block", fontSize: "12px", color: "#666", marginBottom: "4px"}}>Account Number</label>
+              <input
+                type="text"
+                placeholder="YOUR_DHL_ACCOUNT"
+                value={carrierCredentials.dhl.accountNumber}
+                onChange={(e) => handleCarrierCredentialChange('dhl', 'accountNumber', e.target.value)}
+                style={{width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db"}}
+              />
+            </div>
+          </div>
+          <div>
+            <button style={{...primaryButton, backgroundColor: "#ef4444", borderColor: "#ef4444"}} onClick={() => handleSaveCarrierCredentials('dhl')}>
+              💾 Save DHL
+            </button>
+            <button style={{...successButton, marginLeft: "8px"}} onClick={() => handleTestCarrierConnection('dhl')}>
+              🧪 Test Connection
+            </button>
+          </div>
+        </div>
+
+        <div style={{padding: "12px", backgroundColor: "#fffbeb", borderRadius: "4px", border: "1px solid #fbbf24"}}>
+          <strong>ℹ️ Note:</strong> Credentials are currently stored in browser state. 
+          For production use, implement secure backend storage with environment variables.
         </div>
       </div>
 
