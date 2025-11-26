@@ -33,6 +33,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const distPath = path.resolve(process.cwd(), "frontend/dist");
+const indexFile = path.join(distPath, "index.html");
 
 // ---------------------------------------
 // ENVIRONMENT MODE
@@ -88,21 +89,22 @@ io.on('connection', (socket) => {
 
 // ROOT ROUTE - MUST BE FIRST (before any Shopify middleware)
 app.get("/", async (req, res) => {
-  const distPath = path.resolve(process.cwd(), "frontend/dist");
-  const indexPath = path.join(distPath, "index.html");
+  if (!fs.existsSync(indexFile)) {
+    return res.status(500).send("index.html missing.");
+  }
 
   res.setHeader(
     "Content-Security-Policy",
     "frame-ancestors https://admin.shopify.com https://*.myshopify.com;"
   );
 
-  let html = fs.readFileSync(indexPath, "utf8");
+  let html = fs.readFileSync(indexFile, "utf8");
   html = html.replace(
     '<meta name="shopify-api-key" content=""/>',
     `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY}"/>`
   );
 
-  return res.send(html);
+  res.status(200).send(html);
 });
 
 app.use(cors());
@@ -956,8 +958,7 @@ app.get("/api/test", (req, res) => {
 // FRONTEND SERVING
 // ---------------------------------------
 
-const frontendDistPath = path.resolve(process.cwd(), "frontend/dist");
-app.use(express.static(frontendDistPath));
+app.use(express.static(distPath));
 
 // Catch-all route for SPA routes (Express 5 compatible - regex pattern)
 app.get(/.*/, async (req, res) => {
@@ -969,11 +970,8 @@ app.get(/.*/, async (req, res) => {
     return res.status(404).end();
   }
 
-  const distPath = path.resolve(process.cwd(), "frontend/dist");
-  const indexFile = path.join(distPath, "index.html");
-
   if (!fs.existsSync(indexFile)) {
-    return res.status(500).send("frontend missing");
+    return res.status(500).send("index.html missing.");
   }
 
   let html = fs.readFileSync(indexFile, "utf8");
