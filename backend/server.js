@@ -977,7 +977,11 @@ app.get("/", shopify.ensureInstalledOnShop(), async (req, res) => {
   res.setHeader("Content-Security-Policy", "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
 
   // Read and inject API key into HTML
-  const indexPath = path.join(__dirname, "../frontend/dist/index.html");
+  // Try production path first (Docker), then development path
+  const prodPath = path.join(__dirname, "dist/index.html");
+  const devPath = path.join(__dirname, "../frontend/dist/index.html");
+  const indexPath = fs.existsSync(prodPath) ? prodPath : devPath;
+  
   if (fs.existsSync(indexPath)) {
     let html = fs.readFileSync(indexPath, 'utf8');
     html = html.replace(
@@ -990,7 +994,11 @@ app.get("/", shopify.ensureInstalledOnShop(), async (req, res) => {
   return res.status(500).send("Frontend build not found. Run 'npm run build' in frontend directory.");
 });
 
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// Serve static files from production or dev path
+const staticPath = fs.existsSync(path.join(__dirname, "dist")) 
+  ? path.join(__dirname, "dist")
+  : path.join(__dirname, "../frontend/dist");
+app.use(express.static(staticPath));
 
 // ---------------------------------------
 // SPA FALLBACK ROUTE (catch-all for client-side routing)
@@ -1009,7 +1017,10 @@ app.use((req, res, next) => {
   res.setHeader("Content-Security-Policy", "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
   
   // Read and inject API key into HTML for SPA routes
-  const indexPath = path.join(__dirname, "../frontend/dist/index.html");
+  const prodPath = path.join(__dirname, "dist/index.html");
+  const devPath = path.join(__dirname, "../frontend/dist/index.html");
+  const indexPath = fs.existsSync(prodPath) ? prodPath : devPath;
+  
   if (fs.existsSync(indexPath)) {
     let html = fs.readFileSync(indexPath, 'utf8');
     html = html.replace(
