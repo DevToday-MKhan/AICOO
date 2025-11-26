@@ -68,15 +68,19 @@ const ShopifyProvider = ({ children }) => {
     }
   }, [apiKey, host, shop]);
 
-  // If no API key, render without Shopify wrapper (development mode)
-  if (!apiKey) {
-    console.warn('⚠️ SHOPIFY_API_KEY not found - running in standalone mode');
+  // If no API key OR (no host AND no shop), render without Shopify wrapper (development/standalone mode)
+  if (!apiKey || (!host && !shop)) {
+    const isStandalone = !host && !shop;
+    console.warn(isStandalone ? '⚠️ Running in standalone mode (no shop/host parameters)' : '⚠️ SHOPIFY_API_KEY not found');
+    
     return (
       <AppProvider i18n={{}}>
-        <div style={{ padding: '20px', background: '#fff3cd', border: '1px solid #ffc107' }}>
-          <h3>⚠️ Development Mode</h3>
-          <p>SHOPIFY_API_KEY not configured. Set VITE_SHOPIFY_API_KEY environment variable.</p>
-        </div>
+        {!apiKey && (
+          <div style={{ padding: '20px', background: '#fff3cd', border: '1px solid #ffc107' }}>
+            <h3>⚠️ Development Mode</h3>
+            <p>SHOPIFY_API_KEY not configured. Set VITE_SHOPIFY_API_KEY environment variable.</p>
+          </div>
+        )}
         {children}
       </AppProvider>
     );
