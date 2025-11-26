@@ -979,10 +979,31 @@ app.get("/api/test", (req, res) => {
 // ---------------------------------------
 // FRONTEND SERVING
 // ---------------------------------------
+
+// Root route - Shopify OAuth check FIRST (before static files)
+app.get("/", shopify.ensureInstalledOnShop(), async (req, res, next) => {
+  // After OAuth check passes, serve the frontend
+  res.setHeader("Content-Security-Policy",
+    "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
+
+  const indexFile = path.join(distPath, "index.html");
+
+  if (fs.existsSync(indexFile)) {
+    let html = fs.readFileSync(indexFile, "utf8");
+    html = html.replace(
+      '<meta name="shopify-api-key" content=""/>',
+      `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ""}"/>`
+    );
+    return res.send(html);
+  }
+
+  res.status(500).send("index.html missing. Run npm run build in frontend.");
+});
+
 // Serve static files from built frontend
 app.use(express.static(distPath));
 
-// Catch-all middleware for Shopify embedded app + SPA (Express 5 compatible)
+// Catch-all middleware for SPA routes (Express 5 compatible)
 app.use((req, res, next) => {
   // Skip if it's an API route, webhook, auth, health, or static file
   if (req.path.startsWith('/api') || 
