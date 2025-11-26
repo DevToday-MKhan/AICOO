@@ -978,14 +978,15 @@ app.get("/api/test", (req, res) => {
 // Serve static assets
 app.use(express.static(distPath));
 
-// Serve index.html for Shopify embedded app and SPA routes
-app.get("*", (req, res) => {
+// Serve index.html for Shopify embedded app and SPA routes (Express 5 compatible)
+app.use((req, res, next) => {
   if (
     req.path.startsWith("/api") ||
     req.path.startsWith("/auth") ||
-    req.path.startsWith("/webhooks")
+    req.path.startsWith("/webhooks") ||
+    req.path.startsWith("/health")
   ) {
-    return res.status(404).end();
+    return next();
   }
 
   res.setHeader(
