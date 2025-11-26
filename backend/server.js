@@ -961,7 +961,7 @@ app.get("/api/test", (req, res) => {
 app.use(express.static(distPath));
 
 // Catch-all route for SPA routes - serve index.html for non-API routes
-app.get("/*", async (req, res) => {
+app.use("*", async (req, res) => {
   // Skip API routes, auth routes, webhooks, and health checks
   if (
     req.path.startsWith("/api/") ||
