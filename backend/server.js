@@ -944,10 +944,51 @@ if (IS_DEV) {
 }
 
 // ---------------------------------------
+// STATIC FILE SERVING (Production Frontend)
+// ---------------------------------------
+const frontendPath = path.join(__dirname, '..', 'frontend', 'dist');
+if (fs.existsSync(frontendPath)) {
+  console.log(`📦 Serving static frontend from: ${frontendPath}`);
+  app.use(express.static(frontendPath));
+}
+
+// ---------------------------------------
+// HEALTH & TEST ENDPOINTS
+// ---------------------------------------
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "healthy",
+    service: "AICOO Backend",
+    version: "1.1.0",
+    mode: MODE,
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    shopify: {
+      configured: !!(process.env.SHOPIFY_API_KEY && process.env.SHOPIFY_API_SECRET),
+      host: process.env.HOST || "not-set"
+    }
+  });
+});
+
+app.get("/api/test", (req, res) => {
+  res.json({
+    message: "AICOO API is working",
+    timestamp: new Date().toISOString(),
+    mode: MODE
+  });
+});
+
+// ---------------------------------------
 // SHOPIFY EMBEDDED APP ROUTES
 // ---------------------------------------
 app.get("/", shopify.ensureInstalledOnShop(), (req, res) => {
-  res.status(200).send("<html><body><h1>AICOO is live inside Shopify</h1></body></html>");
+  // Serve the frontend build if it exists, otherwise show placeholder
+  const indexPath = path.join(frontendPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(200).send("<html><body><h1>AICOO is live inside Shopify</h1><p>Run 'npm run build' in frontend to generate UI</p></body></html>");
+  }
 });
 
 // ---------------------------------------
