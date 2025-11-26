@@ -86,6 +86,25 @@ io.on('connection', (socket) => {
   });
 });
 
+// ROOT ROUTE - MUST BE FIRST (before any Shopify middleware)
+app.get("/", async (req, res) => {
+  const distPath = path.resolve(process.cwd(), "frontend/dist");
+  const indexPath = path.join(distPath, "index.html");
+
+  res.setHeader(
+    "Content-Security-Policy",
+    "frame-ancestors https://admin.shopify.com https://*.myshopify.com;"
+  );
+
+  let html = fs.readFileSync(indexPath, "utf8");
+  html = html.replace(
+    '<meta name="shopify-api-key" content=""/>',
+    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY}"/>`
+  );
+
+  return res.send(html);
+});
+
 app.use(cors());
 
 // Shopify OAuth + Session Middleware
@@ -133,32 +152,6 @@ app.use(shopify.processWebhooks({
     }
   }
 }));
-
-// Root route for Shopify embedded app
-app.get("/", async (req, res) => {
-  const distPath = path.resolve(process.cwd(), "frontend/dist");
-  const indexFile = path.join(distPath, "index.html");
-
-  res.setHeader(
-    "Content-Security-Policy",
-    "frame-ancestors https://admin.shopify.com https://*.myshopify.com;"
-  );
-
-  if (!fs.existsSync(indexFile)) {
-    return res.status(500).send("index.html not found");
-  }
-
-  let html = fs.readFileSync(indexFile, "utf8");
-  html = html.replace(
-    '<meta name="shopify-api-key" content=""/>',
-    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY}"/>`
-  );
-
-  res.status(200).send(html);
-});
-
-// Shopify session validation for /api routes (optional - comment out if not needed)
-// app.use("/api", shopify.validateAuthenticatedSession());
 
 // JSON parser for all other routes - comes after webhook processing
 app.use(express.json());
