@@ -14,6 +14,7 @@ import path from "path";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { fileURLToPath } from "url";
+import shopify from "./shopify.js";
 import { getEvents, recordEvent, verifyShopifyWebhook, saveShopifyOrder, getLatestOrder } from "./webhooks.js";
 import { getSettings, updateSettings } from "./settings.js";
 import Suggestions from "./suggestions.js";
@@ -84,6 +85,12 @@ io.on('connection', (socket) => {
 });
 
 app.use(cors());
+
+// Shopify OAuth + Session Middleware
+app.use("/auth", shopify.auth.begin());
+app.use("/auth/callback", shopify.auth.callback());
+app.use("/webhooks", shopify.webhooks.process());
+app.use("/api/*", shopify.ensureInstalledOnShop());
 
 // Raw body parser for webhook verification
 app.use("/webhooks", express.raw({ type: "application/json" }));
@@ -935,10 +942,22 @@ if (IS_DEV) {
 }
 
 // ---------------------------------------
+// SHOPIFY EMBEDDED APP ROUTES
+// ---------------------------------------
+app.get("/", shopify.ensureInstalledOnShop(), (req, res) => {
+  res.status(200).send("<html><body><h1>AICOO is live inside Shopify</h1></body></html>");
+});
+
+app.get("/*", shopify.ensureInstalledOnShop(), (req, res) => {
+  res.status(200).send("<html><body><h1>AICOO Admin Loaded</h1></body></html>");
+});
+
+// ---------------------------------------
 // START SERVER (with WebSocket support)
 // ---------------------------------------
-httpServer.listen(3000, () => {
-  console.log("🚀 AICOO backend running on port 3000");
+const PORT = process.env.PORT || 8080;
+httpServer.listen(PORT, () => {
+  console.log(`🚀 AICOO backend running on port ${PORT}`);
   console.log("🔌 WebSocket server ready for real-time updates");
 });
 
