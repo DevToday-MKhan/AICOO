@@ -960,18 +960,8 @@ app.get("/api/test", (req, res) => {
 
 app.use(express.static(distPath));
 
-// SPA catch-all middleware - serves index.html for non-API routes
-app.use(async (req, res, next) => {
-  // Skip API routes, auth routes, webhooks, and health checks
-  if (
-    req.path.startsWith("/api/") ||
-    req.path.startsWith("/auth/") ||
-    req.path.startsWith("/webhooks/") ||
-    req.path === "/health"
-  ) {
-    return next(); // Let it 404
-  }
-
+// SPA catch-all route using regex to avoid path-to-regexp issues
+app.get(/^(?!\/api|\/auth|\/webhooks|\/health).*$/, async (req, res) => {
   if (!fs.existsSync(indexFile)) {
     return res.status(500).send("index.html missing.");
   }
