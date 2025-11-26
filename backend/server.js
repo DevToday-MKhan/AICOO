@@ -994,11 +994,20 @@ app.get("/", shopify.ensureInstalledOnShop(), async (req, res) => {
   return res.status(500).send("Frontend build not found. Run 'npm run build' in frontend directory.");
 });
 
-// Serve static files from production or dev path
-const staticPath = fs.existsSync(path.join(__dirname, "dist")) 
-  ? path.join(__dirname, "dist")
-  : path.join(__dirname, "../frontend/dist");
-app.use(express.static(staticPath));
+// Serve static files - production (dist/) takes priority
+const distPath = path.join(__dirname, "dist");
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  console.log(`📁 Serving static files from: ${distPath}`);
+} else {
+  const devPath = path.join(__dirname, "../frontend/dist");
+  if (fs.existsSync(devPath)) {
+    app.use(express.static(devPath));
+    console.log(`📁 Serving static files from (dev): ${devPath}`);
+  } else {
+    console.warn("⚠️  No dist directory found. Run 'npm run build' in frontend.");
+  }
+}
 
 // ---------------------------------------
 // SPA FALLBACK ROUTE (catch-all for client-side routing)
@@ -1022,15 +1031,21 @@ app.use((req, res, next) => {
   const indexPath = fs.existsSync(prodPath) ? prodPath : devPath;
   
   if (fs.existsSync(indexPath)) {
-    let html = fs.readFileSync(indexPath, 'utf8');
-    html = html.replace(
-      '<meta name="shopify-api-key" content="" />',
-      `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ''}" />`
-    );
-    return res.send(html);
+    try {
+      let html = fs.readFileSync(indexPath, 'utf8');
+      html = html.replace(
+        '<meta name="shopify-api-key" content="" />',
+        `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ''}" />`
+      );
+      return res.send(html);
+    } catch (err) {
+      console.error("❌ Error reading index.html:", err);
+      return res.status(500).send("Failed to load application");
+    }
   }
   
-  next();
+  console.warn(`⚠️  SPA route requested but no index.html found: ${req.path}`);
+  res.status(404).send("Frontend not found. Please ensure the app is built.");
 });
 
 // ---------------------------------------
