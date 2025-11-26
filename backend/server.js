@@ -976,8 +976,18 @@ app.get("/api/test", (req, res) => {
 // Serve static files from built frontend
 app.use(express.static(distPath));
 
-// Catch-all route for Shopify embedded app + SPA
-app.get("*", (req, res) => {
+// Catch-all middleware for Shopify embedded app + SPA (Express 5 compatible)
+app.use((req, res, next) => {
+  // Skip if it's an API route, webhook, auth, health, or static file
+  if (req.path.startsWith('/api') || 
+      req.path.startsWith('/webhooks') || 
+      req.path.startsWith('/auth') ||
+      req.path.startsWith('/health') ||
+      req.path.startsWith('/assets') ||
+      req.path.includes('.')) {
+    return next();
+  }
+
   res.setHeader("Content-Security-Policy",
     "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
 
