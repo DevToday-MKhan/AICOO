@@ -980,9 +980,11 @@ app.get("/api/test", (req, res) => {
 // FRONTEND SERVING
 // ---------------------------------------
 
-// Root route - Shopify OAuth check FIRST (before static files)
-app.get("/", shopify.ensureInstalledOnShop(), async (req, res, next) => {
-  // After OAuth check passes, serve the frontend
+// Serve static files from built frontend
+app.use(express.static(distPath));
+
+// Root route - serve frontend with API key injection
+app.get("/", async (req, res) => {
   res.setHeader("Content-Security-Policy",
     "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
 
@@ -999,9 +1001,6 @@ app.get("/", shopify.ensureInstalledOnShop(), async (req, res, next) => {
 
   res.status(500).send("index.html missing. Run npm run build in frontend.");
 });
-
-// Serve static files from built frontend
-app.use(express.static(distPath));
 
 // Catch-all middleware for SPA routes (Express 5 compatible)
 app.use((req, res, next) => {
