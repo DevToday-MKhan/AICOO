@@ -32,8 +32,9 @@ WORKDIR /app
 COPY --from=backend-build /app/backend ./backend
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 
-WORKDIR /app/backend
+# Keep WORKDIR as /app so process.cwd() returns /app (not /app/backend)
+# This matches server.js: path.resolve(process.cwd(), "frontend/dist")
 
 EXPOSE 8080
 
-CMD ["node", "server.js"]
+CMD ["node", "backend/server.js"]
