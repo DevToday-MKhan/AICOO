@@ -92,8 +92,47 @@ app.use(cors());
 app.use("/auth", shopify.auth.begin());
 app.use("/auth/callback", shopify.auth.callback());
 
-// Process webhooks with raw body - Shopify handles body parsing internally
-app.use(shopify.processWebhooks({ webhookHandlers: {} }));
+// Process Shopify webhooks - Shopify library handles body parsing and HMAC verification
+app.use(shopify.processWebhooks({
+  webhookHandlers: {
+    ORDERS_CREATE: async (topic, shop, body) => {
+      console.log("📦 ORDERS_CREATE webhook received from", shop);
+      
+      try {
+        const orderData = JSON.parse(body);
+        recordEvent({ ...orderData, event_type: topic });
+        
+        // Process order routing
+        const orderId = orderData.id || orderData.order_number || "unknown";
+        const customerZip = orderData.shipping_address?.zip || orderData.billing_address?.zip;
+        const lineItems = orderData.line_items || [];
+
+        // Calculate total weight
+        let totalWeight = 0;
+        for (const item of lineItems) {
+          const grams = item.grams || (item.weight ? item.weight * 1000 : 0);
+          totalWeight += (grams / 453.592) * (item.quantity || 1);
+        }
+
+        if (totalWeight === 0) totalWeight = 3;
+
+        const zipPattern = /^\d{5}$/;
+        if (customerZip && zipPattern.test(customerZip)) {
+          const routingResult = getRouteQuote({ customerZip, weight: parseFloat(totalWeight.toFixed(2)) });
+          saveShopifyOrder({
+            orderId,
+            customerZip,
+            totalWeight: parseFloat(totalWeight.toFixed(2)),
+            routing: routingResult,
+          });
+          console.log(`🚚 Order ${orderId} routed: ${routingResult.recommendation}`);
+        }
+      } catch (err) {
+        console.error("🔥 Webhook processing error:", err);
+      }
+    }
+  }
+}));
 
 // Shopify session validation for /api routes (optional - comment out if not needed)
 // app.use("/api", shopify.validateAuthenticatedSession());
@@ -102,87 +141,14 @@ app.use(shopify.processWebhooks({ webhookHandlers: {} }));
 app.use(express.json());
 
 // ---------------------------------------
-// WEBHOOKS — STORE EVENTS & ROUTE ORDERS
+// WEBHOOKS — LEGACY MANUAL HANDLER (kept for custom webhooks if needed)
 // ---------------------------------------
+// Note: Shopify webhooks are now handled by shopify.processWebhooks() middleware above
+// This route can be used for custom webhook testing or non-Shopify webhooks
+
 app.post("/webhooks/orders/create", async (req, res) => {
-  const hmacHeader = req.headers["x-shopify-hmac-sha256"];
-  const rawBody = req.body.toString("utf8");
-
-  // Verify HMAC signature
-  if (!verifyShopifyWebhook(rawBody, hmacHeader)) {
-    console.error("🔒 HMAC verification failed - rejecting webhook");
-    return res.status(401).send("Unauthorized - Invalid HMAC");
-  }
-
-  console.log("✅ HMAC verified - processing webhook");
-
-  const event_type = req.headers["x-shopify-topic"];
-  let eventData;
-
-  try {
-    eventData = JSON.parse(rawBody);
-  } catch (err) {
-    console.error("❌ Invalid JSON in webhook body");
-    return res.status(400).send("Bad Request - Invalid JSON");
-  }
-
-  const event = {
-    ...eventData,
-    event_type,
-  };
-
-  // Record the raw event
-  recordEvent(event);
-
-  // Process order routing for orders/create webhook
-  if (event_type === "orders/create" || event_type === "orders/paid") {
-    try {
-      const orderId = eventData.id || eventData.order_number || "unknown";
-      const customerZip = eventData.shipping_address?.zip || eventData.billing_address?.zip;
-      const lineItems = eventData.line_items || [];
-
-      // Calculate total weight (convert grams to pounds)
-      let totalWeight = 0;
-      for (const item of lineItems) {
-        const grams = item.grams || (item.weight ? item.weight * 1000 : 0);
-        totalWeight += (grams / 453.592) * (item.quantity || 1); // grams to lbs
-      }
-
-      // Fallback to mock weight if missing
-      if (totalWeight === 0) {
-        totalWeight = 3; // 3 lbs default
-        console.log("⚠️ No weight data in order, using default 3 lbs");
-      }
-
-      // Validate ZIP
-      const zipPattern = /^\d{5}$/;
-      if (customerZip && zipPattern.test(customerZip)) {
-        // Get routing recommendation
-        const routingResult = getRouteQuote({ 
-          customerZip, 
-          weight: parseFloat(totalWeight.toFixed(2))
-        });
-
-        // Save order with routing info
-        const orderData = {
-          orderId,
-          customerZip,
-          totalWeight: parseFloat(totalWeight.toFixed(2)),
-          routing: routingResult,
-        };
-
-        saveShopifyOrder(orderData);
-        console.log(`🚚 Order ${orderId} routed: ${routingResult.recommendation}`);
-      } else {
-        console.warn(`⚠️ Invalid or missing ZIP for order ${orderId}: ${customerZip}`);
-      }
-    } catch (routingErr) {
-      console.error("🔥 Routing error:", routingErr);
-      // Don't fail the webhook - still return 200 OK
-    }
-  }
-
-  res.status(200).send("Event received");
+  console.log("⚠️ Manual webhook endpoint called - use Shopify middleware instead");
+  res.status(200).send("Use shopify.processWebhooks() middleware for Shopify webhooks");
 });
 
 // ---------------------------------------
