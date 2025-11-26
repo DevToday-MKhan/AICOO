@@ -89,8 +89,10 @@ app.use(cors());
 // Shopify OAuth + Session Middleware
 app.use("/auth", shopify.auth.begin());
 app.use("/auth/callback", shopify.auth.callback());
-app.use("/webhooks", shopify.webhooks.process());
-app.use("/api/*", shopify.ensureInstalledOnShop());
+app.use(shopify.processWebhooks({ webhookHandlers: {} }));
+
+// Shopify session validation for /api routes (optional - comment out if not needed)
+// app.use("/api", shopify.validateAuthenticatedSession());
 
 // Raw body parser for webhook verification
 app.use("/webhooks", express.raw({ type: "application/json" }));
@@ -946,10 +948,6 @@ if (IS_DEV) {
 // ---------------------------------------
 app.get("/", shopify.ensureInstalledOnShop(), (req, res) => {
   res.status(200).send("<html><body><h1>AICOO is live inside Shopify</h1></body></html>");
-});
-
-app.get("/*", shopify.ensureInstalledOnShop(), (req, res) => {
-  res.status(200).send("<html><body><h1>AICOO Admin Loaded</h1></body></html>");
 });
 
 // ---------------------------------------
