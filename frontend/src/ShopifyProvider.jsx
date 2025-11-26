@@ -43,16 +43,18 @@ const ShopifyProvider = ({ children }) => {
   }, []);
 
   const config = useMemo(() => {
+    // App Bridge requires either 'host' OR 'shop' parameter
+    // Shopify passes both in the URL when app is loaded in admin
     const cfg = {
       apiKey,
-      host,
+      host: host || undefined,
       forceRedirect: false,
     };
     
     console.log('🔑 Shopify App Bridge Config:', {
       apiKey: apiKey ? '***' + apiKey.slice(-4) : 'missing',
       host: host || 'missing',
-      shop: shop || 'not provided'
+      shop: shop || 'missing'
     });
     
     return cfg;
