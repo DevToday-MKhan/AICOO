@@ -944,15 +944,6 @@ if (IS_DEV) {
 }
 
 // ---------------------------------------
-// STATIC FILE SERVING (Production Frontend)
-// ---------------------------------------
-const frontendPath = path.join(__dirname, '..', 'frontend', 'dist');
-if (fs.existsSync(frontendPath)) {
-  console.log(`📦 Serving static frontend from: ${frontendPath}`);
-  app.use(express.static(frontendPath));
-}
-
-// ---------------------------------------
 // HEALTH & TEST ENDPOINTS
 // ---------------------------------------
 app.get("/health", (req, res) => {
@@ -979,16 +970,69 @@ app.get("/api/test", (req, res) => {
 });
 
 // ---------------------------------------
-// SHOPIFY EMBEDDED APP ROUTES
+// SHOPIFY ROOT HANDLER (Fix Blank Screen)
 // ---------------------------------------
-app.get("/", shopify.ensureInstalledOnShop(), (req, res) => {
-  // Serve the frontend build if it exists, otherwise show placeholder
-  const indexPath = path.join(frontendPath, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(200).send("<html><body><h1>AICOO is live inside Shopify</h1><p>Run 'npm run build' in frontend to generate UI</p></body></html>");
+app.get("/", async (req, res) => {
+  const { shop } = req.query;
+
+  // Set Content Security Policy for Shopify iframe
+  res.setHeader("Content-Security-Policy", "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
+
+  if (!shop) {
+    if (!process.env.SHOPIFY_SHOP_DOMAIN || !process.env.SHOPIFY_API_KEY) {
+      return res.status(500).send("Missing SHOPIFY_SHOP_DOMAIN or SHOPIFY_API_KEY");
+    }
+
+    return res.redirect(
+      302,
+      `https://${process.env.SHOPIFY_SHOP_DOMAIN}/admin/apps/${process.env.SHOPIFY_API_KEY}`
+    );
   }
+
+  // Read and inject API key into HTML
+  const indexPath = path.join(__dirname, "../frontend/dist/index.html");
+  if (fs.existsSync(indexPath)) {
+    let html = fs.readFileSync(indexPath, 'utf8');
+    html = html.replace(
+      '<meta name="shopify-api-key" content="" />',
+      `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ''}" />`
+    );
+    return res.send(html);
+  }
+
+  return res.status(500).send("Frontend build not found. Run 'npm run build' in frontend directory.");
+});
+
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+// ---------------------------------------
+// SPA FALLBACK ROUTE (catch-all for client-side routing)
+// ---------------------------------------
+app.use((req, res, next) => {
+  // Skip if it's an API route, webhook, auth, or static file
+  if (req.path.startsWith('/api') || 
+      req.path.startsWith('/webhooks') || 
+      req.path.startsWith('/auth') ||
+      req.path.startsWith('/assets') ||
+      req.path.includes('.')) {
+    return next();
+  }
+  
+  // Set CSP for all embedded app routes
+  res.setHeader("Content-Security-Policy", "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
+  
+  // Read and inject API key into HTML for SPA routes
+  const indexPath = path.join(__dirname, "../frontend/dist/index.html");
+  if (fs.existsSync(indexPath)) {
+    let html = fs.readFileSync(indexPath, 'utf8');
+    html = html.replace(
+      '<meta name="shopify-api-key" content="" />',
+      `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ''}" />`
+    );
+    return res.send(html);
+  }
+  
+  next();
 });
 
 // ---------------------------------------

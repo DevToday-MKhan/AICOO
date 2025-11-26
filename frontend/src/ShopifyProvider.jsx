@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { Provider as AppBridgeProvider } from '@shopify/app-bridge-react';
 import { AppProvider } from '@shopify/polaris';
 import '@shopify/polaris/build/esm/styles.css';
@@ -8,37 +8,97 @@ import '@shopify/polaris/build/esm/styles.css';
  * Enables embedded app functionality within Shopify Admin
  */
 const ShopifyProvider = ({ children }) => {
+  const [error, setError] = useState(null);
+
   // Get Shopify config from meta tag or environment
   const apiKey = useMemo(() => {
     const metaTag = document.querySelector('meta[name="shopify-api-key"]');
-    return metaTag?.content || import.meta.env.VITE_SHOPIFY_API_KEY || '';
+    const key = metaTag?.content || import.meta.env.VITE_SHOPIFY_API_KEY || '';
+    
+    // Check if it's still a placeholder
+    if (key.includes('%VITE_SHOPIFY_API_KEY%') || key === '') {
+      console.error('❌ SHOPIFY_API_KEY not properly set in environment');
+      return '';
+    }
+    
+    return key;
   }, []);
 
   // Get host from URL params (Shopify passes this)
   const host = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('host') || '';
+    const hostParam = params.get('host');
+    
+    if (!hostParam) {
+      console.warn('⚠️ No host parameter found in URL');
+    }
+    
+    return hostParam || '';
   }, []);
 
-  const config = useMemo(() => ({
-    apiKey,
-    host,
-    forceRedirect: false,
-  }), [apiKey, host]);
+  // Get shop from URL params
+  const shop = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('shop') || '';
+  }, []);
+
+  const config = useMemo(() => {
+    const cfg = {
+      apiKey,
+      host,
+      forceRedirect: false,
+    };
+    
+    console.log('🔑 Shopify App Bridge Config:', {
+      apiKey: apiKey ? '***' + apiKey.slice(-4) : 'missing',
+      host: host || 'missing',
+      shop: shop || 'not provided'
+    });
+    
+    return cfg;
+  }, [apiKey, host, shop]);
+
+  useEffect(() => {
+    if (!apiKey) {
+      setError('Missing SHOPIFY_API_KEY - check environment variables');
+    } else if (!host && shop) {
+      setError('Missing host parameter - app may not load in Shopify admin');
+    }
+  }, [apiKey, host, shop]);
 
   // If no API key, render without Shopify wrapper (development mode)
   if (!apiKey) {
     console.warn('⚠️ SHOPIFY_API_KEY not found - running in standalone mode');
     return (
       <AppProvider i18n={{}}>
+        <div style={{ padding: '20px', background: '#fff3cd', border: '1px solid #ffc107' }}>
+          <h3>⚠️ Development Mode</h3>
+          <p>SHOPIFY_API_KEY not configured. Set VITE_SHOPIFY_API_KEY environment variable.</p>
+        </div>
         {children}
       </AppProvider>
     );
   }
 
+  // If no host parameter, show warning but continue
+  if (!host && error) {
+    console.error('❌ Shopify App Bridge Error:', error);
+  }
+
   return (
     <AppBridgeProvider config={config}>
       <AppProvider i18n={{}}>
+        {error && (
+          <div style={{ 
+            padding: '10px', 
+            background: '#f8d7da', 
+            color: '#721c24',
+            borderBottom: '1px solid #f5c6cb',
+            fontSize: '12px'
+          }}>
+            ⚠️ {error}
+          </div>
+        )}
         {children}
       </AppProvider>
     </AppBridgeProvider>
