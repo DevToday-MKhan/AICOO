@@ -32,13 +32,6 @@ import * as Analytics from "./analytics.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Resolve dist path - check production location first (Docker), then dev location
-const prodDistPath = path.join(__dirname, "dist");
-const devDistPath = path.resolve(__dirname, "../frontend/dist");
-const distPath = fs.existsSync(prodDistPath) ? prodDistPath : devDistPath;
-
-console.log(`📁 Using dist path: ${distPath}`);
-
 // ---------------------------------------
 // ENVIRONMENT MODE
 // ---------------------------------------
@@ -980,42 +973,35 @@ app.get("/api/test", (req, res) => {
 // FRONTEND SERVING
 // ---------------------------------------
 
-// Serve static files from built frontend
+const distPath = path.resolve(process.cwd(), "frontend/dist");
 app.use(express.static(distPath));
 
-// Root route - serve frontend with API key injection
 app.get("/", async (req, res) => {
-  res.setHeader("Content-Security-Policy",
-    "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
+  res.setHeader(
+    "Content-Security-Policy",
+    "frame-ancestors https://admin.shopify.com https://*.myshopify.com"
+  );
 
   const indexFile = path.join(distPath, "index.html");
 
   if (fs.existsSync(indexFile)) {
     let html = fs.readFileSync(indexFile, "utf8");
+
     html = html.replace(
       '<meta name="shopify-api-key" content=""/>',
       `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ""}"/>`
     );
+
     return res.send(html);
   }
 
-  res.status(500).send("index.html missing. Run npm run build in frontend.");
+  res.status(500).send("index.html missing — run npm run build in frontend.");
 });
 
-// Catch-all middleware for SPA routes (Express 5 compatible)
-app.use((req, res, next) => {
-  // Skip if it's an API route, webhook, auth, health, or static file
-  if (req.path.startsWith('/api') || 
-      req.path.startsWith('/webhooks') || 
-      req.path.startsWith('/auth') ||
-      req.path.startsWith('/health') ||
-      req.path.startsWith('/assets') ||
-      req.path.includes('.')) {
-    return next();
+app.get("*", (req, res) => {
+  if (req.path.startsWith("/api") || req.path.startsWith("/auth") || req.path.startsWith("/webhooks")) {
+    return res.status(404).end();
   }
-
-  res.setHeader("Content-Security-Policy",
-    "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
 
   const indexFile = path.join(distPath, "index.html");
 
@@ -1028,7 +1014,7 @@ app.use((req, res, next) => {
     return res.send(html);
   }
 
-  res.status(500).send("index.html missing. Run npm run build in frontend.");
+  res.status(500).send("index.html missing — run npm run build.");
 });
 
 // ---------------------------------------
