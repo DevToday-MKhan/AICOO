@@ -944,7 +944,8 @@ const frontendDistPath = path.resolve(process.cwd(), "frontend/dist");
 app.use(express.static(frontendDistPath));
 
 // Catch-all route for Shopify embedded app and SPA routes (Express 5 compatible - regex pattern)
-app.get(/.*/, async (req, res) => {
+app.get(/.*/, (req, res) => {
+  // Skip API routes - they should 404 if not found
   if (
     req.path.startsWith("/api") ||
     req.path.startsWith("/auth") ||
@@ -953,23 +954,21 @@ app.get(/.*/, async (req, res) => {
     return res.status(404).end();
   }
 
-  res.setHeader(
-    "Content-Security-Policy",
-    "frame-ancestors https://admin.shopify.com https://*.myshopify.com"
-  );
-
   const indexFile = path.join(frontendDistPath, "index.html");
 
   if (!fs.existsSync(indexFile)) {
     return res.status(500).send("index.html missing.");
   }
 
+  res.setHeader(
+    "Content-Security-Policy",
+    "frame-ancestors https://admin.shopify.com https://*.myshopify.com"
+  );
+
   let html = fs.readFileSync(indexFile, "utf8");
   html = html.replace(
     '<meta name="shopify-api-key" content=""/>',
-    `<meta name="shopify-api-key" content="${
-      process.env.SHOPIFY_API_KEY || ""
-    }"/>`
+    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ""}"/>`
   );
 
   return res.send(html);
