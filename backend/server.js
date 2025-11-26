@@ -32,6 +32,8 @@ import * as Analytics from "./analytics.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const distPath = path.resolve(process.cwd(), "frontend/dist");
+
 // ---------------------------------------
 // ENVIRONMENT MODE
 // ---------------------------------------
@@ -973,10 +975,19 @@ app.get("/api/test", (req, res) => {
 // FRONTEND SERVING
 // ---------------------------------------
 
-const distPath = path.resolve(process.cwd(), "frontend/dist");
+// Serve static assets
 app.use(express.static(distPath));
 
-app.get("/", async (req, res) => {
+// Serve index.html for Shopify embedded app and SPA routes
+app.get("*", (req, res) => {
+  if (
+    req.path.startsWith("/api") ||
+    req.path.startsWith("/auth") ||
+    req.path.startsWith("/webhooks")
+  ) {
+    return res.status(404).end();
+  }
+
   res.setHeader(
     "Content-Security-Policy",
     "frame-ancestors https://admin.shopify.com https://*.myshopify.com"
@@ -984,37 +995,18 @@ app.get("/", async (req, res) => {
 
   const indexFile = path.join(distPath, "index.html");
 
-  if (fs.existsSync(indexFile)) {
-    let html = fs.readFileSync(indexFile, "utf8");
-
-    html = html.replace(
-      '<meta name="shopify-api-key" content=""/>',
-      `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ""}"/>`
-    );
-
-    return res.send(html);
+  if (!fs.existsSync(indexFile)) {
+    return res.status(500).send("index.html missing. Run npm run build.");
   }
 
-  res.status(500).send("index.html missing — run npm run build in frontend.");
-});
+  let html = fs.readFileSync(indexFile, "utf8");
 
-app.get("*", (req, res) => {
-  if (req.path.startsWith("/api") || req.path.startsWith("/auth") || req.path.startsWith("/webhooks")) {
-    return res.status(404).end();
-  }
+  html = html.replace(
+    '<meta name="shopify-api-key" content=""/>',
+    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ""}"/>`
+  );
 
-  const indexFile = path.join(distPath, "index.html");
-
-  if (fs.existsSync(indexFile)) {
-    let html = fs.readFileSync(indexFile, "utf8");
-    html = html.replace(
-      '<meta name="shopify-api-key" content=""/>',
-      `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ""}"/>`
-    );
-    return res.send(html);
-  }
-
-  res.status(500).send("index.html missing — run npm run build.");
+  return res.send(html);
 });
 
 // ---------------------------------------
