@@ -31,7 +31,13 @@ import * as Analytics from "./analytics.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const distPath = path.resolve(process.cwd(), "frontend/dist");
+
+// Resolve dist path - check production location first (Docker), then dev location
+const prodDistPath = path.join(__dirname, "dist");
+const devDistPath = path.resolve(__dirname, "../frontend/dist");
+const distPath = fs.existsSync(prodDistPath) ? prodDistPath : devDistPath;
+
+console.log(`📁 Using dist path: ${distPath}`);
 
 // ---------------------------------------
 // ENVIRONMENT MODE
