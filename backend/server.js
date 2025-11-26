@@ -960,8 +960,18 @@ app.get("/api/test", (req, res) => {
 
 app.use(express.static(distPath));
 
-// Catch-all route for SPA routes (Express 5 compatible - regex pattern)
-app.get(/^\/(?!api|auth|webhooks|health).*/, async (req, res) => {
+// Catch-all route for SPA routes - serve index.html for non-API routes
+app.get("*", async (req, res) => {
+  // Skip API routes, auth routes, webhooks, and health checks
+  if (
+    req.path.startsWith("/api/") ||
+    req.path.startsWith("/auth/") ||
+    req.path.startsWith("/webhooks/") ||
+    req.path === "/health"
+  ) {
+    return res.status(404).send("Not found");
+  }
+
   if (!fs.existsSync(indexFile)) {
     return res.status(500).send("index.html missing.");
   }
