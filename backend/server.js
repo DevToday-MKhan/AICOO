@@ -88,20 +88,17 @@ io.on('connection', (socket) => {
 
 app.use(cors());
 
-// Raw body parser for webhook verification - MUST come before JSON parser
-app.use("/webhooks", express.raw({ type: "application/json" }));
-
 // Shopify OAuth + Session Middleware
 app.use("/auth", shopify.auth.begin());
 app.use("/auth/callback", shopify.auth.callback());
 
-// Process webhooks with raw body - MUST come before JSON parser
+// Process webhooks with raw body - Shopify handles body parsing internally
 app.use(shopify.processWebhooks({ webhookHandlers: {} }));
 
 // Shopify session validation for /api routes (optional - comment out if not needed)
 // app.use("/api", shopify.validateAuthenticatedSession());
 
-// JSON parser for all other routes - MUST come after webhook middleware
+// JSON parser for all other routes - comes after webhook processing
 app.use(express.json());
 
 // ---------------------------------------
