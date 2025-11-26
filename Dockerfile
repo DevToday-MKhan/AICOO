@@ -30,7 +30,7 @@ FROM node:18-slim
 WORKDIR /app
 
 COPY --from=backend-build /app/backend ./backend
-COPY --from=frontend-build /app/frontend/dist ./backend/dist
+COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 
 WORKDIR /app/backend
 

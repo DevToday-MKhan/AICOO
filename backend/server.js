@@ -100,8 +100,8 @@ app.get("/", async (req, res) => {
 
   let html = fs.readFileSync(indexFile, "utf8");
   html = html.replace(
-    '<meta name="shopify-api-key" content=""/>',
-    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY}"/>`
+    '%VITE_SHOPIFY_API_KEY%',
+    process.env.SHOPIFY_API_KEY || ''
   );
 
   return res.status(200).send(html);
@@ -976,8 +976,8 @@ app.get(/.*/, async (req, res) => {
 
   let html = fs.readFileSync(indexFile, "utf8");
   html = html.replace(
-    '<meta name="shopify-api-key" content=""/>',
-    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY}"/>`
+    '%VITE_SHOPIFY_API_KEY%',
+    process.env.SHOPIFY_API_KEY || ''
   );
 
   return res.send(html);

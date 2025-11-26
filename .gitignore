@@ -4,8 +4,8 @@ backend/node_modules/
 # Frontend node modules
 frontend/node_modules/
 
-# Build files
-frontend/dist/
+# Build files (dist is NOT ignored - Railway needs it)
+# frontend/dist/ - REMOVED to allow deploying built frontend
 frontend/build/
 
 # macOS system files
