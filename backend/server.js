@@ -134,6 +134,29 @@ app.use(shopify.processWebhooks({
   }
 }));
 
+// Root route for Shopify embedded app
+app.get("/", async (req, res) => {
+  const distPath = path.resolve(process.cwd(), "frontend/dist");
+  const indexFile = path.join(distPath, "index.html");
+
+  res.setHeader(
+    "Content-Security-Policy",
+    "frame-ancestors https://admin.shopify.com https://*.myshopify.com;"
+  );
+
+  if (!fs.existsSync(indexFile)) {
+    return res.status(500).send("index.html not found");
+  }
+
+  let html = fs.readFileSync(indexFile, "utf8");
+  html = html.replace(
+    '<meta name="shopify-api-key" content=""/>',
+    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY}"/>`
+  );
+
+  res.status(200).send(html);
+});
+
 // Shopify session validation for /api routes (optional - comment out if not needed)
 // app.use("/api", shopify.validateAuthenticatedSession());
 
@@ -943,9 +966,8 @@ app.get("/api/test", (req, res) => {
 const frontendDistPath = path.resolve(process.cwd(), "frontend/dist");
 app.use(express.static(frontendDistPath));
 
-// Catch-all route for Shopify embedded app and SPA routes (Express 5 compatible - regex pattern)
-app.get(/.*/, (req, res) => {
-  // Skip API routes - they should 404 if not found
+// Catch-all route for SPA routes (Express 5 compatible - regex pattern)
+app.get(/.*/, async (req, res) => {
   if (
     req.path.startsWith("/api") ||
     req.path.startsWith("/auth") ||
@@ -954,24 +976,20 @@ app.get(/.*/, (req, res) => {
     return res.status(404).end();
   }
 
-  const indexFile = path.join(frontendDistPath, "index.html");
+  const distPath = path.resolve(process.cwd(), "frontend/dist");
+  const indexFile = path.join(distPath, "index.html");
 
   if (!fs.existsSync(indexFile)) {
-    return res.status(500).send("index.html missing.");
+    return res.status(500).send("frontend missing");
   }
-
-  res.setHeader(
-    "Content-Security-Policy",
-    "frame-ancestors https://admin.shopify.com https://*.myshopify.com"
-  );
 
   let html = fs.readFileSync(indexFile, "utf8");
   html = html.replace(
     '<meta name="shopify-api-key" content=""/>',
-    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ""}"/>`
+    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY}"/>`
   );
 
-  return res.send(html);
+  res.send(html);
 });
 
 // ---------------------------------------
