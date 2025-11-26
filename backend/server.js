@@ -104,7 +104,7 @@ app.get("/", async (req, res) => {
     `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY}"/>`
   );
 
-  res.status(200).send(html);
+  return res.status(200).send(html);
 });
 
 app.use(cors());
@@ -980,7 +980,7 @@ app.get(/.*/, async (req, res) => {
     `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY}"/>`
   );
 
-  res.send(html);
+  return res.send(html);
 });
 
 // ---------------------------------------
