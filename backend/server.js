@@ -31,6 +31,7 @@ import * as Analytics from "./analytics.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const distPath = path.resolve(process.cwd(), "frontend/dist");
 
 // ---------------------------------------
 // ENVIRONMENT MODE
@@ -970,82 +971,28 @@ app.get("/api/test", (req, res) => {
 });
 
 // ---------------------------------------
-// SHOPIFY ROOT HANDLER (Fix Blank Screen)
+// FRONTEND SERVING
 // ---------------------------------------
-app.get("/", shopify.ensureInstalledOnShop(), async (req, res) => {
-  // Set Content Security Policy for Shopify iframe
-  res.setHeader("Content-Security-Policy", "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
+// Serve static files from built frontend
+app.use(express.static(distPath));
 
-  // Read and inject API key into HTML
-  // Try production path first (Docker), then development path
-  const prodPath = path.join(__dirname, "dist/index.html");
-  const devPath = path.join(__dirname, "../frontend/dist/index.html");
-  const indexPath = fs.existsSync(prodPath) ? prodPath : devPath;
-  
-  if (fs.existsSync(indexPath)) {
-    let html = fs.readFileSync(indexPath, 'utf8');
+// Catch-all route for Shopify embedded app + SPA
+app.get("*", (req, res) => {
+  res.setHeader("Content-Security-Policy",
+    "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
+
+  const indexFile = path.join(distPath, "index.html");
+
+  if (fs.existsSync(indexFile)) {
+    let html = fs.readFileSync(indexFile, "utf8");
     html = html.replace(
-      '<meta name="shopify-api-key" content="" />',
-      `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ''}" />`
+      '<meta name="shopify-api-key" content=""/>',
+      `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ""}"/>`
     );
     return res.send(html);
   }
 
-  return res.status(500).send("Frontend build not found. Run 'npm run build' in frontend directory.");
-});
-
-// Serve static files - production (dist/) takes priority
-const distPath = path.join(__dirname, "dist");
-if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
-  console.log(`📁 Serving static files from: ${distPath}`);
-} else {
-  const devPath = path.join(__dirname, "../frontend/dist");
-  if (fs.existsSync(devPath)) {
-    app.use(express.static(devPath));
-    console.log(`📁 Serving static files from (dev): ${devPath}`);
-  } else {
-    console.warn("⚠️  No dist directory found. Run 'npm run build' in frontend.");
-  }
-}
-
-// ---------------------------------------
-// SPA FALLBACK ROUTE (catch-all for client-side routing)
-// ---------------------------------------
-app.use((req, res, next) => {
-  // Skip if it's an API route, webhook, auth, or static file
-  if (req.path.startsWith('/api') || 
-      req.path.startsWith('/webhooks') || 
-      req.path.startsWith('/auth') ||
-      req.path.startsWith('/assets') ||
-      req.path.includes('.')) {
-    return next();
-  }
-  
-  // Set CSP for all embedded app routes
-  res.setHeader("Content-Security-Policy", "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
-  
-  // Read and inject API key into HTML for SPA routes
-  const prodPath = path.join(__dirname, "dist/index.html");
-  const devPath = path.join(__dirname, "../frontend/dist/index.html");
-  const indexPath = fs.existsSync(prodPath) ? prodPath : devPath;
-  
-  if (fs.existsSync(indexPath)) {
-    try {
-      let html = fs.readFileSync(indexPath, 'utf8');
-      html = html.replace(
-        '<meta name="shopify-api-key" content="" />',
-        `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ''}" />`
-      );
-      return res.send(html);
-    } catch (err) {
-      console.error("❌ Error reading index.html:", err);
-      return res.status(500).send("Failed to load application");
-    }
-  }
-  
-  console.warn(`⚠️  SPA route requested but no index.html found: ${req.path}`);
-  res.status(404).send("Frontend not found. Please ensure the app is built.");
+  res.status(500).send("index.html missing. Run npm run build in frontend.");
 });
 
 // ---------------------------------------
