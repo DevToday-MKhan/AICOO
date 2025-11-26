@@ -972,22 +972,9 @@ app.get("/api/test", (req, res) => {
 // ---------------------------------------
 // SHOPIFY ROOT HANDLER (Fix Blank Screen)
 // ---------------------------------------
-app.get("/", async (req, res) => {
-  const { shop } = req.query;
-
+app.get("/", shopify.ensureInstalledOnShop(), async (req, res) => {
   // Set Content Security Policy for Shopify iframe
   res.setHeader("Content-Security-Policy", "frame-ancestors https://admin.shopify.com https://*.myshopify.com");
-
-  if (!shop) {
-    if (!process.env.SHOPIFY_SHOP_DOMAIN || !process.env.SHOPIFY_API_KEY) {
-      return res.status(500).send("Missing SHOPIFY_SHOP_DOMAIN or SHOPIFY_API_KEY");
-    }
-
-    return res.redirect(
-      302,
-      `https://${process.env.SHOPIFY_SHOP_DOMAIN}/admin/apps/${process.env.SHOPIFY_API_KEY}`
-    );
-  }
 
   // Read and inject API key into HTML
   const indexPath = path.join(__dirname, "../frontend/dist/index.html");
