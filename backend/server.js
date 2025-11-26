@@ -975,18 +975,17 @@ app.get("/api/test", (req, res) => {
 // FRONTEND SERVING
 // ---------------------------------------
 
-// Serve static assets
-app.use(express.static(distPath));
+const frontendDistPath = path.resolve(process.cwd(), "frontend/dist");
+app.use(express.static(frontendDistPath));
 
-// Serve index.html for Shopify embedded app and SPA routes (Express 5 compatible)
-app.use((req, res, next) => {
+// Catch-all route for Shopify embedded app and SPA routes (Express 5 compatible - regex pattern)
+app.get(/.*/, async (req, res) => {
   if (
     req.path.startsWith("/api") ||
     req.path.startsWith("/auth") ||
-    req.path.startsWith("/webhooks") ||
-    req.path.startsWith("/health")
+    req.path.startsWith("/webhooks")
   ) {
-    return next();
+    return res.status(404).end();
   }
 
   res.setHeader(
@@ -994,17 +993,18 @@ app.use((req, res, next) => {
     "frame-ancestors https://admin.shopify.com https://*.myshopify.com"
   );
 
-  const indexFile = path.join(distPath, "index.html");
+  const indexFile = path.join(frontendDistPath, "index.html");
 
   if (!fs.existsSync(indexFile)) {
-    return res.status(500).send("index.html missing. Run npm run build.");
+    return res.status(500).send("index.html missing.");
   }
 
   let html = fs.readFileSync(indexFile, "utf8");
-
   html = html.replace(
     '<meta name="shopify-api-key" content=""/>',
-    `<meta name="shopify-api-key" content="${process.env.SHOPIFY_API_KEY || ""}"/>`
+    `<meta name="shopify-api-key" content="${
+      process.env.SHOPIFY_API_KEY || ""
+    }"/>`
   );
 
   return res.send(html);
