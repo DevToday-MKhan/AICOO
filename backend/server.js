@@ -9,6 +9,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +35,14 @@ const distPath = path.join(__dirname, "../frontend/dist");
 app.use(express.static(distPath));
 app.use((req, res, next) => {
   if (!req.path.startsWith("/api")) {
-    res.sendFile(path.join(distPath, "index.html"));
+    const indexPath = path.join(distPath, "index.html");
+    fs.readFile(indexPath, 'utf8', (err, html) => {
+      if (err) {
+        return next(err);
+      }
+      html = html.replace('%VITE_SHOPIFY_API_KEY%', process.env.SHOPIFY_API_KEY);
+      res.send(html);
+    });
   } else {
     next();
   }
