@@ -6,6 +6,8 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
+import { AppProvider } from "@shopify/polaris";
+import "@shopify/polaris/build/esm/styles.css";
 
 export const loader = async () => {
   return {
@@ -28,7 +30,9 @@ export default function App() {
         <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
       </head>
       <body style={{ margin: 0, padding: 0 }}>
-        <Outlet />
+        <AppProvider i18n={{}}>
+          <Outlet />
+        </AppProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify({ SHOPIFY_API_KEY: apiKey, API_BASE_URL: apiBaseUrl })}`,
