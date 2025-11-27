@@ -958,21 +958,10 @@ app.get("/api/test", (req, res) => {
 // FRONTEND SERVING
 // ---------------------------------------
 
-app.use(express.static(distPath));
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-// SPA catch-all route using regex to avoid path-to-regexp issues
-app.get(/^(?!\/api|\/auth|\/webhooks|\/health).*$/, async (req, res) => {
-  if (!fs.existsSync(indexFile)) {
-    return res.status(500).send("index.html missing.");
-  }
-
-  let html = fs.readFileSync(indexFile, "utf8");
-  html = html.replace(
-    '%VITE_SHOPIFY_API_KEY%',
-    process.env.SHOPIFY_API_KEY || ''
-  );
-
-  return res.send(html);
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
 
 // ---------------------------------------
