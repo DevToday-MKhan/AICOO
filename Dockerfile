@@ -5,7 +5,8 @@ FROM node:18 AS remix-build
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files and npm config
+COPY .npmrc ./
 COPY package*.json ./
 COPY tsconfig.json ./
 COPY remix.config.js ./
@@ -24,6 +25,7 @@ FROM node:18 AS backend-build
 
 WORKDIR /app/backend
 
+COPY .npmrc ../
 COPY backend/package*.json ./
 RUN npm install
 
