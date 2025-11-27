@@ -8,13 +8,20 @@ frontend/node_modules/
 # frontend/dist/ - REMOVED to allow deploying built frontend
 frontend/build/
 
+# Remix build files
+build/
+public/build/
+.cache/
+
 # macOS system files
 .DS_Store
 
 # Env files (never commit keys)
 backend/.env
+.env
 
 # IDE folders
 .vscode/
 .idea/
 
+node_modules
