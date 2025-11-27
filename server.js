@@ -46,15 +46,15 @@ if (viteDevServer) {
   // Serve static files from public/build in production
   app.use(
     "/build",
-    express.static(path.join(__dirname, "../public/build"), {
+    express.static(path.join(__dirname, "public/build"), {
       immutable: true,
       maxAge: "1y",
     })
   );
 }
 
-// Serve other static files
-app.use(express.static(path.join(__dirname, "../public"), { maxAge: "1h" }));
+// Serve other static files (including /assets for frontend)
+app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 
 // Import all API route handlers - keep existing backend logic
 // These will remain as Express routes and won't be touched
