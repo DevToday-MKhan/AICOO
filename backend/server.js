@@ -4,8 +4,7 @@
 
 import express from "express";
 import cookieParser from "cookie-parser";
-import { shopifyApp } from "@shopify/shopify-app-express";
-import { restResources } from "@shopify/shopify-api/rest/admin/2024-07";
+import { createShopifyAuth, ShopifyAuth } from "@shopify/shopify-api";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -16,21 +15,50 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-const shopify = shopifyApp({
+// Shopify API v7 setup
+const shopify = createShopifyAuth({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
-  apiVersion: "2024-07",
   scopes: process.env.SCOPES.split(","),
-  appUrl: process.env.APP_URL,
-  authPath: "/auth",
-  authCallbackPath: "/auth/callback",
-  sessionStorage: new shopifyApp.SessionStorage.MemorySessionStorage(),
+  hostName: process.env.HOST.replace(/^https?:\/\//, ''),
+  hostScheme: process.env.HOST_SCHEME || 'https',
   isEmbeddedApp: true,
-  restResources,
+  apiVersion: "2024-07"
 });
 
-app.use(shopify.cspHeaders());
-app.use("/*", shopify.ensureInstalledOnShop(), async (req, res, next) => {
+// Auth routes
+app.get('/auth', async (req, res) => {
+  try {
+    const authRoute = await ShopifyAuth.beginAuth(
+      req,
+      res,
+      req.query.shop,
+      '/auth/callback',
+      false
+    );
+    return authRoute;
+  } catch (error) {
+    console.error('Auth error:', error);
+    res.status(500).send('Authentication failed');
+  }
+});
+
+app.get('/auth/callback', async (req, res) => {
+  try {
+    const callbackRoute = await ShopifyAuth.validateAuthCallback(
+      req,
+      res,
+      req.query
+    );
+    return callbackRoute;
+  } catch (error) {
+    console.error('Callback error:', error);
+    res.status(500).send('Authentication callback failed');
+  }
+});
+
+// Main app route - ensure authenticated
+app.get('/', shopify.ensureInstalledOnShop(), async (req, res) => {
   return res
     .status(200)
     .set("Content-Type", "text/html")
