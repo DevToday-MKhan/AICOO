@@ -1,20 +1,23 @@
-# Backend node modules
-backend/node_modules/
-
-# Remix build files
+# Remix & Node build artifacts
 build/
 public/build/
 .cache/
+node_modules/
 
-# macOS system files
-.DS_Store
+# Old frontend folders (Vite)
+frontend/node_modules/
+frontend/build/
 
-# Env files (never commit keys)
+# Backend
+backend/node_modules/
 backend/.env
+
+# Env files
 .env
 
-# IDE folders
+# IDE
 .vscode/
 .idea/
 
-node_modules
+# OS
+.DS_Store
