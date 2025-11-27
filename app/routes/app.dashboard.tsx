@@ -15,10 +15,10 @@ import {
   Divider,
 } from "@shopify/polaris";
 import {
-  CirclePlusOutlineMinor,
-  ExportMinor,
-  AnalyticsMinor,
-  ReportMinor,
+  PlusCircleIcon,
+  ExportIcon,
+  ChartVerticalIcon,
+  FileIcon,
 } from "@shopify/polaris-icons";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -200,16 +200,16 @@ export default function Dashboard() {
               </Text>
               <Divider />
               <InlineStack gap="300" wrap>
-                <Button icon={CirclePlusOutlineMinor} variant="primary">
+                <Button icon={PlusCircleIcon} variant="primary">
                   Create Discount
                 </Button>
-                <Button icon={ExportMinor}>
+                <Button icon={ExportIcon}>
                   Export Customers
                 </Button>
-                <Button icon={AnalyticsMinor}>
+                <Button icon={ChartVerticalIcon}>
                   Analyze Store
                 </Button>
-                <Button icon={ReportMinor}>
+                <Button icon={FileIcon}>
                   Sales Report
                 </Button>
               </InlineStack>
