@@ -96,7 +96,10 @@ app.get("/", async (req, res) => {
 
   res.setHeader(
     "Content-Security-Policy",
-    "frame-ancestors https://admin.shopify.com https://*.myshopify.com;"
+    "frame-ancestors https://admin.shopify.com https://*.myshopify.com; " +
+    "script-src 'self' 'unsafe-inline' https://cdn.shopify.com; " +
+    "connect-src 'self' https://*.myshopify.com wss://*.myshopify.com; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.shopify.com;"
   );
 
   let html = fs.readFileSync(indexFile, "utf8");
