@@ -4,7 +4,7 @@
 
 import express from "express";
 import cookieParser from "cookie-parser";
-import { createShopifyAuth, ShopifyAuth } from "@shopify/shopify-api";
+import shopify from "./shopify.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -15,47 +15,9 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// Shopify API v7 setup
-const shopify = createShopifyAuth({
-  apiKey: process.env.SHOPIFY_API_KEY,
-  apiSecretKey: process.env.SHOPIFY_API_SECRET,
-  scopes: process.env.SCOPES.split(","),
-  hostName: process.env.HOST.replace(/^https?:\/\//, ''),
-  hostScheme: process.env.HOST_SCHEME || 'https',
-  isEmbeddedApp: true,
-  apiVersion: "2024-04"
-});
-
 // Auth routes
-app.get('/auth', async (req, res) => {
-  try {
-    const authRoute = await ShopifyAuth.beginAuth(
-      req,
-      res,
-      req.query.shop,
-      '/auth/callback',
-      false
-    );
-    return authRoute;
-  } catch (error) {
-    console.error('Auth error:', error);
-    res.status(500).send('Authentication failed');
-  }
-});
-
-app.get('/auth/callback', async (req, res) => {
-  try {
-    const callbackRoute = await ShopifyAuth.validateAuthCallback(
-      req,
-      res,
-      req.query
-    );
-    return callbackRoute;
-  } catch (error) {
-    console.error('Callback error:', error);
-    res.status(500).send('Authentication callback failed');
-  }
-});
+app.use("/auth", shopify.auth.begin());
+app.use("/auth/callback", shopify.auth.callback());
 
 // Main app route - ensure authenticated
 app.get('/', shopify.ensureInstalledOnShop(), async (req, res) => {
