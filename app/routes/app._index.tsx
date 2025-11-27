@@ -25,9 +25,15 @@ export default function AppIndex() {
   useEffect(() => {
     // Initialize frontend app
     if (typeof window !== "undefined" && !scriptLoaded.current) {
-      // Set global environment variables
+      // Set global environment variables for App Bridge and frontend
       (window as any).ENV = { SHOPIFY_API_KEY: apiKey };
       (window as any).__SHOPIFY_DEV_HOST = host;
+      
+      // Also set on document for compatibility
+      const apiKeyMeta = document.querySelector('meta[name="shopify-api-key"]');
+      if (apiKeyMeta && !apiKeyMeta.getAttribute('content')) {
+        apiKeyMeta.setAttribute('content', apiKey);
+      }
       
       // Load CSS
       const link = document.createElement('link');
@@ -42,7 +48,7 @@ export default function AppIndex() {
       script.crossOrigin = 'anonymous';
       script.src = assets.js;
       script.onload = () => {
-        console.log('Frontend app loaded');
+        console.log('Frontend app loaded with API key:', apiKey);
       };
       document.body.appendChild(script);
       
