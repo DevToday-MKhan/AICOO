@@ -1,7 +1,11 @@
 {
   "version": 2,
-  "name": "aicoo-frontend",
+  "name": "aicoo-fullstack",
   "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    },
     {
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
@@ -11,6 +15,14 @@
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/server.js"
+    },
+    {
+      "src": "/auth/(.*)",
+      "dest": "/backend/server.js"
+    },
     {
       "src": "/(.*)",
       "dest": "/frontend/dist/$1"

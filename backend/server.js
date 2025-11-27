@@ -988,17 +988,19 @@ app.use((req, res, next) => {
 });
 
 // ---------------------------------------
-// START SERVER (with WebSocket support)
-// ---------------------------------------
-const PORT = process.env.PORT || 8080;
-httpServer.listen(PORT, () => {
-  console.log(`🚀 AICOO backend running on port ${PORT}`);
-  console.log("🔌 WebSocket server ready for real-time updates");
-});
-
-// ---------------------------------------
-// EXPORT — MUST BE LAST
+// EXPORT FOR VERCEL SERVERLESS
 // ---------------------------------------
 export default app;
+
+// ---------------------------------------
+// START SERVER (only for local development)
+// ---------------------------------------
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 8080;
+  httpServer.listen(PORT, () => {
+    console.log(`🚀 AICOO backend running on port ${PORT}`);
+    console.log("🔌 WebSocket server ready for real-time updates");
+  });
+}
 
 
