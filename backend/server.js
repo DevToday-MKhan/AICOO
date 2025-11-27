@@ -103,10 +103,21 @@ app.get("/", async (req, res) => {
   );
 
   let html = fs.readFileSync(indexFile, "utf8");
+  const apiKey = process.env.SHOPIFY_API_KEY || '';
+  
+  console.log(`🔑 Replacing VITE_SHOPIFY_API_KEY with: ${apiKey ? '***' + apiKey.slice(-4) : 'EMPTY'}`);
+  
   html = html.replace(
     '%VITE_SHOPIFY_API_KEY%',
-    process.env.SHOPIFY_API_KEY || ''
+    apiKey
   );
+
+  // Check if replacement worked
+  if (html.includes('%VITE_SHOPIFY_API_KEY%')) {
+    console.error('❌ VITE_SHOPIFY_API_KEY replacement failed!');
+  } else {
+    console.log('✅ VITE_SHOPIFY_API_KEY replacement successful');
+  }
 
   return res.status(200).send(html);
 });
