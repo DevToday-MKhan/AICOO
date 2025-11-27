@@ -112,13 +112,16 @@ app.use(cors());
 // Conditional raw body parsing for Shopify webhooks only
 app.use((req, res, next) => {
   if (req.headers['x-shopify-topic']) {
-    // Only parse raw body for webhook requests
-    express.raw({ 
-      type: 'application/json', 
-      verify: (req, res, buf, encoding) => { 
-        req.rawBody = buf.toString(); 
-      } 
-    })(req, res, next);
+    // Read raw body for webhook requests
+    let data = '';
+    req.on('data', chunk => {
+      data += chunk;
+    });
+    req.on('end', () => {
+      req.rawBody = data;
+      req.body = data; // Set body to raw string for Shopify middleware
+      next();
+    });
   } else {
     next();
   }
