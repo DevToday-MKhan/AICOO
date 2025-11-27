@@ -32,7 +32,7 @@ import * as Analytics from "./analytics.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const distPath = path.resolve(process.cwd(), "frontend/dist");
+const distPath = path.join(process.cwd(), "frontend", "dist");
 const indexFile = path.join(distPath, "index.html");
 
 // ---------------------------------------
@@ -961,10 +961,10 @@ app.get("/api/test", (req, res) => {
 // FRONTEND SERVING
 // ---------------------------------------
 
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+app.use(express.static(distPath));
 
-app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
 // ---------------------------------------
