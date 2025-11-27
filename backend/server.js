@@ -1,18 +1,16 @@
 //////////////////////////////////////////////////////////////////
-//  AI-COO — Production Embedded App Server
+//  AI-COO — Legacy Backend Server (DEPRECATED)
+//  This file is no longer used - all routing handled by /server.js
 //////////////////////////////////////////////////////////////////
+
+// NOTE: Railway should run "node server.js" from root, not this file
+// This file is kept for reference/backup only
 
 import express from "express";
 import cookieParser from "cookie-parser";
 import shopify from "./shopify.js";
-import path from "path";
-import { fileURLToPath } from "url";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
-import fs from "fs";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
@@ -21,7 +19,7 @@ app.use(cookieParser());
 const httpServer = createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: "*", // Adjust as needed
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -31,23 +29,8 @@ global.io = io;
 app.use("/app/auth", shopify.auth.begin());
 app.use("/app/auth/callback", shopify.auth.callback());
 
-app.get("/", (req, res) => {
-  const indexPath = path.join(distPath, "index.html");
-  fs.readFile(indexPath, 'utf8', (err, html) => {
-    if (err) {
-      return res.status(500).send("Error loading page");
-    }
-    html = html.replace("%VITE_SHOPIFY_API_KEY%", process.env.SHOPIFY_API_KEY);
-    res.send(html);
-  });
-});
-
-// Remix handles all routing - no separate frontend dist
-app.use((req, res, next) => {
-  if (!req.path.startsWith("/api")) {
-    next();
-  }
-});
+// Backend server.js is no longer used - all routing handled by root server.js
+// This file is kept for reference only
 
 const PORT = process.env.PORT || 8080;
 httpServer.listen(PORT, () => {
