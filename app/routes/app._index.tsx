@@ -1,19 +1,12 @@
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate.admin(request);
   
+  // Redirect to dashboard as default route
   const url = new URL(request.url);
-  const shop = url.searchParams.get("shop") || "";
-  const host = url.searchParams.get("host") || "";
-  
-  return json({
-    apiKey: process.env.SHOPIFY_API_KEY || "",
-    shop,
-    host,
-  });
+  return redirect(`/app/dashboard${url.search}`);
 }
 
 export default function AppIndex() {
