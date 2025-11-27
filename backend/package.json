@@ -22,7 +22,13 @@
     "openai": "^6.9.1",
     "socket.io": "^4.8.1"
   },
-  "keywords": ["shopify", "logistics", "ai", "carrier", "shipping"],
+  "keywords": [
+    "shopify",
+    "logistics",
+    "ai",
+    "carrier",
+    "shipping"
+  ],
   "author": "DevToday-MKhan",
   "license": "MIT"
 }
