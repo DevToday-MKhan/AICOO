@@ -31,18 +31,22 @@ global.io = io;
 app.use("/auth", shopify.auth.begin());
 app.use("/auth/callback", shopify.auth.callback());
 
+app.get("/", (req, res) => {
+  const indexPath = path.join(distPath, "index.html");
+  fs.readFile(indexPath, 'utf8', (err, html) => {
+    if (err) {
+      return res.status(500).send("Error loading page");
+    }
+    html = html.replace("%VITE_SHOPIFY_API_KEY%", process.env.SHOPIFY_API_KEY);
+    res.send(html);
+  });
+});
+
 const distPath = path.join(__dirname, "../frontend/dist");
 app.use(express.static(distPath));
 app.use((req, res, next) => {
   if (!req.path.startsWith("/api")) {
-    const indexPath = path.join(distPath, "index.html");
-    fs.readFile(indexPath, 'utf8', (err, html) => {
-      if (err) {
-        return next(err);
-      }
-      html = html.replace('%VITE_SHOPIFY_API_KEY%', process.env.SHOPIFY_API_KEY);
-      res.send(html);
-    });
+    res.sendFile(path.join(distPath, "index.html"));
   } else {
     next();
   }
