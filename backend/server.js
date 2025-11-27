@@ -109,8 +109,20 @@ app.get("/", async (req, res) => {
 
 app.use(cors());
 
-// Raw body parsing for Shopify webhooks (must be before JSON parsing)
-app.use(express.raw({ verify: (req, res, buf, encoding) => { req.rawBody = buf; } }));
+// Conditional raw body parsing for Shopify webhooks only
+app.use((req, res, next) => {
+  if (req.headers['x-shopify-topic']) {
+    // Only parse raw body for webhook requests
+    express.raw({ 
+      type: 'application/json', 
+      verify: (req, res, buf, encoding) => { 
+        req.rawBody = buf.toString(); 
+      } 
+    })(req, res, next);
+  } else {
+    next();
+  }
+});
 
 // Shopify OAuth + Session Middleware
 app.use("/auth", shopify.auth.begin());
