@@ -24,6 +24,7 @@
     "@shopify/shopify-api": "^10.0.0",
     "@shopify/shopify-app-remix": "^3.3.1",
     "@shopify/shopify-app-session-storage-memory": "^3.0.0",
+    "@shopify/shopify-app-session-storage-postgresql": "^3.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

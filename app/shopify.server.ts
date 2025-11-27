@@ -4,13 +4,14 @@ import {
   AppDistribution,
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
-import { MemorySessionStorage } from "@shopify/shopify-app-session-storage-memory";
+import { PostgreSQLSessionStorage } from "@shopify/shopify-app-session-storage-postgresql";
 
 // Load ENV
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || "";
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || "";
 const SCOPES = process.env.SCOPES?.split(",") || ["read_products"];
 const HOST = process.env.HOST?.replace(/^https?:\/\//, "") || "";
+const DATABASE_URL = process.env.DATABASE_URL || process.env.POSTGRES_URL || "";
 
 const shopify = shopifyApp({
   apiKey: SHOPIFY_API_KEY,
@@ -18,7 +19,7 @@ const shopify = shopifyApp({
   scopes: SCOPES,
   appUrl: `https://${HOST}`,
   authPathPrefix: "/auth",
-  sessionStorage: new MemorySessionStorage(),
+  sessionStorage: new PostgreSQLSessionStorage(DATABASE_URL),
   distribution: AppDistribution.AppStore,
   apiVersion: ApiVersion.October24,
 });
