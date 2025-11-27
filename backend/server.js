@@ -23,7 +23,7 @@ const shopify = createShopifyAuth({
   hostName: process.env.HOST.replace(/^https?:\/\//, ''),
   hostScheme: process.env.HOST_SCHEME || 'https',
   isEmbeddedApp: true,
-  apiVersion: "2024-07"
+  apiVersion: "2024-04"
 });
 
 // Auth routes
