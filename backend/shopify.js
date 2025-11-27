@@ -3,21 +3,25 @@ import { LATEST_API_VERSION } from "@shopify/shopify-api";
 import { shopifyApp } from "@shopify/shopify-app-express";
 import { MemorySessionStorage } from "@shopify/shopify-app-session-storage-memory";
 
-// Get environment variables with safe defaults
-const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || "test-key";
-const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || "test-secret";
-const SCOPES = (process.env.SCOPES || "read_products").split(",").filter(s => s.trim());
+const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY;
+const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET;
+
+// Host must be EXACT domain only — no https://, no stripping, no replace()
 const HOST = process.env.HOST || "aicoo-production.up.railway.app";
 
-console.log(`🔑 Shopify Config: Host=${HOST}, Scopes=${SCOPES.join(",")}`);
+const SCOPES = (process.env.SCOPES || "write_products,write_orders")
+  .split(",")
+  .map(s => s.trim());
 
-// Initialize Shopify App - it will create the API internally
+console.log("🔑 Using hostName:", HOST);
+console.log("🔑 OAuth callback should be: https://" + HOST + "/auth/callback");
+
 const shopify = shopifyApp({
   api: {
     apiKey: SHOPIFY_API_KEY,
     apiSecretKey: SHOPIFY_API_SECRET,
-    scopes: SCOPES,
     hostName: HOST,
+    scopes: SCOPES,
     apiVersion: LATEST_API_VERSION,
     isEmbeddedApp: true,
   },
@@ -25,14 +29,7 @@ const shopify = shopifyApp({
     path: "/auth",
     callbackPath: "/auth/callback",
   },
-  // Remove webhooks config since we're handling manually
-  // webhooks: {
-  //   path: "/api/webhooks",
-  // },
   sessionStorage: new MemorySessionStorage(),
 });
 
-console.log("✅ Shopify app initialized successfully");
-
-// Export the complete shopify instance as default
 export default shopify;
