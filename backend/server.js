@@ -42,12 +42,9 @@ app.get("/", (req, res) => {
   });
 });
 
-const distPath = path.join(__dirname, "../frontend/dist");
-app.use(express.static(distPath));
+// Remix handles all routing - no separate frontend dist
 app.use((req, res, next) => {
   if (!req.path.startsWith("/api")) {
-    res.sendFile(path.join(distPath, "index.html"));
-  } else {
     next();
   }
 });

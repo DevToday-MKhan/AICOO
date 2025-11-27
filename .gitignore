@@ -1,13 +1,6 @@
 # Backend node modules
 backend/node_modules/
 
-# Frontend node modules
-frontend/node_modules/
-
-# Build files (dist is NOT ignored - Railway needs it)
-# frontend/dist/ - REMOVED to allow deploying built frontend
-frontend/build/
-
 # Remix build files
 build/
 public/build/
