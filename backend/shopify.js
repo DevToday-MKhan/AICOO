@@ -7,7 +7,7 @@ import { MemorySessionStorage } from "@shopify/shopify-app-session-storage-memor
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || "test-key";
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || "test-secret";
 const SCOPES = (process.env.SCOPES || "read_products").split(",").filter(s => s.trim());
-const HOST = (process.env.HOST || "localhost:8080").replace(/^https?:\/\//, "");
+const HOST = process.env.HOST || "aicoo-production.up.railway.app";
 
 console.log(`🔑 Shopify Config: Host=${HOST}, Scopes=${SCOPES.join(",")}`);
 
