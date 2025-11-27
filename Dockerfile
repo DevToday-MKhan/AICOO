@@ -1,26 +1,33 @@
 # ============================
-# 1. Build Frontend (Vite)
+# 1. Build Remix App
 # ============================
-FROM node:18 AS frontend-build
+FROM node:18 AS remix-build
 
 WORKDIR /app
 
-COPY frontend ./frontend
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY remix.config.js ./
 
-WORKDIR /app/frontend
-RUN npm install && npm run build
+# Copy Remix app directory
+COPY app ./app
+
+# Install dependencies and build Remix
+RUN npm install
+RUN npx remix build
 
 # ============================
 # 2. Build Backend
 # ============================
 FROM node:18 AS backend-build
 
-WORKDIR /app
-
-COPY backend ./backend
-
 WORKDIR /app/backend
+
+COPY backend/package*.json ./
 RUN npm install
+
+COPY backend ./
 
 # ============================
 # 3. Final Runtime Image
@@ -29,12 +36,19 @@ FROM node:18-slim
 
 WORKDIR /app
 
-COPY --from=backend-build /app/backend ./backend
-COPY --from=frontend-build /app/frontend/dist ./frontend/dist
+# Copy Remix build artifacts
+COPY --from=remix-build /app/build ./build
+COPY --from=remix-build /app/public ./public
+COPY --from=remix-build /app/node_modules ./node_modules
+COPY --from=remix-build /app/package.json ./package.json
 
-# Keep WORKDIR as /app so process.cwd() returns /app (not /app/backend)
-# This matches server.js: path.resolve(process.cwd(), "frontend/dist")
+# Copy backend
+COPY --from=backend-build /app/backend ./backend
+
+# Copy server.js and config
+COPY server.js ./server.js
+COPY config ./config
 
 EXPOSE 8080
 
-CMD ["node", "backend/server.js"]
+CMD ["node", "server.js"]
