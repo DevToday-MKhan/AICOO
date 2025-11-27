@@ -16,7 +16,7 @@ const shopify = shopifyApp({
   apiKey: SHOPIFY_API_KEY,
   apiSecretKey: SHOPIFY_API_SECRET,
   scopes: SCOPES,
-  appUrl: `https://${HOST}/app`,
+  appUrl: `https://${HOST}`,
   authPathPrefix: "/auth",
   sessionStorage: new MemorySessionStorage(),
   distribution: AppDistribution.AppStore,
