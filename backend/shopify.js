@@ -25,9 +25,10 @@ const shopify = shopifyApp({
     path: "/auth",
     callbackPath: "/auth/callback",
   },
-  webhooks: {
-    path: "/api/webhooks",
-  },
+  // Remove webhooks config since we're handling manually
+  // webhooks: {
+  //   path: "/api/webhooks",
+  // },
   sessionStorage: new MemorySessionStorage(),
 });
 
