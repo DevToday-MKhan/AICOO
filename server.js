@@ -1,5 +1,4 @@
 import { createRequestHandler } from "@remix-run/express";
-import { broadcastDevReady } from "@remix-run/node";
 import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -11,22 +10,11 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
-// Force production mode if not explicitly set
-if (!process.env.NODE_ENV) {
-  process.env.NODE_ENV = "production";
-}
+// Force production mode
+process.env.NODE_ENV = "production";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const viteDevServer =
-  process.env.NODE_ENV === "production"
-    ? undefined
-    : await import("vite").then((vite) =>
-        vite.createServer({
-          server: { middlewareMode: true },
-        })
-      );
 
 const app = express();
 
@@ -44,21 +32,16 @@ const io = new SocketIOServer(httpServer, {
 });
 global.io = io;
 
-// Vite dev server for HMR in development
-if (viteDevServer) {
-  app.use(viteDevServer.middlewares);
-} else {
-  // Serve static files from public/build in production
-  app.use(
-    "/build",
-    express.static(path.join(__dirname, "public/build"), {
-      immutable: true,
-      maxAge: "1y",
-    })
-  );
-}
+// Serve static files from public/build in production
+app.use(
+  "/build",
+  express.static(path.join(__dirname, "public/build"), {
+    immutable: true,
+    maxAge: "1y",
+  })
+);
 
-// Serve other static files (including /assets for frontend)
+// Serve other static files
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 
 // Import all API route handlers - keep existing backend logic
@@ -66,32 +49,23 @@ app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 // Add your API routes here if needed
 // Example: app.use("/api/deliveries", deliveryRouter);
 
-// Remix request handler for all non-API routes
-const build = viteDevServer
-  ? () => viteDevServer.ssrLoadModule("virtual:remix/server-build")
-  : await import("./build/index.js");
+// Import Remix build (production only)
+const build = await import("./build/index.js");
 
 app.all(
   "*",
   createRequestHandler({
     build,
-    mode: process.env.NODE_ENV,
+    mode: "production",
   })
 );
 
 const PORT = process.env.PORT || 8080;
 
-httpServer.listen(PORT, async () => {
+httpServer.listen(PORT, () => {
   console.log(`🚀 AI-COO server running on port ${PORT}`);
-  console.log(`📦 Environment: ${process.env.NODE_ENV || "development"}`);
-  
-  if (process.env.NODE_ENV === "development" && viteDevServer) {
-    try {
-      await broadcastDevReady(await build);
-    } catch (error) {
-      console.warn("⚠️  Dev ready broadcast skipped:", error.message);
-    }
-  }
+  console.log(`📦 Environment: production`);
+  console.log(`✅ Remix build loaded from ./build/index.js`);
 });
 
 export default app;
