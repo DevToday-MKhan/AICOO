@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import { useState, useEffect } from 'react';
 import { getColors } from '../styles/theme';
 
@@ -14,7 +15,7 @@ export default function CarrierPerformanceCard({ isDarkMode }) {
 
   const fetchCarrierPerformance = async () => {
     try {
-      const response = await fetch('/api/memory/carrier-performance');
+      const response = await apiFetch('/api/memory/carrier-performance');
       const data = await response.json();
       setPerformance(data);
       setLoading(false);

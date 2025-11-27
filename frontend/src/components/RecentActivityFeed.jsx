@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import { useEffect, useState } from "react";
 import { colors, spacing, borderRadius, typography } from "../styles/theme";
 import { useAICOOEvents } from "../hooks/useWebSocket";
@@ -56,10 +57,10 @@ const RecentActivityFeed = () => {
   const fetchActivities = async () => {
     try {
       const [ordersRes, deliveriesRes, eventsRes, simsRes] = await Promise.all([
-        fetch("/api/orders/latest"),
-        fetch("/api/delivery/latest"),
-        fetch("/api/events"),
-        fetch("/api/simulate/list?limit=5"),
+        apiFetch("/api/orders/latest"),
+        apiFetch("/api/delivery/latest"),
+        apiFetch("/api/events"),
+        apiFetch("/api/simulate/list?limit=5"),
       ]);
 
       const orders = await ordersRes.json();

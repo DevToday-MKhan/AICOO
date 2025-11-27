@@ -1,19 +1,27 @@
 // API Configuration
-// In development: Vite proxy handles /api -> http://localhost:3000
-// In production: Use VITE_API_URL environment variable
-const API_BASE = import.meta.env.VITE_API_URL || '';
+// Uses window.ENV.API_BASE_URL set by Remix SSR
+// Falls back to empty string for development (same origin)
+const API_BASE = typeof window !== 'undefined' && window.ENV?.API_BASE_URL 
+  ? window.ENV.API_BASE_URL 
+  : '';
 
 // Helper to build API URL
-// Development: '/api/...' (proxied by Vite)
-// Production: 'https://backend.railway.app/api/...' (full URL)
 export function apiUrl(path) {
-  return `${API_BASE}${path}`;
+  // Ensure path starts with /
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${API_BASE}${cleanPath}`;
+}
+
+// Helper for fetch calls with automatic URL construction
+export async function apiFetch(path, options = {}) {
+  const url = apiUrl(path);
+  return fetch(url, options);
 }
 
 // WebSocket URL for real-time updates
 export const WS_URL = API_BASE 
   ? API_BASE.replace('http', 'ws') 
-  : `ws://localhost:3000`;
+  : (typeof window !== 'undefined' ? `ws://${window.location.host}` : 'ws://localhost:8080');
 
 // API Endpoints - using helper for environment-aware URLs
 export const ENDPOINTS = {

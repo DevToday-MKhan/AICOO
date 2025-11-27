@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import { useState, useEffect } from "react";
 import { colors, spacing, borderRadius, typography, shadows } from "../styles/theme";
 
@@ -5,7 +6,7 @@ const ModeIndicator = () => {
   const [mode, setMode] = useState("DEV");
 
   useEffect(() => {
-    fetch("/api/admin/mode")
+    apiFetch("/api/admin/mode")
       .then(res => res.json())
       .then(data => setMode(data.mode))
       .catch(() => setMode("DEV"));

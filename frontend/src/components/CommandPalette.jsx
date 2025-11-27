@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import { useState, useEffect, useRef } from "react";
 import { colors, spacing, borderRadius, shadows, typography } from "../styles/theme";
 
@@ -126,31 +127,31 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
 
       // Analytics commands
       if (command === "analytics") {
-        const res = await fetch("/api/analytics");
+        const res = await apiFetch("/api/analytics");
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to fetch analytics");
         setResult({ type: "analytics", data });
       }
       else if (command === "summary") {
-        const res = await fetch("/api/analytics/daily");
+        const res = await apiFetch("/api/analytics/daily");
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to fetch summary");
         setResult({ type: "summary", data });
       }
       else if (command === "trends") {
-        const res = await fetch("/api/analytics/trends");
+        const res = await apiFetch("/api/analytics/trends");
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to fetch trends");
         setResult({ type: "trends", data });
       }
       else if (command === "predictions") {
-        const res = await fetch("/api/analytics");
+        const res = await apiFetch("/api/analytics");
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to fetch predictions");
         setResult({ type: "predictions", data: data.predictions });
       }
       else if (command === "hotspots") {
-        const res = await fetch("/api/analytics/zip");
+        const res = await apiFetch("/api/analytics/zip");
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to fetch hotspots");
         setResult({ type: "hotspots", data });
@@ -236,7 +237,7 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
       
       // Memory
       else if (command === "memory") {
-        const res = await fetch("/api/memory");
+        const res = await apiFetch("/api/memory");
         const data = await res.json();
         
         if (!res.ok) throw new Error("Failed to fetch memory");
@@ -246,7 +247,7 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
       
       // Health
       else if (command === "health") {
-        const res = await fetch("/api/health");
+        const res = await apiFetch("/api/health");
         const data = await res.json();
         
         if (!res.ok) throw new Error("Failed to fetch health");
@@ -256,7 +257,7 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
       
       // Orders
       else if (command === "orders") {
-        const res = await fetch("/api/orders/latest");
+        const res = await apiFetch("/api/orders/latest");
         const data = await res.json();
         
         if (!res.ok) throw new Error("Failed to fetch orders");
@@ -266,7 +267,7 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
       
       // Deliveries
       else if (command === "deliveries") {
-        const res = await fetch("/api/delivery/history");
+        const res = await apiFetch("/api/delivery/history");
         const data = await res.json();
         
         if (!res.ok) throw new Error("Failed to fetch deliveries");
@@ -276,7 +277,7 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
       
       // Events
       else if (command === "events") {
-        const res = await fetch("/api/events");
+        const res = await apiFetch("/api/events");
         const data = await res.json();
         
         if (!res.ok) throw new Error("Failed to fetch events");
@@ -339,7 +340,7 @@ const CommandPalette = ({ isOpen, onClose, onExecute }) => {
       
       // List simulations
       else if (command === "simulations") {
-        const res = await fetch("/api/simulate/list");
+        const res = await apiFetch("/api/simulate/list");
         const data = await res.json();
         
         if (!res.ok) throw new Error("Failed to fetch simulations");

@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import React, { useState, useEffect } from "react";
 import { colors, spacing, borderRadius, shadows, typography, components } from "../styles/theme";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -83,55 +84,55 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         // Fetch events
-        const eventsRes = await fetch("/api/events");
+        const eventsRes = await apiFetch("/api/events");
         if (!eventsRes.ok) throw new Error("Failed to fetch events");
         const eventsData = await eventsRes.json();
         setEvents(eventsData);
 
         // Fetch suggestions
-        const suggestionsRes = await fetch("/api/suggestions");
+        const suggestionsRes = await apiFetch("/api/suggestions");
         if (!suggestionsRes.ok) throw new Error("Failed to fetch suggestions");
         const suggestionsData = await suggestionsRes.json();
         setSuggestions(suggestionsData);
 
         // Fetch settings
-        const settingsRes = await fetch("/api/settings");
+        const settingsRes = await apiFetch("/api/settings");
         if (!settingsRes.ok) throw new Error("Failed to fetch settings");
         const settingsData = await settingsRes.json();
         setSettings(settingsData);
 
         // Fetch courier history
-        const courierRes = await fetch("/api/courier/history");
+        const courierRes = await apiFetch("/api/courier/history");
         if (!courierRes.ok) throw new Error("Failed to fetch courier history");
         const courierData = await courierRes.json();
         setCourierHistory(courierData);
 
         // Fetch ride history
-        const rideRes = await fetch("/api/ride/history");
+        const rideRes = await apiFetch("/api/ride/history");
         if (!rideRes.ok) throw new Error("Failed to fetch ride history");
         const rideData = await rideRes.json();
         setRideHistory(rideData);
 
         // Fetch route history
-        const routeRes = await fetch("/api/route/history");
+        const routeRes = await apiFetch("/api/route/history");
         if (!routeRes.ok) throw new Error("Failed to fetch route history");
         const routeData = await routeRes.json();
         setRouteHistory(routeData);
 
         // Fetch latest Shopify order
-        const orderRes = await fetch("/api/orders/latest");
+        const orderRes = await apiFetch("/api/orders/latest");
         if (!orderRes.ok) throw new Error("Failed to fetch latest order");
         const orderData = await orderRes.json();
         setLatestOrder(orderData);
 
         // Fetch latest delivery assignment
-        const deliveryRes = await fetch("/api/delivery/latest");
+        const deliveryRes = await apiFetch("/api/delivery/latest");
         if (!deliveryRes.ok) throw new Error("Failed to fetch latest delivery");
         const deliveryData = await deliveryRes.json();
         setLatestDelivery(deliveryData);
 
         // Fetch AICOO memory
-        const memoryRes = await fetch("/api/memory");
+        const memoryRes = await apiFetch("/api/memory");
         if (!memoryRes.ok) throw new Error("Failed to fetch memory");
         const memoryData = await memoryRes.json();
         setMemory(memoryData);

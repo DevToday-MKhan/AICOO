@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
@@ -38,8 +39,8 @@ const AnalyticsDashboard = () => {
   const fetchAnalyticsData = async () => {
     try {
       const [memoryRes, eventsRes] = await Promise.all([
-        fetch("/api/memory"),
-        fetch("/api/events"),
+        apiFetch("/api/memory"),
+        apiFetch("/api/events"),
       ]);
 
       const memory = await memoryRes.json();

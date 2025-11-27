@@ -10,11 +10,12 @@ import {
 export const loader = async () => {
   return {
     apiKey: process.env.SHOPIFY_API_KEY || "",
+    apiBaseUrl: process.env.API_BASE_URL || "",
   };
 };
 
 export default function App() {
-  const { apiKey } = useLoaderData<typeof loader>();
+  const { apiKey, apiBaseUrl } = useLoaderData<typeof loader>();
 
   return (
     <html lang="en">
@@ -28,6 +29,11 @@ export default function App() {
       </head>
       <body style={{ margin: 0, padding: 0 }}>
         <Outlet />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify({ SHOPIFY_API_KEY: apiKey, API_BASE_URL: apiBaseUrl })}`,
+          }}
+        />
         <ScrollRestoration />
         <Scripts />
       </body>

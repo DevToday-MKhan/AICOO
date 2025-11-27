@@ -5,14 +5,21 @@ import { io } from 'socket.io-client';
  * Custom hook for WebSocket real-time updates
  * Connects to backend Socket.io server and listens for events
  */
-export function useWebSocket(url = 'http://localhost:3000') {
+export function useWebSocket(url) {
+  // Use provided URL or get from window.ENV
+  const defaultUrl = typeof window !== 'undefined' && window.ENV?.API_BASE_URL
+    ? window.ENV.API_BASE_URL
+    : `${window.location.protocol}//${window.location.host}`;
+  
+  const socketUrl = url || defaultUrl;
+  
   const socketRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastEvent, setLastEvent] = useState(null);
 
   useEffect(() => {
     // Create socket connection
-    socketRef.current = io(url, {
+    socketRef.current = io(socketUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5

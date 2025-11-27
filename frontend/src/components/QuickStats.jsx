@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import { useState, useEffect } from "react";
 import { colors, spacing, borderRadius, shadows, typography } from "../styles/theme";
 
@@ -21,10 +22,10 @@ const QuickStats = () => {
   const fetchStats = async () => {
     try {
       const [ordersRes, eventsRes, deliveriesRes, memoryRes] = await Promise.all([
-        fetch("/api/orders/latest"),
-        fetch("/api/events"),
-        fetch("/api/delivery/latest"),
-        fetch("/api/memory"),
+        apiFetch("/api/orders/latest"),
+        apiFetch("/api/events"),
+        apiFetch("/api/delivery/latest"),
+        apiFetch("/api/memory"),
       ]);
 
       const orders = await ordersRes.json();

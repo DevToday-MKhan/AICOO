@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import { useEffect, useState } from 'react';
 import { getColors, shadows, animations, transitions } from '../styles/theme';
 
@@ -54,10 +55,10 @@ export default function IntelligenceDashboard() {
   const fetchIntelligence = async () => {
     try {
       const [dailyRes, trendsRes, zipRes, analyticsRes] = await Promise.all([
-        fetch('/api/analytics/daily'),
-        fetch('/api/analytics/trends'),
-        fetch('/api/analytics/zip'),
-        fetch('/api/analytics')
+        apiFetch('/api/analytics/daily'),
+        apiFetch('/api/analytics/trends'),
+        apiFetch('/api/analytics/zip'),
+        apiFetch('/api/analytics')
       ]);
 
       const dailyData = await dailyRes.json();

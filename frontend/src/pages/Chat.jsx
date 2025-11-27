@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { getColors, spacing, borderRadius, shadows, typography, animations, transitions } from "../styles/theme";
 import { LoadingDots } from "../components/LoadingSpinner";
+import { apiFetch } from "../config/api";
 
 function Chat() {
   const [messages, setMessages] = useState([
@@ -68,7 +69,7 @@ How can I help optimize your operations today?`
         const orderId = assignMatch[1];
         
         // Call delivery assignment API
-        const res = await fetch("/api/delivery/assign", {
+        const res = await apiFetch("/api/delivery/assign", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId }),
@@ -100,7 +101,7 @@ How can I help optimize your operations today?`
         }
       } else if (memoryMatch) {
         // Show AICOO memory
-        const res = await fetch("/api/memory");
+        const res = await apiFetch("/api/memory");
         const memory = await res.json();
         
         const recentObs = memory.observations.slice(-5).reverse();
@@ -123,7 +124,7 @@ How can I help optimize your operations today?`
         const command = analyticsMatch[1].toLowerCase();
         
         if (command === "analytics" || command === "summary") {
-          const res = await fetch("/api/analytics/daily");
+          const res = await apiFetch("/api/analytics/daily");
           const data = await res.json();
           
           const warnings = data.warnings && data.warnings.length > 0
@@ -140,7 +141,7 @@ How can I help optimize your operations today?`
           };
           setMessages((prev) => [...prev, aiMessage]);
         } else if (command === "trends") {
-          const res = await fetch("/api/analytics/trends");
+          const res = await apiFetch("/api/analytics/trends");
           const data = await res.json();
           
           const trendText = data.last7Days && data.last7Days.length > 0
@@ -155,7 +156,7 @@ How can I help optimize your operations today?`
           };
           setMessages((prev) => [...prev, aiMessage]);
         } else if (command === "predict") {
-          const res = await fetch("/api/analytics");
+          const res = await apiFetch("/api/analytics");
           const data = await res.json();
           const pred = data.predictions;
           
@@ -175,7 +176,7 @@ How can I help optimize your operations today?`
         const toZip = ratesMatch[2];
         const weight = parseFloat(ratesMatch[3]);
         
-        const res = await fetch("/api/courier/rates", {
+        const res = await apiFetch("/api/courier/rates", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ fromZip, toZip, weight })
@@ -231,7 +232,7 @@ How can I help optimize your operations today?`
         
         // For demo, we'll use default shipment data
         // In production, this would fetch order details first
-        const res = await fetch("/api/courier/label", {
+        const res = await apiFetch("/api/courier/label", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -274,7 +275,7 @@ How can I help optimize your operations today?`
         // /track command - Track shipment
         const trackingNumber = trackMatch[1].trim();
         
-        const res = await fetch("/api/courier/track", {
+        const res = await apiFetch("/api/courier/track", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ trackingNumber })
@@ -327,7 +328,7 @@ How can I help optimize your operations today?`
           zip: parts[2]?.split(' ')[1] || "10001"
         };
         
-        const res = await fetch("/api/courier/validate-address", {
+        const res = await apiFetch("/api/courier/validate-address", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ address, carrier: "fedex" })
@@ -359,7 +360,7 @@ How can I help optimize your operations today?`
         // Fetch analytics insights for context injection
         let analyticsContext = "";
         try {
-          const analyticsRes = await fetch("/api/analytics/daily");
+          const analyticsRes = await apiFetch("/api/analytics/daily");
           const analytics = await analyticsRes.json();
           
           if (analytics) {
@@ -376,7 +377,7 @@ ${analytics.warnings && analytics.warnings.length > 0 ? `Warnings: ${analytics.w
         }
         
         // Fetch recent memory for context injection
-        const memoryRes = await fetch("/api/memory");
+        const memoryRes = await apiFetch("/api/memory");
         const memory = await memoryRes.json();
         const recentContext = memory.observations.slice(-5).reverse();
         
@@ -385,7 +386,7 @@ ${analytics.warnings && analytics.warnings.length > 0 ? `Warnings: ${analytics.w
           : "";
         
         // Normal GPT chat with memory + analytics context
-        const res = await fetch("/api/gpt", {
+        const res = await apiFetch("/api/gpt", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt: userInput + analyticsContext + contextString }),

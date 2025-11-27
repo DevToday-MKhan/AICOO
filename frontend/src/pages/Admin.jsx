@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import React, { useState, useEffect } from "react";
 import { colors, spacing, borderRadius, shadows, typography, components } from "../styles/theme";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -97,7 +98,7 @@ const Admin = () => {
 
   const fetchHealth = async () => {
     try {
-      const res = await fetch("/api/health");
+      const res = await apiFetch("/api/health");
       const data = await res.json();
       setHealth(data);
     } catch (err) {
@@ -107,7 +108,7 @@ const Admin = () => {
 
   const fetchMode = async () => {
     try {
-      const res = await fetch("/api/admin/mode");
+      const res = await apiFetch("/api/admin/mode");
       const data = await res.json();
       setMode(data.mode);
     } catch (err) {
@@ -118,12 +119,12 @@ const Admin = () => {
   const fetchStats = async () => {
     try {
       const [eventsRes, ordersRes, deliveriesRes, routesRes, couriersRes, ridesRes] = await Promise.all([
-        fetch("/api/events"),
-        fetch("/api/orders/latest"),
-        fetch("/api/delivery/history"),
-        fetch("/api/route/history"),
-        fetch("/api/courier/history"),
-        fetch("/api/ride/history")
+        apiFetch("/api/events"),
+        apiFetch("/api/orders/latest"),
+        apiFetch("/api/delivery/history"),
+        apiFetch("/api/route/history"),
+        apiFetch("/api/courier/history"),
+        apiFetch("/api/ride/history")
       ]);
 
       const events = await eventsRes.json();
@@ -133,7 +134,7 @@ const Admin = () => {
       const rides = await ridesRes.json();
 
       // Count orders by reading orders.json indirectly
-      const ordersCount = await fetch("/api/orders/latest").then(r => r.json()).then(data => data.orderId ? 1 : 0);
+      const ordersCount = await apiFetch("/api/orders/latest").then(r => r.json()).then(data => data.orderId ? 1 : 0);
 
       setStats({
         events: Array.isArray(events) ? events.length : 0,
@@ -175,7 +176,7 @@ const Admin = () => {
 
   const handleBackup = async () => {
     try {
-      const res = await fetch("/api/admin/export-all");
+      const res = await apiFetch("/api/admin/export-all");
       const data = await res.json();
       
       if (res.ok) {
@@ -201,7 +202,7 @@ const Admin = () => {
 
   const handleZipBackup = async () => {
     try {
-      const res = await fetch("/api/admin/export-zip");
+      const res = await apiFetch("/api/admin/export-zip");
       const data = await res.json();
       
       if (res.ok) {
@@ -316,7 +317,7 @@ const Admin = () => {
 
   const handleDownloadAnalytics = async () => {
     try {
-      const res = await fetch("/api/analytics");
+      const res = await apiFetch("/api/analytics");
       if (!res.ok) {
         setMessage("❌ Failed to fetch analytics");
         setTimeout(() => setMessage(""), 3000);
@@ -344,7 +345,7 @@ const Admin = () => {
 
   const handleSimulateOrder = async () => {
     try {
-      const res = await fetch("/api/simulate/fake-order?zip=10001&weight=5");
+      const res = await apiFetch("/api/simulate/fake-order?zip=10001&weight=5");
       const data = await res.json();
       
       if (res.ok) {
@@ -361,7 +362,7 @@ const Admin = () => {
 
   const handleReplayLastOrder = async () => {
     try {
-      const ordersRes = await fetch("/api/orders/latest");
+      const ordersRes = await apiFetch("/api/orders/latest");
       const order = await ordersRes.json();
       
       if (!order || !order.id) {

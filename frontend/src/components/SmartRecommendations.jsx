@@ -1,3 +1,4 @@
+import { apiFetch } from "../config/api";
 import { useEffect, useState } from 'react';
 import { getColors } from '../styles/theme';
 
@@ -21,8 +22,8 @@ export default function SmartRecommendations() {
   const fetchRecommendations = async () => {
     try {
       const [recsRes, statsRes] = await Promise.all([
-        fetch('/api/recommendations'),
-        fetch('/api/recommendations/stats')
+        apiFetch('/api/recommendations'),
+        apiFetch('/api/recommendations/stats')
       ]);
 
       const recsData = await recsRes.json();
