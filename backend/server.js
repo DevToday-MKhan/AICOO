@@ -109,6 +109,9 @@ app.get("/", async (req, res) => {
 
 app.use(cors());
 
+// Raw body parsing for Shopify webhooks (must be before JSON parsing)
+app.use(express.raw({ type: 'application/json', verify: (req, res, buf, encoding) => { req.rawBody = buf; } }));
+
 // Shopify OAuth + Session Middleware
 app.use("/auth", shopify.auth.begin());
 app.use("/auth/callback", shopify.auth.callback());
