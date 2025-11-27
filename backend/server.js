@@ -28,8 +28,8 @@ const io = new SocketIOServer(httpServer, {
 global.io = io;
 
 // Auth routes
-app.use("/auth", shopify.auth.begin());
-app.use("/auth/callback", shopify.auth.callback());
+app.use("/app/auth", shopify.auth.begin());
+app.use("/app/auth/callback", shopify.auth.callback());
 
 app.get("/", (req, res) => {
   const indexPath = path.join(distPath, "index.html");
