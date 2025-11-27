@@ -11,7 +11,15 @@ import {
   Button,
   Box,
   Badge,
+  InlineGrid,
+  Divider,
 } from "@shopify/polaris";
+import {
+  CirclePlusOutlineMinor,
+  ExportMinor,
+  AnalyticsMinor,
+  ReportMinor,
+} from "@shopify/polaris-icons";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate.admin(request);
@@ -27,108 +35,158 @@ export default function Dashboard() {
   return (
     <Page title={title}>
       <Layout>
-        {/* Summary Cards Section */}
+        {/* Summary Metrics - 4 Column Grid */}
         <Layout.Section>
-          <BlockStack gap="400">
-            <Text variant="headingLg" as="h2">
-              Summary Cards
-            </Text>
-            <InlineStack gap="400" wrap={false}>
-              <Card>
-                <BlockStack gap="200">
-                  <Text variant="headingSm" as="h3">
-                    Orders Today
-                  </Text>
-                  <Text variant="heading2xl" as="p">
-                    0
-                  </Text>
-                  <Badge tone="success">Live</Badge>
-                </BlockStack>
-              </Card>
+          <InlineGrid columns={4} gap="400">
+            <Card>
+              <BlockStack gap="300">
+                <Text variant="headingSm" as="h3" tone="subdued">
+                  Orders Today
+                </Text>
+                <Text variant="heading2xl" as="p" fontWeight="bold">
+                  0
+                </Text>
+                <Badge tone="success">Live</Badge>
+              </BlockStack>
+            </Card>
 
-              <Card>
-                <BlockStack gap="200">
-                  <Text variant="headingSm" as="h3">
-                    Revenue Today
-                  </Text>
-                  <Text variant="heading2xl" as="p">
-                    $0.00
-                  </Text>
-                  <Badge tone="info">Updated</Badge>
-                </BlockStack>
-              </Card>
+            <Card>
+              <BlockStack gap="300">
+                <Text variant="headingSm" as="h3" tone="subdued">
+                  Revenue Today
+                </Text>
+                <Text variant="heading2xl" as="p" fontWeight="bold">
+                  $0.00
+                </Text>
+                <Badge tone="info">Updated</Badge>
+              </BlockStack>
+            </Card>
 
-              <Card>
-                <BlockStack gap="200">
-                  <Text variant="headingSm" as="h3">
-                    Total Customers
-                  </Text>
-                  <Text variant="heading2xl" as="p">
-                    0
-                  </Text>
-                  <Badge>Active</Badge>
-                </BlockStack>
-              </Card>
+            <Card>
+              <BlockStack gap="300">
+                <Text variant="headingSm" as="h3" tone="subdued">
+                  Total Customers
+                </Text>
+                <Text variant="heading2xl" as="p" fontWeight="bold">
+                  0
+                </Text>
+                <Badge>Active</Badge>
+              </BlockStack>
+            </Card>
 
-              <Card>
-                <BlockStack gap="200">
-                  <Text variant="headingSm" as="h3">
-                    Low Stock Items
-                  </Text>
-                  <Text variant="heading2xl" as="p">
-                    0
-                  </Text>
-                  <Badge tone="warning">Monitor</Badge>
-                </BlockStack>
-              </Card>
-            </InlineStack>
-          </BlockStack>
+            <Card>
+              <BlockStack gap="300">
+                <Text variant="headingSm" as="h3" tone="subdued">
+                  Low Stock Items
+                </Text>
+                <Text variant="heading2xl" as="p" fontWeight="bold">
+                  0
+                </Text>
+                <Badge tone="warning">Monitor</Badge>
+              </BlockStack>
+            </Card>
+          </InlineGrid>
         </Layout.Section>
 
-        {/* Orders Summary Section */}
+        {/* Orders & Inventory - 2 Column Layout */}
         <Layout.Section>
-          <Card>
-            <BlockStack gap="300">
-              <Text variant="headingLg" as="h2">
-                Orders Summary
-              </Text>
-              <Box padding="400">
-                <Text variant="bodyMd" as="p" tone="subdued">
-                  Orders summary will appear here.
+          <InlineGrid columns={2} gap="400">
+            <Card>
+              <BlockStack gap="400">
+                <Text variant="headingLg" as="h2">
+                  Orders Summary
                 </Text>
-              </Box>
-            </BlockStack>
-          </Card>
-        </Layout.Section>
+                <Divider />
+                <BlockStack gap="300">
+                  <InlineStack align="space-between">
+                    <Text variant="bodyMd" as="p">
+                      Pending Orders
+                    </Text>
+                    <Text variant="bodyMd" as="p" fontWeight="semibold">
+                      0
+                    </Text>
+                  </InlineStack>
+                  <InlineStack align="space-between">
+                    <Text variant="bodyMd" as="p">
+                      Fulfilled Today
+                    </Text>
+                    <Text variant="bodyMd" as="p" fontWeight="semibold">
+                      0
+                    </Text>
+                  </InlineStack>
+                  <InlineStack align="space-between">
+                    <Text variant="bodyMd" as="p">
+                      Cancelled Today
+                    </Text>
+                    <Text variant="bodyMd" as="p" fontWeight="semibold">
+                      0
+                    </Text>
+                  </InlineStack>
+                </BlockStack>
+              </BlockStack>
+            </Card>
 
-        {/* Inventory Summary Section */}
-        <Layout.Section>
-          <Card>
-            <BlockStack gap="300">
-              <Text variant="headingLg" as="h2">
-                Inventory Summary
-              </Text>
-              <Box padding="400">
-                <Text variant="bodyMd" as="p" tone="subdued">
-                  Inventory summary will appear here.
+            <Card>
+              <BlockStack gap="400">
+                <Text variant="headingLg" as="h2">
+                  Inventory Summary
                 </Text>
-              </Box>
-            </BlockStack>
-          </Card>
+                <Divider />
+                <BlockStack gap="300">
+                  <InlineStack align="space-between">
+                    <Text variant="bodyMd" as="p">
+                      Total Products
+                    </Text>
+                    <Text variant="bodyMd" as="p" fontWeight="semibold">
+                      0
+                    </Text>
+                  </InlineStack>
+                  <InlineStack align="space-between">
+                    <Text variant="bodyMd" as="p">
+                      Low Stock Alerts
+                    </Text>
+                    <Text variant="bodyMd" as="p" fontWeight="semibold">
+                      0
+                    </Text>
+                  </InlineStack>
+                  <InlineStack align="space-between">
+                    <Text variant="bodyMd" as="p">
+                      Out of Stock
+                    </Text>
+                    <Text variant="bodyMd" as="p" fontWeight="semibold">
+                      0
+                    </Text>
+                  </InlineStack>
+                </BlockStack>
+              </BlockStack>
+            </Card>
+          </InlineGrid>
         </Layout.Section>
 
         {/* AI Insights Section */}
         <Layout.Section>
           <Card>
-            <BlockStack gap="300">
+            <BlockStack gap="400">
               <Text variant="headingLg" as="h2">
-                AI Insights
+                AI-COO Insights
               </Text>
-              <Box padding="400">
-                <Text variant="bodyMd" as="p" tone="subdued">
-                  AI-COO will generate real-time business insights here.
-                </Text>
-              </Box>
+              <Divider />
+              <BlockStack gap="300">
+                <Box
+                  padding="400"
+                  background="bg-surface-secondary"
+                  borderRadius="200"
+                >
+                  <BlockStack gap="200">
+                    <Text variant="headingSm" as="h3">
+                      💡 Recommendation
+                    </Text>
+                    <Text variant="bodyMd" as="p" tone="subdued">
+                      AI-COO will analyze your store data and provide actionable insights here. Connect live data to see personalized recommendations.
+                    </Text>
+                  </BlockStack>
+                </Box>
+              </BlockStack>
             </BlockStack>
           </Card>
         </Layout.Section>
@@ -136,15 +194,24 @@ export default function Dashboard() {
         {/* Quick Actions Section */}
         <Layout.Section>
           <Card>
-            <BlockStack gap="300">
+            <BlockStack gap="400">
               <Text variant="headingLg" as="h2">
                 Quick Actions
               </Text>
-              <InlineStack gap="300">
-                <Button>Create Discount</Button>
-                <Button>Export Customers CSV</Button>
-                <Button>Analyze Store</Button>
-                <Button>Generate Sales Report</Button>
+              <Divider />
+              <InlineStack gap="300" wrap>
+                <Button icon={CirclePlusOutlineMinor} variant="primary">
+                  Create Discount
+                </Button>
+                <Button icon={ExportMinor}>
+                  Export Customers
+                </Button>
+                <Button icon={AnalyticsMinor}>
+                  Analyze Store
+                </Button>
+                <Button icon={ReportMinor}>
+                  Sales Report
+                </Button>
               </InlineStack>
             </BlockStack>
           </Card>
