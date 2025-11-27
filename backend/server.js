@@ -12,6 +12,7 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 import http from "http";
+import crypto from "crypto";
 import { Server as SocketIOServer } from "socket.io";
 import { fileURLToPath } from "url";
 import shopify from "./shopify.js";
@@ -132,47 +133,69 @@ app.use((req, res, next) => {
 app.use("/auth", shopify.auth.begin());
 app.use("/auth/callback", shopify.auth.callback());
 
-// Process Shopify webhooks - Shopify library handles body parsing and HMAC verification
-app.use(shopify.processWebhooks({
-  webhookHandlers: {
-    ORDERS_CREATE: async (topic, shop, body) => {
-      console.log("📦 ORDERS_CREATE webhook received from", shop);
-      
-      try {
-        const orderData = JSON.parse(body);
-        recordEvent({ ...orderData, event_type: topic });
-        
-        // Process order routing
-        const orderId = orderData.id || orderData.order_number || "unknown";
-        const customerZip = orderData.shipping_address?.zip || orderData.billing_address?.zip;
-        const lineItems = orderData.line_items || [];
+// ---------------------------------------
+// SHOPIFY WEBHOOKS — MANUAL HANDLING (bypassing middleware issues)
+// ---------------------------------------
+app.post('/api/webhooks/shopify/orders', async (req, res) => {
+  try {
+    console.log("📦 Manual Shopify webhook received");
 
-        // Calculate total weight
-        let totalWeight = 0;
-        for (const item of lineItems) {
-          const grams = item.grams || (item.weight ? item.weight * 1000 : 0);
-          totalWeight += (grams / 453.592) * (item.quantity || 1);
-        }
+    // Get raw body for HMAC verification
+    const rawBody = req.rawBody || req.body;
+    const hmac = req.headers['x-shopify-hmac-sha256'];
 
-        if (totalWeight === 0) totalWeight = 3;
-
-        const zipPattern = /^\d{5}$/;
-        if (customerZip && zipPattern.test(customerZip)) {
-          const routingResult = getRouteQuote({ customerZip, weight: parseFloat(totalWeight.toFixed(2)) });
-          saveShopifyOrder({
-            orderId,
-            customerZip,
-            totalWeight: parseFloat(totalWeight.toFixed(2)),
-            routing: routingResult,
-          });
-          console.log(`🚚 Order ${orderId} routed: ${routingResult.recommendation}`);
-        }
-      } catch (err) {
-        console.error("🔥 Webhook processing error:", err);
-      }
+    // Verify HMAC
+    const secret = process.env.SHOPIFY_API_SECRET;
+    if (!secret) {
+      console.error("❌ SHOPIFY_API_SECRET not configured");
+      return res.status(500).send('Server configuration error');
     }
+
+    const hash = crypto.createHmac('sha256', secret).update(rawBody).digest('base64');
+    if (hash !== hmac) {
+      console.error("❌ Invalid HMAC signature");
+      return res.status(401).send('Unauthorized');
+    }
+
+    // Parse the order data
+    const orderData = JSON.parse(rawBody.toString());
+    console.log(`✅ Valid webhook from ${req.headers['x-shopify-shop-domain']}`);
+
+    // Process order routing (same logic as before)
+    const orderId = orderData.id || orderData.order_number || "unknown";
+    const customerZip = orderData.shipping_address?.zip || orderData.billing_address?.zip;
+    const lineItems = orderData.line_items || [];
+
+    // Calculate total weight
+    let totalWeight = 0;
+    for (const item of lineItems) {
+      const grams = item.grams || (item.weight ? item.weight * 1000 : 0);
+      totalWeight += (grams / 453.592) * (item.quantity || 1);
+    }
+
+    if (totalWeight === 0) totalWeight = 3;
+
+    const zipPattern = /^\d{5}$/;
+    if (customerZip && zipPattern.test(customerZip)) {
+      const routingResult = getRouteQuote({ customerZip, weight: parseFloat(totalWeight.toFixed(2)) });
+      saveShopifyOrder({
+        orderId,
+        customerZip,
+        totalWeight: parseFloat(totalWeight.toFixed(2)),
+        routing: routingResult,
+      });
+      console.log(`🚚 Order ${orderId} routed: ${routingResult.recommendation}`);
+    }
+
+    res.status(200).send('OK');
+  } catch (err) {
+    console.error("🔥 Manual webhook processing error:", err);
+    res.status(500).send('Internal server error');
   }
-}));
+});
+
+// Remove the problematic Shopify processWebhooks middleware
+// app.use(shopify.processWebhooks({...}));
 
 // JSON parser for all other routes - comes after webhook processing
 app.use(express.json());
