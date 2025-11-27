@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 import shopify from "./shopify.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createServer } from "http";
+import { Server as SocketIOServer } from "socket.io";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,40 +17,32 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+const httpServer = createServer(app);
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: "*", // Adjust as needed
+    methods: ["GET", "POST"]
+  }
+});
+global.io = io;
+
 // Auth routes
 app.use("/auth", shopify.auth.begin());
 app.use("/auth/callback", shopify.auth.callback());
 
-// Main app route - ensure authenticated
-app.get('/', shopify.ensureInstalledOnShop(), async (req, res) => {
-  return res
-    .status(200)
-    .set("Content-Type", "text/html")
-    .send(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>AI-COO</title>
-          <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-        </head>
-        <body>
-          <div id="app"></div>
-          <script>
-            var AppBridge = window['app-bridge'];
-            var createApp = AppBridge.default;
-            var app = createApp({
-              apiKey: '${process.env.SHOPIFY_API_KEY}',
-              host: new URLSearchParams(window.location.search).get('host')
-            });
-          </script>
-        </body>
-      </html>
-    `);
+const distPath = path.join(__dirname, "../frontend/dist");
+app.use(express.static(distPath));
+app.use((req, res, next) => {
+  if (!req.path.startsWith("/api")) {
+    res.sendFile(path.join(distPath, "index.html"));
+  } else {
+    next();
+  }
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`AI-COO server running on port ${PORT}`);
 });
 
-
+export default app;
