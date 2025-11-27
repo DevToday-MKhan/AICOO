@@ -5,7 +5,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import { shopifyApp } from "@shopify/shopify-app-express";
-import { restResources } from "@shopify/shopify-api/rest/admin/2024-10";
+import { restResources } from "@shopify/shopify-api/rest/admin/2024-07";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -19,7 +19,7 @@ app.use(cookieParser());
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
-  apiVersion: "2025-01",
+  apiVersion: "2024-07",
   scopes: process.env.SCOPES.split(","),
   appUrl: process.env.APP_URL,
   authPath: "/auth",
