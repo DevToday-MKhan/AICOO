@@ -49,6 +49,9 @@ COPY --from=backend-build /app/backend ./backend
 COPY server.js ./server.js
 COPY config ./config
 
+# Set production environment
+ENV NODE_ENV=production
+
 EXPOSE 8080
 
 CMD ["node", "server.js"]
