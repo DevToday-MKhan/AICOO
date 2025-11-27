@@ -963,8 +963,13 @@ app.get("/api/test", (req, res) => {
 
 app.use(express.static(distPath));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(distPath, "index.html"));
+// SPA catch-all route (must be last)
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(distPath, "index.html"));
+  } else {
+    next();
+  }
 });
 
 // ---------------------------------------
