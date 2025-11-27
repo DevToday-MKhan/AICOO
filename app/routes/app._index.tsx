@@ -1,72 +1,76 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { authenticate } from "../shopify.server";
-import { getFrontendAssets } from "../utils/manifest.server";
-import { useEffect, useRef } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate.admin(request);
   
   const url = new URL(request.url);
+  const shop = url.searchParams.get("shop") || "";
   const host = url.searchParams.get("host") || "";
-  const assets = getFrontendAssets();
   
   return json({
     apiKey: process.env.SHOPIFY_API_KEY || "",
+    shop,
     host,
-    assets,
   });
 }
 
 export default function AppIndex() {
-  const { apiKey, host, assets } = useLoaderData<typeof loader>();
-  const scriptLoaded = useRef(false);
-
-  useEffect(() => {
-    // Initialize frontend app
-    if (typeof window !== "undefined" && !scriptLoaded.current) {
-      // Set global environment variables for App Bridge and frontend
-      (window as any).ENV = { SHOPIFY_API_KEY: apiKey };
-      (window as any).__SHOPIFY_DEV_HOST = host;
-      
-      // Also set on document for compatibility
-      const apiKeyMeta = document.querySelector('meta[name="shopify-api-key"]');
-      if (apiKeyMeta && !apiKeyMeta.getAttribute('content')) {
-        apiKeyMeta.setAttribute('content', apiKey);
-      }
-      
-      // Load CSS
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.crossOrigin = 'anonymous';
-      link.href = assets.css;
-      document.head.appendChild(link);
-      
-      // Load the frontend app's main script
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.crossOrigin = 'anonymous';
-      script.src = assets.js;
-      script.onload = () => {
-        console.log('Frontend app loaded with API key:', apiKey);
-      };
-      document.body.appendChild(script);
-      
-      scriptLoaded.current = true;
-    }
-  }, [apiKey, host, assets]);
+  const { apiKey, shop, host } = useLoaderData<typeof loader>();
 
   return (
-    <div 
-      style={{ 
-        height: "100vh", 
-        width: "100vw",
-        margin: 0,
-        padding: 0,
-        overflow: "auto"
-      }}
-    >
-      <div id="root"></div>
+    <div style={{ 
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      padding: '20px',
+      maxWidth: '1200px',
+      margin: '0 auto'
+    }}>
+      <h1>🚀 AICOO - AI Chicken Logistics</h1>
+      <p>Welcome to your Shopify embedded app!</p>
+      
+      <div style={{
+        background: '#f3f4f6',
+        padding: '20px',
+        borderRadius: '8px',
+        marginTop: '20px'
+      }}>
+        <h2>App Status</h2>
+        <ul>
+          <li><strong>Shop:</strong> {shop || 'Not provided'}</li>
+          <li><strong>Host:</strong> {host ? 'Connected' : 'Not provided'}</li>
+          <li><strong>API Key:</strong> {apiKey ? '✅ Configured' : '❌ Missing'}</li>
+          <li><strong>Session:</strong> ✅ Authenticated</li>
+        </ul>
+      </div>
+
+      <div style={{
+        background: '#dbeafe',
+        padding: '20px',
+        borderRadius: '8px',
+        marginTop: '20px'
+      }}>
+        <h2>🎯 Next Steps</h2>
+        <ol>
+          <li>Build your custom UI components here</li>
+          <li>Add routes for different features</li>
+          <li>Use App Bridge for native Shopify integration</li>
+          <li>Connect to backend APIs at <code>/api/*</code></li>
+        </ol>
+      </div>
+
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            // Initialize App Bridge
+            if (window.shopify && window.shopify.environment) {
+              console.log('✅ Shopify App Bridge loaded');
+              console.log('Shop:', '${shop}');
+              console.log('Host:', '${host}');
+            }
+          `,
+        }}
+      />
     </div>
   );
 }
