@@ -61,7 +61,7 @@ export default function Dashboard() {
                   <Badge tone="success">ONLINE</Badge>
                 </InlineStack>
 
-                <Text variant="bodyMd" tone="subdued">
+                <Text variant="bodyMd" as="p" tone="subdued">
                   Your store systems are synced and running. AI-COO is monitoring performance, routing, and insights.
                 </Text>
               </BlockStack>
@@ -80,23 +80,23 @@ export default function Dashboard() {
             <Box paddingBlockStart="400">
               <InlineGrid columns={4} gap="400">
                 <BlockStack gap="100">
-                  <Text tone="subdued" variant="bodySm">AI Activity</Text>
-                  <Text variant="bodyLg" fontWeight="bold">Active</Text>
+                  <Text tone="subdued" variant="bodySm" as="p">AI Activity</Text>
+                  <Text variant="bodyLg" as="p" fontWeight="bold">Active</Text>
                 </BlockStack>
 
                 <BlockStack gap="100">
-                  <Text tone="subdued" variant="bodySm">Last Sync</Text>
-                  <Text variant="bodyLg" fontWeight="bold">Just now</Text>
+                  <Text tone="subdued" variant="bodySm" as="p">Last Sync</Text>
+                  <Text variant="bodyLg" as="p" fontWeight="bold">Just now</Text>
                 </BlockStack>
 
                 <BlockStack gap="100">
-                  <Text tone="subdued" variant="bodySm">System Health</Text>
+                  <Text tone="subdued" variant="bodySm" as="p">System Health</Text>
                   <Badge tone="success">Optimal</Badge>
                 </BlockStack>
 
                 <BlockStack gap="100">
-                  <Text tone="subdued" variant="bodySm">Automations Today</Text>
-                  <Text variant="bodyLg" fontWeight="bold">0 actions</Text>
+                  <Text tone="subdued" variant="bodySm" as="p">Automations Today</Text>
+                  <Text variant="bodyLg" as="p" fontWeight="bold">0 actions</Text>
                 </BlockStack>
               </InlineGrid>
             </Box>
@@ -216,7 +216,7 @@ export default function Dashboard() {
                     <Icon source={ProductIcon} tone="warning" />
                   </Box>
                 </InlineStack>
-                <ProgressBar progress={0} tone="warning" size="small" />
+                <ProgressBar progress={0} size="small" />
                 <Text variant="bodySm" as="p" tone="subdued">
                   No alerts
                 </Text>
