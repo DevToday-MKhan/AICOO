@@ -50,17 +50,19 @@ export default function Dashboard() {
   const { title } = useLoaderData<typeof loader>();
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
-  const host = new URLSearchParams(window.location.search).get("host");
-
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const host = new URLSearchParams(window.location.search).get("host");
     if (!host) return;
+    
     const app = createApp({
       apiKey: window.ENV.SHOPIFY_API_KEY,
       host,
       forceRedirect: false,
     });
     app.dispatch({ type: "APP::IFRAME::RESIZE" });
-  }, [host]);
+  }, []);
 
   return (
     <div id="dashboard-root">
