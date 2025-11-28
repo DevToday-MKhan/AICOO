@@ -13,13 +13,21 @@ import {
   Badge,
   InlineGrid,
   Divider,
+  Icon,
+  ProgressBar,
+  Banner,
 } from "@shopify/polaris";
 import {
   PlusCircleIcon,
   ExportIcon,
   ChartVerticalIcon,
   FileIcon,
+  OrderIcon,
+  CashDollarIcon,
+  CustomerIcon,
+  ProductIcon,
 } from "@shopify/polaris-icons";
+import { useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate.admin(request);
@@ -31,6 +39,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Dashboard() {
   const { title } = useLoaderData<typeof loader>();
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
   return (
     <Page 
@@ -38,54 +47,123 @@ export default function Dashboard() {
       subtitle="Your AI-powered business control center"
     >
       <Layout>
-        {/* Summary Metrics - 4 Column Grid */}
+        {/* Welcome Banner */}
+        <Layout.Section>
+          <Banner
+            title="Welcome to AI-COO! 👋"
+            tone="info"
+          >
+            <p>
+              Your intelligent operations assistant is ready to help optimize your store. 
+              Start by reviewing today's metrics below.
+            </p>
+          </Banner>
+        </Layout.Section>
+
+        {/* Summary Metrics - 4 Column Grid with Icons */}
         <Layout.Section>
           <InlineGrid columns={4} gap="400">
             <Card>
-              <BlockStack gap="300">
-                <Text variant="headingSm" as="h3" tone="subdued">
-                  Orders Today
+              <BlockStack gap="400">
+                <InlineStack align="space-between" blockAlign="start">
+                  <BlockStack gap="200">
+                    <Text variant="headingSm" as="h3" tone="subdued">
+                      Orders Today
+                    </Text>
+                    <Text variant="heading2xl" as="p" fontWeight="bold">
+                      0
+                    </Text>
+                  </BlockStack>
+                  <Box
+                    padding="300"
+                    background="bg-fill-info"
+                    borderRadius="200"
+                  >
+                    <Icon source={OrderIcon} tone="info" />
+                  </Box>
+                </InlineStack>
+                <ProgressBar progress={0} tone="success" size="small" />
+                <Text variant="bodySm" as="p" tone="subdued">
+                  +0% from yesterday
                 </Text>
-                <Text variant="heading2xl" as="p" fontWeight="bold">
-                  0
-                </Text>
-                <Badge tone="success">Live</Badge>
               </BlockStack>
             </Card>
 
             <Card>
-              <BlockStack gap="300">
-                <Text variant="headingSm" as="h3" tone="subdued">
-                  Revenue Today
+              <BlockStack gap="400">
+                <InlineStack align="space-between" blockAlign="start">
+                  <BlockStack gap="200">
+                    <Text variant="headingSm" as="h3" tone="subdued">
+                      Revenue Today
+                    </Text>
+                    <Text variant="heading2xl" as="p" fontWeight="bold">
+                      $0.00
+                    </Text>
+                  </BlockStack>
+                  <Box
+                    padding="300"
+                    background="bg-fill-success"
+                    borderRadius="200"
+                  >
+                    <Icon source={CashDollarIcon} tone="success" />
+                  </Box>
+                </InlineStack>
+                <ProgressBar progress={0} tone="success" size="small" />
+                <Text variant="bodySm" as="p" tone="subdued">
+                  +0% from yesterday
                 </Text>
-                <Text variant="heading2xl" as="p" fontWeight="bold">
-                  $0.00
-                </Text>
-                <Badge tone="info">Updated</Badge>
               </BlockStack>
             </Card>
 
             <Card>
-              <BlockStack gap="300">
-                <Text variant="headingSm" as="h3" tone="subdued">
-                  Total Customers
+              <BlockStack gap="400">
+                <InlineStack align="space-between" blockAlign="start">
+                  <BlockStack gap="200">
+                    <Text variant="headingSm" as="h3" tone="subdued">
+                      Total Customers
+                    </Text>
+                    <Text variant="heading2xl" as="p" fontWeight="bold">
+                      0
+                    </Text>
+                  </BlockStack>
+                  <Box
+                    padding="300"
+                    background="bg-fill-brand"
+                    borderRadius="200"
+                  >
+                    <Icon source={CustomerIcon} tone="emphasis" />
+                  </Box>
+                </InlineStack>
+                <ProgressBar progress={0} tone="primary" size="small" />
+                <Text variant="bodySm" as="p" tone="subdued">
+                  Growing steadily
                 </Text>
-                <Text variant="heading2xl" as="p" fontWeight="bold">
-                  0
-                </Text>
-                <Badge>Active</Badge>
               </BlockStack>
             </Card>
 
             <Card>
-              <BlockStack gap="300">
-                <Text variant="headingSm" as="h3" tone="subdued">
-                  Low Stock Items
+              <BlockStack gap="400">
+                <InlineStack align="space-between" blockAlign="start">
+                  <BlockStack gap="200">
+                    <Text variant="headingSm" as="h3" tone="subdued">
+                      Low Stock Items
+                    </Text>
+                    <Text variant="heading2xl" as="p" fontWeight="bold">
+                      0
+                    </Text>
+                  </BlockStack>
+                  <Box
+                    padding="300"
+                    background="bg-fill-warning"
+                    borderRadius="200"
+                  >
+                    <Icon source={ProductIcon} tone="warning" />
+                  </Box>
+                </InlineStack>
+                <ProgressBar progress={0} tone="warning" size="small" />
+                <Text variant="bodySm" as="p" tone="subdued">
+                  No alerts
                 </Text>
-                <Text variant="heading2xl" as="p" fontWeight="bold">
-                  0
-                </Text>
-                <Badge tone="warning">Monitor</Badge>
               </BlockStack>
             </Card>
           </InlineGrid>
@@ -96,97 +174,170 @@ export default function Dashboard() {
           <InlineGrid columns={2} gap="400">
             <Card>
               <BlockStack gap="400">
-                <Text variant="headingLg" as="h2">
-                  Orders Summary
-                </Text>
+                <InlineStack align="space-between" blockAlign="center">
+                  <Text variant="headingLg" as="h2">
+                    Orders Summary
+                  </Text>
+                  <Button size="slim" variant="plain">View all</Button>
+                </InlineStack>
                 <Divider />
-                <BlockStack gap="300">
-                  <InlineStack align="space-between">
-                    <Text variant="bodyMd" as="p">
-                      Pending Orders
-                    </Text>
-                    <Text variant="bodyMd" as="p" fontWeight="semibold">
-                      0
-                    </Text>
-                  </InlineStack>
-                  <InlineStack align="space-between">
-                    <Text variant="bodyMd" as="p">
-                      Fulfilled Today
-                    </Text>
-                    <Text variant="bodyMd" as="p" fontWeight="semibold">
-                      0
-                    </Text>
-                  </InlineStack>
-                  <InlineStack align="space-between">
-                    <Text variant="bodyMd" as="p">
-                      Cancelled Today
-                    </Text>
-                    <Text variant="bodyMd" as="p" fontWeight="semibold">
-                      0
-                    </Text>
-                  </InlineStack>
+                <BlockStack gap="400">
+                  <Box
+                    padding="300"
+                    background="bg-surface-secondary"
+                    borderRadius="200"
+                  >
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <Badge tone="attention">Pending</Badge>
+                        <Text variant="bodyMd" as="p">
+                          Pending Orders
+                        </Text>
+                      </InlineStack>
+                      <Text variant="headingMd" as="p" fontWeight="bold">
+                        0
+                      </Text>
+                    </InlineStack>
+                  </Box>
+                  
+                  <Box
+                    padding="300"
+                    background="bg-surface-secondary"
+                    borderRadius="200"
+                  >
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <Badge tone="success">Fulfilled</Badge>
+                        <Text variant="bodyMd" as="p">
+                          Fulfilled Today
+                        </Text>
+                      </InlineStack>
+                      <Text variant="headingMd" as="p" fontWeight="bold">
+                        0
+                      </Text>
+                    </InlineStack>
+                  </Box>
+                  
+                  <Box
+                    padding="300"
+                    background="bg-surface-secondary"
+                    borderRadius="200"
+                  >
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <Badge>Cancelled</Badge>
+                        <Text variant="bodyMd" as="p">
+                          Cancelled Today
+                        </Text>
+                      </InlineStack>
+                      <Text variant="headingMd" as="p" fontWeight="bold">
+                        0
+                      </Text>
+                    </InlineStack>
+                  </Box>
                 </BlockStack>
               </BlockStack>
             </Card>
 
             <Card>
               <BlockStack gap="400">
-                <Text variant="headingLg" as="h2">
-                  Inventory Summary
-                </Text>
+                <InlineStack align="space-between" blockAlign="center">
+                  <Text variant="headingLg" as="h2">
+                    Inventory Summary
+                  </Text>
+                  <Button size="slim" variant="plain">Manage</Button>
+                </InlineStack>
                 <Divider />
-                <BlockStack gap="300">
-                  <InlineStack align="space-between">
-                    <Text variant="bodyMd" as="p">
-                      Total Products
-                    </Text>
-                    <Text variant="bodyMd" as="p" fontWeight="semibold">
-                      0
-                    </Text>
-                  </InlineStack>
-                  <InlineStack align="space-between">
-                    <Text variant="bodyMd" as="p">
-                      Low Stock Alerts
-                    </Text>
-                    <Text variant="bodyMd" as="p" fontWeight="semibold">
-                      0
-                    </Text>
-                  </InlineStack>
-                  <InlineStack align="space-between">
-                    <Text variant="bodyMd" as="p">
-                      Out of Stock
-                    </Text>
-                    <Text variant="bodyMd" as="p" fontWeight="semibold">
-                      0
-                    </Text>
-                  </InlineStack>
+                <BlockStack gap="400">
+                  <Box
+                    padding="300"
+                    background="bg-surface-secondary"
+                    borderRadius="200"
+                  >
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <Badge tone="info">Active</Badge>
+                        <Text variant="bodyMd" as="p">
+                          Total Products
+                        </Text>
+                      </InlineStack>
+                      <Text variant="headingMd" as="p" fontWeight="bold">
+                        0
+                      </Text>
+                    </InlineStack>
+                  </Box>
+                  
+                  <Box
+                    padding="300"
+                    background="bg-surface-secondary"
+                    borderRadius="200"
+                  >
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <Badge tone="warning">Alert</Badge>
+                        <Text variant="bodyMd" as="p">
+                          Low Stock Alerts
+                        </Text>
+                      </InlineStack>
+                      <Text variant="headingMd" as="p" fontWeight="bold">
+                        0
+                      </Text>
+                    </InlineStack>
+                  </Box>
+                  
+                  <Box
+                    padding="300"
+                    background="bg-surface-secondary"
+                    borderRadius="200"
+                  >
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <Badge tone="critical">Empty</Badge>
+                        <Text variant="bodyMd" as="p">
+                          Out of Stock
+                        </Text>
+                      </InlineStack>
+                      <Text variant="headingMd" as="p" fontWeight="bold">
+                        0
+                      </Text>
+                    </InlineStack>
+                  </Box>
                 </BlockStack>
               </BlockStack>
             </Card>
           </InlineGrid>
         </Layout.Section>
 
-        {/* AI Insights Section */}
+        {/* AI Insights Section - Enhanced */}
         <Layout.Section>
           <Card>
             <BlockStack gap="400">
-              <Text variant="headingLg" as="h2">
-                AI-COO Insights
-              </Text>
+              <InlineStack align="space-between" blockAlign="center">
+                <Text variant="headingLg" as="h2">
+                  🤖 AI-COO Insights
+                </Text>
+                <Badge tone="magic">Powered by AI</Badge>
+              </InlineStack>
               <Divider />
-              <BlockStack gap="300">
+              <BlockStack gap="400">
                 <Box
-                  padding="400"
-                  background="bg-surface-secondary"
-                  borderRadius="200"
+                  padding="500"
+                  background="bg-fill-info-secondary"
+                  borderRadius="300"
                 >
-                  <BlockStack gap="200">
-                    <Text variant="headingSm" as="h3">
-                      💡 Recommendation
+                  <BlockStack gap="300">
+                    <InlineStack gap="200" blockAlign="center">
+                      <Text variant="headingMd" as="h3">
+                        💡 Smart Recommendation
+                      </Text>
+                    </InlineStack>
+                    <Text variant="bodyLg" as="p">
+                      AI-COO will analyze your store data and provide actionable insights here. 
+                      Connect live data to see personalized recommendations for growth.
                     </Text>
-                    <Text variant="bodyMd" as="p" tone="subdued">
-                      AI-COO will analyze your store data and provide actionable insights here. Connect live data to see personalized recommendations.
-                    </Text>
+                    <Button variant="primary" tone="success">
+                      Activate AI Analysis
+                    </Button>
                   </BlockStack>
                 </Box>
               </BlockStack>
@@ -194,28 +345,80 @@ export default function Dashboard() {
           </Card>
         </Layout.Section>
 
-        {/* Quick Actions Section */}
+        {/* Quick Actions Section - Interactive */}
         <Layout.Section>
           <Card>
             <BlockStack gap="400">
               <Text variant="headingLg" as="h2">
-                Quick Actions
+                ⚡ Quick Actions
               </Text>
               <Divider />
-              <InlineStack gap="300" wrap>
-                <Button icon={PlusCircleIcon} variant="primary">
-                  Create Discount
-                </Button>
-                <Button icon={ExportIcon}>
-                  Export Customers
-                </Button>
-                <Button icon={ChartVerticalIcon}>
-                  Analyze Store
-                </Button>
-                <Button icon={FileIcon}>
-                  Sales Report
-                </Button>
-              </InlineStack>
+              <InlineGrid columns={4} gap="400">
+                <Box
+                  padding="400"
+                  background={selectedAction === "discount" ? "bg-fill-selected" : "bg-surface"}
+                  borderRadius="200"
+                  borderColor="border"
+                  borderWidth="025"
+                >
+                  <Button 
+                    icon={PlusCircleIcon} 
+                    variant="primary"
+                    fullWidth
+                    onClick={() => setSelectedAction("discount")}
+                  >
+                    Create Discount
+                  </Button>
+                </Box>
+                
+                <Box
+                  padding="400"
+                  background={selectedAction === "export" ? "bg-fill-selected" : "bg-surface"}
+                  borderRadius="200"
+                  borderColor="border"
+                  borderWidth="025"
+                >
+                  <Button 
+                    icon={ExportIcon}
+                    fullWidth
+                    onClick={() => setSelectedAction("export")}
+                  >
+                    Export Data
+                  </Button>
+                </Box>
+                
+                <Box
+                  padding="400"
+                  background={selectedAction === "analyze" ? "bg-fill-selected" : "bg-surface"}
+                  borderRadius="200"
+                  borderColor="border"
+                  borderWidth="025"
+                >
+                  <Button 
+                    icon={ChartVerticalIcon}
+                    fullWidth
+                    onClick={() => setSelectedAction("analyze")}
+                  >
+                    Analyze Store
+                  </Button>
+                </Box>
+                
+                <Box
+                  padding="400"
+                  background={selectedAction === "report" ? "bg-fill-selected" : "bg-surface"}
+                  borderRadius="200"
+                  borderColor="border"
+                  borderWidth="025"
+                >
+                  <Button 
+                    icon={FileIcon}
+                    fullWidth
+                    onClick={() => setSelectedAction("report")}
+                  >
+                    Sales Report
+                  </Button>
+                </Box>
+              </InlineGrid>
             </BlockStack>
           </Card>
         </Layout.Section>
