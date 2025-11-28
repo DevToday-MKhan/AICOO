@@ -1,7 +1,7 @@
 import type { AppLoadContext, EntryContext } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
-import { renderToReadableStream } from "react-dom/server";
+import { renderToString } from "react-dom/server";
 
 const ABORT_DELAY = 5000;
 
@@ -12,37 +12,14 @@ export default async function handleRequest(
   remixContext: EntryContext,
   loadContext: AppLoadContext
 ) {
-  const prohibitOutOfOrderStreaming =
-    isBotRequest(request.headers.get("user-agent")) || remixContext.isSpaMode;
-
-  const body = await renderToReadableStream(
-    <RemixServer context={remixContext} url={request.url} />,
-    {
-      signal: prohibitOutOfOrderStreaming
-        ? null
-        : AbortSignal.timeout(ABORT_DELAY),
-      onError(error: unknown) {
-        console.error(error);
-        responseStatusCode = 500;
-      },
-    }
+  let markup = renderToString(
+    <RemixServer context={remixContext} url={request.url} />
   );
 
-  if (prohibitOutOfOrderStreaming) {
-    await body.allReady;
-  }
-
   responseHeaders.set("Content-Type", "text/html");
-  return new Response(body, {
+
+  return new Response("<!DOCTYPE html>" + markup, {
     headers: responseHeaders,
     status: responseStatusCode,
   });
-}
-
-function isBotRequest(userAgent: string | null) {
-  if (!userAgent) {
-    return false;
-  }
-
-  return isbot(userAgent);
 }
