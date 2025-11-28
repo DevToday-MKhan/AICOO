@@ -24,7 +24,7 @@ import {
   FileIcon,
   OrderIcon,
   CashDollarIcon,
-  CustomerIcon,
+  PersonIcon,
   ProductIcon,
 } from "@shopify/polaris-icons";
 import { useState } from "react";
@@ -131,7 +131,7 @@ export default function Dashboard() {
                     background="bg-fill-brand"
                     borderRadius="200"
                   >
-                    <Icon source={CustomerIcon} tone="emphasis" />
+                    <Icon source={PersonIcon} tone="emphasis" />
                   </Box>
                 </InlineStack>
                 <ProgressBar progress={0} tone="primary" size="small" />
