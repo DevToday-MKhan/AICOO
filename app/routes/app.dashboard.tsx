@@ -33,7 +33,10 @@ export default function Dashboard() {
   const { title } = useLoaderData<typeof loader>();
 
   return (
-    <Page title={title}>
+    <Page 
+      title={title}
+      subtitle="Your AI-powered business control center"
+    >
       <Layout>
         {/* Summary Metrics - 4 Column Grid */}
         <Layout.Section>
