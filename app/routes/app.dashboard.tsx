@@ -27,7 +27,16 @@ import {
   PersonIcon,
   ProductIcon,
 } from "@shopify/polaris-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import createApp from "@shopify/app-bridge";
+
+declare global {
+  interface Window {
+    ENV: {
+      SHOPIFY_API_KEY: string;
+    };
+  }
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate.admin(request);
@@ -41,8 +50,21 @@ export default function Dashboard() {
   const { title } = useLoaderData<typeof loader>();
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
+  const host = new URLSearchParams(window.location.search).get("host");
+
+  useEffect(() => {
+    if (!host) return;
+    const app = createApp({
+      apiKey: window.ENV.SHOPIFY_API_KEY,
+      host,
+      forceRedirect: false,
+    });
+    app.dispatch({ type: "APP::IFRAME::RESIZE" });
+  }, [host]);
+
   return (
-    <Page 
+    <div id="dashboard-root">
+      <Page 
       title={title}
       subtitle="Your AI-powered business control center"
     >
@@ -480,5 +502,6 @@ export default function Dashboard() {
         </Layout.Section>
       </Layout>
     </Page>
+    </div>
   );
 }
