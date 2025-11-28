@@ -47,6 +47,62 @@ export default function Dashboard() {
       subtitle="Your AI-powered business control center"
     >
       <Layout>
+        {/* Hero Header Section - Fills empty space */}
+        <Layout.Section>
+          <Box
+            padding="600"
+            background="bg-surface-secondary"
+            borderRadius="300"
+          >
+            <InlineStack align="space-between" blockAlign="center">
+              <BlockStack gap="200">
+                <InlineStack gap="200" blockAlign="center">
+                  <Text variant="headingLg" as="h2">AI-COO Status</Text>
+                  <Badge tone="success">ONLINE</Badge>
+                </InlineStack>
+
+                <Text variant="bodyMd" tone="subdued">
+                  Your store systems are synced and running. AI-COO is monitoring performance, routing, and insights.
+                </Text>
+              </BlockStack>
+
+              <InlineStack gap="300" blockAlign="center">
+                <Button variant="primary" size="slim">
+                  Sync Now
+                </Button>
+              </InlineStack>
+            </InlineStack>
+
+            <Box paddingBlockStart="400">
+              <Divider />
+            </Box>
+
+            <Box paddingBlockStart="400">
+              <InlineGrid columns={4} gap="400">
+                <BlockStack gap="100">
+                  <Text tone="subdued" variant="bodySm">AI Activity</Text>
+                  <Text variant="bodyLg" fontWeight="bold">Active</Text>
+                </BlockStack>
+
+                <BlockStack gap="100">
+                  <Text tone="subdued" variant="bodySm">Last Sync</Text>
+                  <Text variant="bodyLg" fontWeight="bold">Just now</Text>
+                </BlockStack>
+
+                <BlockStack gap="100">
+                  <Text tone="subdued" variant="bodySm">System Health</Text>
+                  <Badge tone="success">Optimal</Badge>
+                </BlockStack>
+
+                <BlockStack gap="100">
+                  <Text tone="subdued" variant="bodySm">Automations Today</Text>
+                  <Text variant="bodyLg" fontWeight="bold">0 actions</Text>
+                </BlockStack>
+              </InlineGrid>
+            </Box>
+          </Box>
+        </Layout.Section>
+
         {/* Welcome Banner */}
         <Layout.Section>
           <Banner
